@@ -35,3 +35,10 @@ yang dimasukkan guru di tab *Kode hasil*, dan kelompok disusun di halaman guru.
 ## Akun uji coba
 
 Di halaman pilih nama ada tombol **Akun uji coba (guru)** (butuh PIN guru). Akun ini tidak masuk statistik dan kelompok siswa asli, selalu mulai dari awal, dan punya tombol **Lompat ke…** untuk mencoba tiap tahap. Atur ulang dari halaman guru → Pantau.
+
+## Alur di kelas
+
+1. **Penjelasan** (guru) dan **Pengantar** (siswa): animasi yang sama. Guru menyeret angka ke mesin, siswa cukup mengetuk. Tiap adegan punya tombol *Ulangi animasi* dan pilihan kecepatan 1×/2×/3×.
+2. **Tes awal** lima soal, hasil dikirim ke guru atau ditunjukkan sebagai kode 5 karakter.
+3. **Kelompok** terkunci sampai guru menekan *Buka kelompok untuk siswa* di tab Kelompok.
+4. **Tahap lanjutan** berurutan, dibuka guru lewat tab *Tahap 2*: Kartu pakar, Tebak fungsinya (diskusi kelompok), Cocokkan grafik, Tiket keluar dan refleksi. Siswa menutup dengan Kartu Penghargaan; guru melihat peringkat di *Panggung Kelas*.

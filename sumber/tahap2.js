@@ -1,158 +1,262 @@
-/* Tahap lanjutan: pakar berpasangan — kartu pakar, saling menjelaskan, mencocokkan masalah dengan grafik, tiket keluar. */
+/* Tahap lanjutan: pakar berpasangan. Langkah berurutan, dibuka guru:
+   1 Kartu pakar · 2 Tebak fungsinya (diskusi kelompok) · 3 Cocokkan grafik · 4 Tiket keluar + refleksi + Kartu Penghargaan */
 (function (root) {
   'use strict';
   const { el, ik, esc, anim } = UI, B = BS, K = GF.K, NAMA = UI.NAMA;
-  let E, tmrT = null;
+  let E, tmrCek = null;
   const T = () => E.P().t2;
-  const kirim = (data) => { if (E.net() === 'online') E.api('t2', { idx: E.idx(), t2: data, tahap: 'tahap2' }); };
-  const HURUF = ['A', 'B', 'C'];
-  const VAR = { poli: 2, trig: 0 };
-  const warnaFam = (f) => 'var(--f-' + f + ')';
+  const kirim = (d) => { if (E.net() === 'online') E.api('t2', { idx: E.idx(), t2: d, tahap: 'tahap2' }); };
+  const HURUF = ['A', 'B', 'C'], VAR = { poli: 2, trig: 0 }, warnaFam = (f) => 'var(--f-' + f + ')';
+  const WARNA9 = ['poli', 'eksp', 'log', 'trig', 'rasional', 'akar', 'mutlak', 'tangga', 'sepotong'];
+  const inisial = (n) => { const k = String(n).split(/\s+/).filter((x) => /^[A-Za-z]/.test(x)); if (!k.length) return '?'; return (k[0][0] + (k.length > 1 ? k[k.length - 1][0] : '')).toUpperCase(); };
+  const num = (v) => { if (typeof v === 'number') return v; const s = String(v); return parseFloat(s.indexOf(',') >= 0 ? s.replace(/\./g, '').replace(',', '.') : s.replace(/\./g, '')); };
+  const F = (n) => String(n).replace('-', '−');
+  const adaFam = (f, arr) => (arr || []).indexOf(f) >= 0;
 
-  /* grafik tanpa angka sumbu (hanya bentuk) untuk pilihan */
+  /* ---------- poin & sinkron ke guru ---------- */
+  function hitung() { const t = T(); return B.hitungPoin({ kartu: t.kartu, fam: t.fam, diskusi: t.dis, cocok: t.cocok, tiket: t.tiket, tamat: t.tamat }); }
+  function sinkron(extra) { const t = T(), p = hitung(); t.poin = p.poin; t.lencana = p.lencana; E.simpan(); kirim(Object.assign({ poin: p.poin, lencana: p.lencana }, extra || {})); return p; }
+
+  /* ---------- grafik bantu ---------- */
   function miniGrafik(fam, berwarna) {
     const v = K[fam].varian[VAR[fam] || 0], b = GF.bidang(Object.assign({ W: 480, H: 340 }, v.spec, { xt: [], yt: [] })); if (v.tegak) v.tegak.forEach((x) => b.tegak(x, berwarna ? warnaFam(fam) : '#9B5DE5'));
     b.kurva(v.garis(), { warna: berwarna ? warnaFam(fam) : '#6D35E8', tebal: 6 }); (v.titik || []).forEach((p) => { b.lapis.titik.append(GF.S('circle', { cx: b.sx(p.x), cy: b.sy(p.y), r: 8, fill: p.t === 'kosong' ? '#fff' : (berwarna ? warnaFam(fam) : '#6D35E8'), stroke: berwarna ? warnaFam(fam) : '#6D35E8', 'stroke-width': 3.4 })); }); return b.svg;
   }
+  /* titik-titik data masalah sehari-hari digambar pada bidang Kartesius */
+  function plotData(s) {
+    const xs = s.baris.map((r) => num(r[0])), ys = s.baris.map((r) => num(r[1]));
+    const rentang = (a) => { let lo = Math.min.apply(null, a), hi = Math.max.apply(null, a); const r = (hi - lo) || 1; lo = (lo >= 0 && lo <= 0.4 * hi) ? 0 : lo - 0.14 * r; return [lo, hi + 0.14 * r]; };
+    const [x0, x1] = rentang(xs), [y0, y1] = rentang(ys);
+    const b = GF.bidang({ W: 460, H: 330, xmin: x0, xmax: x1, ymin: y0, ymax: y1, xt: xs, yt: ys, labelX: s.x, labelY: s.y, label: 'Titik data ' + s.judul });
+    b.lapis.kurva.append(GF.S('polyline', { points: xs.map((x, i) => b.sx(x).toFixed(1) + ',' + b.sy(ys[i]).toFixed(1)).join(' '), fill: 'none', stroke: '#B8B2E0', 'stroke-width': 3, 'stroke-dasharray': '2 9', 'stroke-linecap': 'round' }));
+    xs.forEach((x, i) => b.titik(x, ys[i], { teks: false, r: 9, warna: '#6D35E8' })); return b.svg;
+  }
+  const tabelData = (s) => '<table class="tabel-mini"><thead><tr><th>' + esc(s.x) + '</th><th>' + esc(s.y) + '</th></tr></thead><tbody>' + s.baris.map((r) => '<tr><td>' + r[0] + '</td><td>' + r[1] + '</td></tr>').join('') + '</tbody></table>';
+
+  /* ---------- kerangka layar: kepala, isi, navigasi ---------- */
+  function kerangka(eyebrow, judul, o) {
+    o = o || {}; const w = el('div', { kelas: 't2-bingkai' }), kep = el('div', { kelas: 't2-kepala' }), isi = el('div', { kelas: 't2-isi' }), nav = el('div', { kelas: 't2-nav' });
+    const kiri = el('div', null, el('div', { kelas: 'eyebrow' }, eyebrow), el('h2', { gaya: 'margin:0' }, judul)), kanan = el('div', { kelas: 'baris' });
+    if (o.titik) kanan.append(el('div', { kelas: 't2-titik' }, o.titik.map((s, i) => el('button', { type: 'button', 'aria-label': 'Nomor ' + (i + 1), kelas: 'dt' + (s === 'now' ? ' now' : '') + (s === 'isi' ? ' isi' : ''), onclick: o.ke ? () => o.ke(i) : null }, String(i + 1)))));
+    if (o.pusat !== false) kanan.append(el('button', { kelas: 'btn sekunder kecil', type: 'button', html: ik('kembali', 'kecil') + 'Ke pusat', onclick: hub }));
+    kep.append(kiri, kanan); w.append(kep, isi, nav); return { w, isi, nav };
+  }
+  const tombol = (t, ikon, o) => el('button', Object.assign({ kelas: 'btn ' + ((o && o.kelas) || ''), type: 'button', html: (o && o.kiri ? ik(ikon, 'kecil') + t : t + (ikon ? ik(ikon, 'kecil') : '')) }, o && o.p ? o.p : {}));
 
   /* ============================================================ penentuan pasangan */
   async function tentukan() {
-    const t = T(); if (t.pas != null && t.fam) return;
+    const t = T(); if (t.pas != null && t.fam && t.fam.length) return;
     const r = await E.api('kelompok', { idx: E.idx() });
-    if (r.ok && r.kelompok) { const g = r.kelompok[r.saya], pos = g.findIndex((s) => s.idx === E.idx()), bp = B.bagianPasangan(Math.max(0, pos), g.length); t.pas = bp.pasangan; t.fam = bp.keluarga; t.mitra = g.filter((s, i) => Math.min(bp.jumlahPasangan - 1, Math.floor(i / 2)) === bp.pasangan && s.idx !== E.idx()).map((s) => s.nama); t.grup = r.saya + 1; }
-    else await pilihPasangan();
+    if (r.ok && r.kelompok && r.kelompok[r.saya]) {
+      const g = r.kelompok[r.saya], pos = Math.max(0, g.findIndex((s) => s.idx === E.idx())), bp = B.bagianPasangan(pos, g.length);
+      t.pas = bp.pasangan; t.fam = bp.keluarga.length ? bp.keluarga : B.SET[bp.pasangan % 3].slice(); t.pos = pos; t.grup = r.saya + 1;
+      if (E.idx() === B.DUMMY && g.length < 2) { t.pas = 0; t.fam = B.SET[0].slice(); t.pos = 0; t.mitra = ['Teman Contoh']; E.simpan(); kirim({ pasangan: t.pas }); return; }
+      t.mitra = g.filter((s, i) => Math.min(bp.jumlahPasangan - 1, Math.floor(i / 2)) === bp.pasangan && s.idx !== E.idx()).map((s) => s.nama);
+    } else { await pilihPasangan(); }
     E.simpan(); kirim({ pasangan: t.pas });
   }
   async function pilihPasangan() {
-    const v = await UI.dialog({ judul: 'Kamu di pasangan mana?', ikon: ik('kelompok', 'besar'), isi: '<div class="tengah"><p>Kelompok berenam dibagi 3 pasangan: <b>A</b> (1–2), <b>B</b> (3–4), <b>C</b> (5–6) menurut urutan nama di daftar kelompok. Tanyakan gurumu bila belum jelas.</p></div>', tombol: [0, 1, 2].map((i) => ({ t: 'Pasangan ' + HURUF[i], nilai: i })) });
-    const t = T(); t.pas = v == null ? 0 : v; t.fam = B.SET[t.pas].slice(); t.mitra = t.mitra || []; E.simpan();
+    const v = await UI.dialog({ judul: 'Kamu di pasangan mana?', ikon: ik('kelompok', 'besar'), isi: '<div class="tengah"><p>Kelompok berenam dibagi 3 pasangan: <b>A</b> (urutan 1–2), <b>B</b> (3–4), <b>C</b> (5–6) menurut daftar kelompok di layar guru.</p></div>', tombol: [0, 1, 2].map((i) => ({ t: 'Pasangan ' + HURUF[i], nilai: i })) });
+    const t = T(); t.pas = v == null ? 0 : v; t.fam = B.SET[t.pas].slice(); t.mitra = t.mitra || []; t.pos = t.pas * 2; t.grup = t.grup || null; E.simpan();
+  }
+  async function sapaPasangan() {
+    const t = T(), aku = B.nama(E.idx()), av = (n, tag) => '<div class="av-kol"><span class="av-besar fx-' + WARNA9[(n.length + (tag ? 1 : 3)) % 9] + '">' + esc(inisial(n)) + '</span><b>' + esc(n.split(/\s+/).slice(0, 2).join(' ')) + '</b>' + (tag ? '<span class="muted kecil">kamu</span>' : '') + '</div>';
+    const teman = t.mitra && t.mitra.length;
+    const isi = '<div class="tengah"><p style="font-size:1.35rem;margin:.1rem 0 .4rem">' + (teman ? 'Pasangan belajarmu adalah <b>' + t.mitra.map(esc).join(' dan ') + '</b>.' : 'Kamu belajar sendiri untuk bagian ini. Kamu boleh bertanya kepada teman sekelompokmu.') + '</p>'
+      + '<div class="baris" style="justify-content:center;gap:1.4rem;margin:.6rem 0">' + av(aku, true) + (teman ? '<span class="plus-p">+</span>' + t.mitra.map((m) => av(m, false)).join('') : '') + '</div>'
+      + '<div class="eyebrow" style="justify-content:center;margin-top:.8rem">Tugas ' + (teman ? 'kalian' : 'kamu') + ': jadi pakar untuk</div><div class="baris" style="justify-content:center;flex-wrap:wrap;gap:.5rem;margin-top:.3rem">' + t.fam.map((f) => '<span class="chip fx-' + f + '" style="background:var(--tt);color:var(--td);font-size:1.05rem">' + UI.ubin(f) + NAMA[f] + '</span>').join('') + '</div>'
+      + '<p class="muted" style="margin:.8rem 0 0">Pasangan ini tidak diubah, supaya semua kelompok punya pakar untuk sembilan jenis grafik.</p></div>';
+    await UI.dialog({ judul: 'Selamat!', ikon: ik('bintang', 'besar'), isi, lebar: true, tombol: [{ t: 'Mulai belajar', nilai: true, ikon: 'panah' }] });
+    E.konfeti(innerWidth / 2, innerHeight / 3, 50);
   }
 
   /* ============================================================ pusat */
+  const status = () => { const t = T(); return [t.fam.every((f) => t.kartu[f]), !!t.dis.selesai, !!t.cocok.selesai, !!t.tamat]; };
+  function terbuka(k, sel) { if (E.idx() === B.DUMMY) return true; if (E.net() === 'online') return k <= (T().buka || 1); return k === 1 || sel[k - 2]; }
   async function hub() {
-    E.bawahKosong(); E.gambarAtas(); clearInterval(tmrT); await tentukan(); const t = T(), fam = t.fam;
-    const sel = { kartu: fam.every((f) => t.kartu[f]), jelas: !!t.jelasSelesai, cocok: !!t.cocok.selesai, tiket: !!t.tiket.selesai };
-    const w = el('div', { kelas: 't2-hub' });
-    const kiri = el('div', { kelas: 'kartu t2-kiri' }); kiri.innerHTML = '<div class="eyebrow">Tahap berikutnya</div><h2 style="margin-bottom:.2rem">Pakar Grafik</h2><p class="muted">Kamu dan pasanganmu menjadi pakar untuk beberapa jenis grafik, lalu saling menjelaskan di kelompok.</p>'
-      + '<div class="eyebrow" style="margin-top:.4rem">Pasanganmu</div><div class="baris" style="flex-wrap:wrap"><span class="chip" style="font-size:1rem">Pasangan ' + HURUF[t.pas] + '</span>' + (t.grup ? '<span class="chip abu">Kelompok ' + t.grup + '</span>' : '') + '</div><div class="muted kecil" style="margin:.3rem 0">Bersama: <b>' + esc((t.mitra && t.mitra.length ? t.mitra.join(', ') : 'teman sebangku')) + '</b></div>'
-      + '<div class="eyebrow" style="margin-top:.4rem">Jenis grafik yang kamu kuasai</div><div class="fam-chips">' + fam.map((f) => '<span class="chip fx-' + f + '" style="background:var(--tt);color:var(--td);font-size:.95rem">' + (t.kartu[f] ? ik('centang', 'kecil') : '') + NAMA[f] + '</span>').join('') + '</div>';
-    kiri.append(el('button', { kelas: 'btn sekunder kecil', type: 'button', gaya: 'margin-top:auto;align-self:flex-start', html: ik('ulang', 'kecil') + 'Ubah pasangan', onclick: async () => { await pilihPasangan(); hub(); } }));
-    const kanan = el('div', { kelas: 't2-langkah' });
-    const L = [['1', 'Kartu pakar', 'Pelajari rumus, bentuk grafik, dan contoh kehidupan. Jawab satu soal tiap kartu.', sel.kartu, kartuPakar, false], ['2', 'Jelaskan ke kelompok', 'Bergantian menjelaskan kartumu ke pasangan lain, dan menyimak penjelasan mereka.', sel.jelas, jelaskan, false], ['3', 'Cocokkan masalah', '5 masalah sehari-hari: pilih grafik yang paling cocok.', sel.cocok, cocok, false], ['4', 'Tiket keluar', '3 soal singkat dan refleksi. Kerjakan sendiri.', sel.tiket, tiket, !sel.cocok]];
-    L.forEach(([no, j, d, ok, fn, kunci]) => kanan.append(el('div', { kelas: 'kartu t2-kartu' + (ok ? ' selesai' : '') + (kunci ? ' terkunci' : '') }, el('div', { kelas: 'baris' }, el('span', { kelas: 'no-bulat' }, ok ? ik('centang', 'kecil') : no), el('h3', { gaya: 'margin:0' }, j), ok ? el('span', { kelas: 'chip ok', gaya: 'margin-left:auto' }, 'selesai') : (kunci ? el('span', { kelas: 'chip abu', gaya: 'margin-left:auto', html: ik('kunci', 'kecil') + 'selesaikan langkah 3' }) : null)), el('p', { kelas: 'muted', gaya: 'margin:.3rem 0 .6rem' }, d), el('button', { kelas: 'btn' + (ok ? ' sekunder' : ''), type: 'button', gaya: 'margin-top:auto', disabled: kunci, html: (ok ? 'Buka lagi' : 'Mulai') + ik('panah'), onclick: fn }))));
-    w.append(kiri, kanan);
-    if (sel.kartu && sel.jelas && sel.cocok && sel.tiket) { const b = el('button', { kelas: 'btn hijau besar denyut', type: 'button', gaya: 'position:absolute;right:0;bottom:0', html: ik('bintang') + 'Lihat ringkasan akhir', onclick: tamat }); w.append(b); }
-    E.layar(w);
+    E.bawahKosong(); E.gambarAtas(); await tentukan(); const t = T(); if (!t.sapa) { await sapaPasangan(); t.sapa = true; E.simpan(); }
+    mulaiCek(); render();
+  }
+  function render() {
+    const t = T(), sel = status(), selesai = sel.filter(Boolean).length, p = hitung(), fam = t.fam; const w = el('div', { kelas: 't2-hub' });
+    /* sisi kiri */
+    const sisi = el('aside', { kelas: 'kartu t2-sisi' }), tim = [B.nama(E.idx())].concat(t.mitra || []);
+    sisi.append(el('div', { kelas: 'eyebrow' }, 'Pakar Grafik' + (t.grup ? ' · Kelompok ' + t.grup : '')));
+    sisi.append(el('div', { kelas: 't2-tim', html: tim.map((n, i) => '<div class="av-kol kecil"><span class="av-besar kecil fx-' + WARNA9[(n.length + i * 4) % 9] + '">' + esc(inisial(n)) + '</span><span>' + esc(n.split(/\s+/)[0]) + (i === 0 ? ' <span class="muted kecil">(kamu)</span>' : '') + '</span></div>').join('') }));
+    const R = 34, C = 2 * Math.PI * R;
+    sisi.append(el('div', { kelas: 't2-kemajuan', html: '<svg viewBox="0 0 80 80" class="cincin"><circle cx="40" cy="40" r="' + R + '" fill="none" stroke="#E4D9FC" stroke-width="8"/><circle cx="40" cy="40" r="' + R + '" fill="none" stroke="#6D35E8" stroke-width="8" stroke-linecap="round" stroke-dasharray="' + (C * selesai / 4).toFixed(1) + ' ' + C.toFixed(1) + '" transform="rotate(-90 40 40)"/><text x="40" y="47" text-anchor="middle" font-size="22" font-weight="700" font-family="Bricolage,sans-serif" fill="#1E1B4B">' + selesai + '/4</text></svg><div><b style="font-size:1.1rem">Kemajuanmu</b><div class="muted kecil">' + selesai + ' dari 4 langkah selesai</div><span class="chip sorot" style="margin-top:.3rem">' + ik('bintang', 'kecil') + p.poin + ' poin</span></div>' }));
+    sisi.append(el('div', { kelas: 'eyebrow', gaya: 'margin-top:.2rem' }, 'Pakar untuk'), el('div', { kelas: 't2-fam', html: fam.map((f) => '<div class="t2-fam-baris fx-' + f + '">' + UI.ubin(f) + '<b>' + NAMA[f] + '</b>' + (t.kartu[f] ? '<span class="ok-bulat">' + ik('centang', 'kecil') + '</span>' : '') + '</div>').join('') }));
+    sisi.append(el('button', { kelas: 'btn ' + (t.tamat ? 'hijau denyut-h' : 'sekunder') + ' t2-ringkas', type: 'button', disabled: !t.tamat, html: ik(t.tamat ? 'bintang' : 'gembok', 'kecil') + 'Lihat ringkasan akhir', onclick: tamat }));
+    /* sisi kanan */
+    const kanan = el('section', { kelas: 't2-utama' }); kanan.append(el('div', { kelas: 't2-judul' }, el('div', null, el('div', { kelas: 'eyebrow' }, 'Tahap lanjutan'), el('h2', { gaya: 'margin:0' }, 'Perjalanan belajarmu')), el('div', { kelas: 'muted', gaya: 'max-width:21rem;text-align:right' }, 'Kerjakan berurutan. Langkah berikutnya dibuka guru saat sudah waktunya.')));
+    const L = [
+      [1, 'Kartu pakar', 'buku', 'Pelajari rumus, bentuk grafik, dan contoh nyata. Lalu uji dengan soal cerita.', fam.filter((f) => t.kartu[f]).length + ' dari ' + fam.length + ' kartu', kartuPakar, 'poli', fam.length, fam.filter((f) => t.kartu[f]).length],
+      [2, 'Tebak fungsinya', 'kelompok', 'Diskusi bersama kelompok: kejadian sehari-hari ini grafiknya jenis apa?', ((t.dis.rnd || []).filter((r) => r && r.selesai).length) + ' dari 6 tebakan', diskusi, 'trig', 6, (t.dis.rnd || []).filter((r) => r && r.selesai).length],
+      [3, 'Cocokkan grafik', 'mata', 'Lihat data lima masalah nyata, lalu tentukan nama fungsinya.', t.cocok.jawab.filter((v) => v != null).length + ' dari 5 masalah', cocok, 'eksp', 5, t.cocok.jawab.filter((v) => v != null).length],
+      [4, 'Tiket keluar', 'pensil', 'Tiga soal singkat, lalu refleksi. Kerjakan sendiri.', (t.tiket.jawab || []).filter((v) => v != null).length + ' dari 3 soal', tiket, 'sepotong', 3, (t.tiket.jawab || []).filter((v) => v != null).length]
+    ];
+    const grid = el('div', { kelas: 't2-langkah' });
+    L.forEach(([no, j, ikon, d, meta, fn, warna, tot, isi]) => {
+      const ok = sel[no - 1], buka = terbuka(no, sel), kelas = ok ? 'selesai' : (buka ? 'siap' : 'terkunci');
+      const kartu = el('div', { kelas: 'kartu t2-kartu fx-' + warna + ' ' + kelas });
+      kartu.append(el('div', { kelas: 'baris' }, el('span', { kelas: 'no-bulat', html: ok ? ik('centang', 'kecil') : (buka ? String(no) : ik('gembok', 'kecil')) }), el('h3', { gaya: 'margin:0' }, j), el('span', { kelas: 'chip ' + (ok ? 'ok' : (buka ? 'sorot' : 'abu')), gaya: 'margin-left:auto', html: ok ? 'selesai' : (buka ? 'terbuka' : ik('gembok', 'kecil') + 'menunggu guru') })),
+        el('p', { kelas: 'muted', gaya: 'margin:.5rem 0 .3rem' }, d), el('div', { kelas: 't2-meta' }, meta), el('div', { kelas: 't2-prog' }, Array.from({ length: tot }, (_, i) => el('span', { kelas: 'pt' + (i < isi ? ' on' : '') }))));
+      kartu.append(el('button', { kelas: 'btn t2-tbl' + (ok ? ' sekunder' : (buka ? ' denyut' : '')), type: 'button', disabled: !buka, html: !buka ? ik('gembok', 'kecil') + 'Menunggu aba-aba guru' : (ok ? 'Buka lagi' : (meta.charAt(0) === '0' ? 'Mulai' : 'Lanjutkan')) + ik('panah', 'kecil'), onclick: () => fn() })); grid.append(kartu);
+    });
+    kanan.append(grid); w.append(sisi, kanan); E.layar(w);
+  }
+  function mulaiCek() {
+    clearInterval(tmrCek); if (E.idx() === B.DUMMY) return;
+    const f = async () => { if (E.net() !== 'online') return; const r = await E.api('t2s'); if (!(r && r.ok && r.buka)) return; const t = T(), lama = t.buka || 1; if (r.buka === lama) return; t.buka = r.buka; E.simpan(); if (r.buka > lama) UI.toast('Guru membuka langkah ' + r.buka, 'bintang'); if (document.querySelector('.t2-hub')) render(); };
+    f(); tmrCek = setInterval(f, 5000);
   }
 
   /* ============================================================ langkah 1: kartu pakar */
   function isiKartu(f, o) {
-    o = o || {}; const d = K[f], kolom = el('div', { kelas: 'isi fx-' + f, gaya: 'flex:1;min-height:0' }), kiri = el('div', { kelas: 'kotak-grafik' }), wad = el('div', { kelas: 'wadah' }); kiri.append(wad);
+    const d = K[f], kolom = el('div', { kelas: 'isi fx-' + f, gaya: 'flex:1;min-height:0' }), kiri = el('div', { kelas: 'kotak-grafik' }), wad = el('div', { kelas: 'wadah' }); kiri.append(wad);
     const kanan = el('div', { kelas: 'info gulir' }), rk = el('div', { kelas: 'rumus-kartu' }), sv = el('div', { kelas: 'seg-varian' });
-    kanan.append(el('div', { kelas: 'baris' }, el('div', { html: UI.ubin(f) }).firstChild, el('h3', { gaya: 'margin:0;font-size:1.6rem;color:var(--td)' }, NAMA[f])), rk); if (d.varian.length > 1) kanan.append(sv);
-    kanan.append(el('div', null, el('div', { kelas: 'eyebrow' }, 'Ciri grafik'), el('ul', { gaya: 'margin:.2rem 0;padding-left:1.2rem' }, d.ciri.map((x) => el('li', null, x)))), el('div', null, el('div', { kelas: 'eyebrow' }, 'Contoh dalam kehidupan'), el('ul', { gaya: 'margin:.2rem 0;padding-left:1.2rem' }, d.konteks.map((x) => el('li', null, x)))));
-    const gambar = (v) => { wad.innerHTML = ''; const r = GF.gambarVarian(d.varian[v], 'var(--t)'); wad.append(r.b.svg); rk.innerHTML = '<div class="eyebrow" style="margin:0">Contoh fungsi · ' + esc(d.varian[v].nama) + '</div><div class="mat" style="font-size:' + (d.varian[v].rumus.length > 18 ? '1.35rem' : '2.1rem') + '">' + esc(d.varian[v].rumus) + '</div>'; GF.gambarKurva(r.kurva, 1200).then(() => r.b.svg.querySelectorAll('.tk').forEach((c) => c.setAttribute('opacity', 1))).catch(() => {}); };
+    kanan.append(el('div', { kelas: 'baris' }, el('div', { html: UI.ubin(f) }).firstChild, el('h3', { gaya: 'margin:0;font-size:1.6rem;color:var(--td)' }, NAMA[f])), el('div', { kelas: 'baris', gaya: 'flex-wrap:wrap;gap:.35rem' }, el('span', { kelas: 'muted kecil' }, 'Nama lain:'), d.alias.map((x) => el('span', { kelas: 'chip abu' }, x))), rk); if (d.varian.length > 1) kanan.append(sv);
+    kanan.append(el('div', null, el('div', { kelas: 'eyebrow' }, 'Ciri grafik'), el('ul', null, d.ciri.map((x) => el('li', null, x)))), el('div', null, el('div', { kelas: 'eyebrow' }, 'Contoh dalam kehidupan'), el('ul', null, d.konteks.map((x) => el('li', null, x)))));
+    const gambar = (v) => { wad.innerHTML = ''; const r = GF.gambarVarian(d.varian[v], 'var(--t)'); wad.append(r.b.svg); rk.innerHTML = '<div class="eyebrow" style="margin:0">Contoh fungsi · ' + esc(d.varian[v].nama) + '</div><div class="mat" style="font-size:' + ((d.varian[v].panjang || d.varian[v].rumus.replace(/<[^>]+>/g, '').length > 24) ? '1.4rem' : '2.1rem') + '">' + d.varian[v].rumus + '</div>'; GF.gambarKurva(r.kurva, 1200).then(() => r.b.svg.querySelectorAll('.tk').forEach((c) => c.setAttribute('opacity', 1))).catch(() => {}); };
     if (d.varian.length > 1) d.varian.forEach((v, k) => sv.append(el('button', { type: 'button', kelas: k === 0 ? 'aktif' : '', onclick: (e) => { [...sv.children].forEach((x) => x.classList.remove('aktif')); e.currentTarget.classList.add('aktif'); gambar(k); } }, v.nama.split('·')[0].trim())));
     gambar(0); kolom.append(kiri, kanan); return { kolom, kanan };
   }
   function kartuPakar() {
-    E.bawahKosong(); const t = T(), fam = t.fam; let aktif = 0; const w = el('div', { kelas: 'kartu-wrap' }); E.layar(w);
+    E.bawahKosong(); const t = T(), fam = t.fam; let aktif = Math.max(0, fam.findIndex((f) => !t.kartu[f])); const w = el('div', { kelas: 't2-bingkai' }); E.layar(w);
     function gambar() {
-      w.innerHTML = ''; const daftar = el('div', { kelas: 'daftar gulir' }), f = fam[aktif], isi = el('div', { gaya: 'min-height:0;display:flex;flex-direction:column;gap:.5rem' });
+      w.innerHTML = ''; const f = fam[aktif], sel = fam.every((x) => t.kartu[x]);
+      const kep = el('div', { kelas: 't2-kepala' }, el('div', null, el('div', { kelas: 'eyebrow' }, 'Langkah 1 · ' + fam.filter((x) => t.kartu[x]).length + ' dari ' + fam.length + ' kartu selesai'), el('h2', { gaya: 'margin:0' }, 'Kartu pakar')), el('div', { kelas: 'baris' }, sel ? el('button', { kelas: 'btn hijau denyut-h', type: 'button', html: 'Semua kartu selesai' + ik('panah', 'kecil'), onclick: hub }) : null, el('button', { kelas: 'btn sekunder kecil', type: 'button', html: ik('kembali', 'kecil') + 'Ke pusat', onclick: hub })));
+      const daftar = el('div', { kelas: 'daftar gulir' }), isi = el('div', { gaya: 'min-height:0;display:flex;flex-direction:column;gap:.5rem' });
       fam.forEach((x, i) => daftar.append(el('button', { kelas: 'tab fx-' + x + (i === aktif ? ' aktif' : '') + (t.kartu[x] ? ' lihat' : ''), type: 'button', html: UI.ubin(x) + '<span>' + NAMA[x] + '</span>' + ik('centang', 'kecil').replace('class="ik kecil"', 'class="ik kecil centang"'), onclick: () => { aktif = i; gambar(); } })));
-      daftar.append(el('button', { kelas: 'btn sekunder kecil', type: 'button', gaya: 'margin-top:auto', html: ik('kembali', 'kecil') + 'Ke pusat', onclick: hub }));
       const { kolom, kanan } = isiKartu(f);
-      kanan.append(el('div', { kelas: 'baris', gaya: 'margin-top:auto;justify-content:space-between' }, el('span', { kelas: 'chip ' + (t.kartu[f] ? 'ok' : 'abu') }, t.kartu[f] ? 'Sudah kamu kuasai' : 'Belum diuji'), el('button', { kelas: 'btn hijau', type: 'button', html: ik('ujian') + (t.kartu[f] ? 'Coba soal lagi' : 'Uji pemahaman'), onclick: () => uji(f) })));
-      isi.append(kolom); w.append(el('div', { kelas: 'galeri', gaya: 'position:absolute;inset:0' }, daftar, isi));
+      kanan.append(el('div', { kelas: 'uji-kotak' }, el('div', null, el('b', null, t.kartu[f] ? 'Kartu ini sudah kamu kuasai' : 'Siap menguji dirimu?'), el('div', { kelas: 'muted kecil' }, 'Satu soal cerita sehari-hari tentang ' + NAMA[f] + '.')), el('button', { kelas: 'btn hijau ' + (t.kartu[f] ? '' : 'denyut-h'), type: 'button', html: ik('ujian') + (t.kartu[f] ? 'Coba lagi' : 'Uji sekarang'), onclick: () => uji(f) })));
+      isi.append(kolom); w.append(kep, el('div', { kelas: 'galeri t2-galeri' }, daftar, isi));
     }
     async function uji(f) {
-      const q = B.TANTANGAN[f], v = await UI.keypadAngka({ judul: 'Uji pemahaman · ' + NAMA[f], tanya: q.tanya, ikon: ik('ujian', 'besar') }); if (v == null) return;
+      const q = B.TANTANGAN[f], v = await UI.keypadAngka({ judul: 'Soal cerita · ' + NAMA[f], tanya: q.tanya, ikon: ik('ujian', 'besar') }); if (v == null) return;
       t.coba = t.coba || {}; t.coba[f] = (t.coba[f] || 0) + 1;
-      if (v === q.kunci) { t.kartu[f] = 1; E.simpan(); kirim({ kartu: Object.keys(t.kartu) }); await UI.info('Tepat!', '<div class="tengah"><p style="font-size:1.3rem">' + esc(q.jelas) + '</p></div>', 'Lanjut', { ikon: ik('centang', 'besar') }); E.konfeti(innerWidth / 2, innerHeight / 3, 30); if (fam.every((x) => t.kartu[x])) { await UI.info('Semua kartu selesai', '<div class="tengah"><p style="font-size:1.25rem">Kamu sudah menguasai semua kartumu. Saatnya menjelaskan ke teman.</p></div>', 'Kembali ke pusat'); return hub(); } gambar(); }
-      else if (t.coba[f] >= 2) { t.kartu[f] = 2; E.simpan(); kirim({ kartu: Object.keys(t.kartu) }); await UI.info('Ini jawabannya', '<div class="tengah"><p style="font-size:1.3rem">' + esc(q.jelas) + '</p><p class="muted">Tidak apa-apa. Tanyakan pasanganmu bila masih bingung.</p></div>', 'Mengerti', { ikon: ik('info', 'besar') }); gambar(); }
-      else { const lagi = await UI.dialog({ judul: 'Belum tepat', ikon: ik('info', 'besar'), isi: '<div class="tengah"><p style="font-size:1.25rem">Jawabanmu <b>' + String(v).replace('-', '−') + '</b> belum tepat.</p><p class="muted">Petunjuk: ganti <i>x</i> dengan angka yang diminta, lalu hitung pelan-pelan.</p></div>', tombol: [{ t: 'Tutup', nilai: false, kelas: 'sekunder' }, { t: 'Coba lagi', nilai: true }] }); if (lagi) uji(f); }
+      if (v === q.kunci) { t.kartu[f] = 1; sinkron({ kartu: Object.keys(t.kartu) }); E.konfeti(innerWidth / 2, innerHeight / 3, 34); await UI.info('Tepat!', '<div class="tengah"><p style="font-size:1.25rem">' + esc(q.jelas) + '</p></div>', 'Lanjut', { ikon: ik('centang', 'besar') }); if (fam.every((x) => t.kartu[x])) { await UI.info('Semua kartu selesai', '<div class="tengah"><p style="font-size:1.25rem">Kamu dan pasanganmu sudah menguasai kartu pakar. Tunggu aba-aba guru untuk langkah berikutnya.</p></div>', 'Kembali ke pusat'); return hub(); } aktif = Math.max(0, fam.findIndex((x) => !t.kartu[x])); gambar(); }
+      else if (t.coba[f] >= 2) { if (!t.kartu[f]) t.kartu[f] = 2; sinkron({ kartu: Object.keys(t.kartu) }); await UI.info('Ini jawabannya', '<div class="tengah"><p style="font-size:1.25rem">' + esc(q.jelas) + '</p><p class="muted">Tidak apa-apa. Tanyakan pasanganmu bila masih bingung.</p></div>', 'Mengerti', { ikon: ik('info', 'besar') }); gambar(); }
+      else { const lagi = await UI.dialog({ judul: 'Belum tepat', ikon: ik('info', 'besar'), isi: '<div class="tengah"><p style="font-size:1.25rem">Jawabanmu <b>' + F(v) + '</b> belum tepat.</p><p class="muted">Petunjuk: ganti peubah dengan angka yang diminta, lalu hitung pelan-pelan.</p></div>', tombol: [{ t: 'Tutup', nilai: false, kelas: 'sekunder' }, { t: 'Coba lagi', nilai: true }] }); if (lagi) uji(f); }
     }
     gambar();
   }
 
-  /* ============================================================ langkah 2: saling menjelaskan */
-  function jelaskan() {
-    E.bawahKosong(); const t = T(), fam = t.fam, lain = B.SET.flat().filter((f) => !fam.includes(f)); t.jelas = t.jelas || {}; t.paham = t.paham || {}; if (!t.timerMulai) { t.timerMulai = 0; }
-    const w = el('div', { kelas: 'jelas-wrap' }); E.layar(w);
-    const DUR = 600, timer = el('span', { kelas: 'chip sorot', gaya: 'font-size:1.1rem' });
-    const tick = () => { if (!t.timerMulai) { timer.innerHTML = ik('jam', 'kecil') + 'Pewaktu 10:00'; return; } const sisa = Math.max(0, DUR - Math.floor((Date.now() - t.timerMulai) / 1000)); timer.innerHTML = ik('jam', 'kecil') + String(Math.floor(sisa / 60)).padStart(2, '0') + ':' + String(sisa % 60).padStart(2, '0'); if (sisa <= 0) { clearInterval(tmrT); } };
+  /* ============================================================ langkah 2: tebak fungsinya (diskusi) */
+  const PERAN = [['Pembaca', 'Bacakan konteks dan tabel dengan kata-katamu sendiri.'], ['Penebak', 'Sebutkan tebakanmu dan satu alasan.'], ['Penyanggah', 'Setuju atau beri pandangan lain, lengkap dengan alasannya.'], ['Pencatat', 'Ketuk jawaban setelah kelompok sepakat.']];
+  function diskusi() {
+    E.bawahKosong(); const t = T(), soal = B.diskusiSiswa(t.grup || (E.idx() % 4) + 1), semua = B.SET.flat(); t.dis.rnd = t.dis.rnd || []; let no = Math.min(5, t.dis.rnd.filter((r) => r && r.selesai).length);
+    const w = el('div', { kelas: 't2-bingkai' }); E.layar(w);
     function gambar() {
-      w.innerHTML = ''; const siapSelesai = lain.every((f) => t.paham[f]) || (t.timerMulai && Date.now() - t.timerMulai >= DUR * 1000);
-      const kep = el('div', { kelas: 'baris', gaya: 'justify-content:space-between;margin-bottom:.5rem' }, el('div', null, el('div', { kelas: 'eyebrow' }, 'Langkah 2'), el('h2', { gaya: 'margin:0' }, 'Saling menjelaskan')), el('div', { kelas: 'baris' }, timer, el('button', { kelas: 'btn sekunder kecil', type: 'button', html: ik('main', 'kecil') + (t.timerMulai ? 'Ulang pewaktu' : 'Mulai pewaktu'), onclick: () => { t.timerMulai = Date.now(); E.simpan(); clearInterval(tmrT); tmrT = setInterval(tick, 1000); tick(); gambar(); } }), el('button', { kelas: 'btn sekunder kecil', type: 'button', html: ik('kembali', 'kecil') + 'Ke pusat', onclick: hub }), el('button', { kelas: 'btn hijau', type: 'button', disabled: !siapSelesai, html: ik('centang') + 'Selesai berbagi', onclick: () => { t.jelasSelesai = true; E.simpan(); hub(); } })));
-      const isi = el('div', { kelas: 'jelas-isi' }), kiri = el('div', { kelas: 'kartu jelas-kol gulir' }), kanan = el('div', { kelas: 'kartu jelas-kol gulir' });
-      kiri.append(el('h3', null, 'Giliranmu menjelaskan'), el('p', { kelas: 'muted kecil' }, 'Jelaskan kepada pasangan lain di kelompokmu. Centang bila sudah kamu sebutkan.'));
-      fam.forEach((f) => { const j = t.jelas[f] = t.jelas[f] || [false, false, false]; kiri.append(el('div', { kelas: 'fam-baris fx-' + f }, el('div', { kelas: 'baris' }, el('div', { html: UI.ubin(f) }).firstChild, el('b', { gaya: 'font-size:1.15rem;color:var(--td)' }, NAMA[f]), el('button', { kelas: 'btn sekunder kecil', type: 'button', gaya: 'margin-left:auto', html: ik('mata', 'kecil') + 'Lihat kartu', onclick: () => UI.dialog({ lebar: true, judul: NAMA[f], tutupX: true, tutupLuar: true, isi: isiKartu(f).kolom, tombol: [{ t: 'Tutup', nilai: true }] }) })), el('div', { kelas: 'baris', gaya: 'margin-top:.4rem;flex-wrap:wrap' }, ['Rumus', 'Bentuk grafik', 'Contoh kehidupan'].map((x, i) => el('button', { kelas: 'cek-chip' + (j[i] ? ' on' : ''), type: 'button', html: (j[i] ? ik('centang', 'kecil') : '') + x, onclick: () => { j[i] = !j[i]; E.simpan(); gambar(); } }))))); });
-      kanan.append(el('h3', null, 'Giliranmu menyimak'), el('p', { kelas: 'muted kecil' }, 'Setelah pasangan lain menjelaskan, tandai: apakah kamu sudah paham?'));
-      lain.forEach((f) => kanan.append(el('div', { kelas: 'fam-baris fx-' + f }, el('div', { kelas: 'baris' }, el('div', { html: UI.ubin(f) }).firstChild, el('b', { gaya: 'color:var(--td)' }, NAMA[f]), el('div', { kelas: 'baris', gaya: 'margin-left:auto' }, el('button', { kelas: 'pil-paham ya' + (t.paham[f] === 'ya' ? ' on' : ''), type: 'button', html: ik('centang', 'kecil') + 'Paham', onclick: () => { t.paham[f] = 'ya'; E.simpan(); kirim({ paham: { [f]: 'ya' } }); gambar(); } }), el('button', { kelas: 'pil-paham bingung' + (t.paham[f] === 'bingung' ? ' on' : ''), type: 'button', html: ik('info', 'kecil') + 'Masih bingung', onclick: () => { t.paham[f] = 'bingung'; E.simpan(); kirim({ paham: { [f]: 'bingung' } }); gambar(); } }))))));
-      isi.append(kiri, kanan); w.append(kep, isi);
+      w.innerHTML = ''; const s = soal[no], r = t.dis.rnd[no] = t.dis.rnd[no] || { coba: 0, selesai: false, ok: false }, peran = PERAN[(no + (t.pos || 0)) % 4];
+      const k = kerangka('Langkah 2 · putaran ' + (no + 1) + ' dari 6', 'Tebak fungsinya', { titik: soal.map((_, i) => (i === no ? 'now' : ((t.dis.rnd[i] && t.dis.rnd[i].selesai) ? 'isi' : ''))), ke: (i) => { if (i <= t.dis.rnd.filter((x) => x && x.selesai).length) { no = i; gambar(); } } });
+      const kiri = el('div', { kelas: 'kartu t2-konteks' }); kiri.innerHTML = '<div class="eyebrow">Kejadian sehari-hari</div><h3>' + esc(s.judul) + '</h3><p style="font-size:1.15rem;margin:.2rem 0 .4rem">' + esc(s.konteks) + '</p><div class="data-baris"><div>' + tabelData(s) + '</div><div class="plot-kecil"></div></div>'; kiri.querySelector('.plot-kecil').append(plotData(s));
+      const kanan = el('div', { kelas: 't2-diskusi' }); kanan.append(el('div', { kelas: 'peran' }, el('span', { kelas: 'chip sorot', html: ik('siswa', 'kecil') + 'Perananmu: ' + peran[0] }), el('span', { kelas: 'muted kecil' }, peran[1])), el('div', { kelas: 'umpan ok', gaya: 'align-items:flex-start;flex-direction:column;gap:.15rem' , html: '<b>Bicarakan dulu bersama kelompok</b>' + B.PROMPT.map((x, i) => '<span>' + (i + 1) + '. ' + esc(x) + '</span>').join('') }));
+      const gridF = el('div', { kelas: 'fam-pilih' }); semua.forEach((f) => gridF.append(el('button', { kelas: 'fam-tbl fx-' + f + (r.selesai ? (f === s.fam ? ' benar' : '') : '') + (r.salah === f && !r.selesai ? ' salah' : ''), type: 'button', disabled: r.selesai, html: UI.ubin(f) + '<span>' + NAMA[f] + '</span>', onclick: () => pilih(f) }))); kanan.append(el('div', { kelas: 'eyebrow', gaya: 'margin-top:.2rem' }, r.selesai ? 'Jawaban kelompok' : 'Menurut kelompokmu, ini fungsi apa?'), gridF);
+      k.isi.append(kiri, kanan); k.isi.classList.add('dua'); const sudah = t.dis.rnd.filter((x) => x && x.selesai).length;
+      k.nav.append(tombol('Sebelumnya', 'kembali', { kelas: 'sekunder', kiri: true, p: { disabled: no === 0, onclick: () => { no--; gambar(); } } }), el('span', { kelas: 'muted' }, r.selesai ? 'Tebakanmu sudah dikunci' : 'Tanpa batas waktu. Diskusikan sampai sepakat.'), no < 5 ? tombol('Berikutnya', 'panah', { p: { disabled: !r.selesai, onclick: () => { no++; gambar(); } } }) : tombol('Selesai diskusi', 'centang', { kelas: 'hijau', kiri: true, p: { disabled: sudah < 6, onclick: akhir } }));
+      w.append(k.w);
     }
-    gambar(); clearInterval(tmrT); tick(); if (t.timerMulai) tmrT = setInterval(tick, 1000);
+    async function pilih(f) {
+      const s = soal[no], r = t.dis.rnd[no]; r.salah = null;
+      if (f === s.fam) { r.selesai = true; r.ok = r.coba === 0; r.pilih = f; hitungDis(); E.simpan(); sinkron({ diskusi: { benar: t.dis.benar, total: 6 } }); if (r.ok) E.konfeti(innerWidth / 2, innerHeight / 3, 30); gambar(); await dialogFeedback(true, s, f, r.ok ? 'Tepat sekali!' : 'Tepat!'); }
+      else if (r.coba >= 1) { r.selesai = true; r.ok = false; r.pilih = s.fam; hitungDis(); E.simpan(); sinkron({ diskusi: { benar: t.dis.benar, total: 6 } }); gambar(); await dialogFeedback(false, s, f, 'Ini jawabannya'); }
+      else { r.coba++; r.salah = f; E.simpan(); gambar(); await UI.dialog({ judul: 'Belum cocok', ikon: ik('info', 'besar'), isi: '<div class="tengah"><p style="font-size:1.2rem">Bukan <b>' + NAMA[f] + '</b>. Diskusikan sekali lagi.</p><p class="muted">Perhatikan angkanya: apa yang terjadi pada y saat x bertambah? Naik terus, turun, berulang, atau melompat?</p></div>', tombol: [{ t: 'Coba lagi', nilai: true }] }); }
+    }
+    function hitungDis() { t.dis.benar = t.dis.rnd.filter((x) => x && x.ok).length; }
+    function dialogFeedback(ok, s, f, judul) {
+      const isi = el('div', { kelas: 'umpan-isi' }); isi.innerHTML = '<div class="umpan-g"></div><div><p style="font-size:1.25rem;margin:0 0 .4rem">Ini fungsi <b>' + NAMA[s.fam] + '</b>' + (ok ? '' : ', bukan ' + NAMA[f]) + '.</p><p style="margin:.2rem 0">' + esc(s.alasan) + '</p></div>'; isi.querySelector('.umpan-g').append(miniGrafik(s.fam, true));
+      return UI.dialog({ lebar: true, judul, ikon: ik(ok ? 'centang' : 'info', 'besar'), isi, tombol: [{ t: no < 5 ? 'Lanjut' : 'Tutup', nilai: true }] });
+    }
+    async function akhir() {
+      t.dis.selesai = true; hitungDis(); sinkron({ diskusi: { benar: t.dis.benar, total: 6 } }); E.konfeti(innerWidth / 2, innerHeight / 3, 50);
+      await UI.info('Diskusi selesai', '<div class="tengah"><p style="font-size:1.3rem"><b>' + t.dis.benar + ' dari 6</b> tebakan tepat pada percobaan pertama.</p><p class="muted">Tunggu aba-aba guru untuk langkah berikutnya.</p></div>', 'Kembali ke pusat', { ikon: ik('bintang', 'besar') }); hub();
+    }
+    gambar();
   }
 
-  /* ============================================================ langkah 3: cocokkan masalah dengan grafik */
-  function tabelSit(s) { return '<table class="tabel-mini"><thead><tr><th>' + esc(s.x) + '</th><th>' + esc(s.y) + '</th></tr></thead><tbody>' + s.baris.map((r) => '<tr><td>' + r[0] + '</td><td>' + r[1] + '</td></tr>').join('') + '</tbody></table>'; }
+  /* ============================================================ langkah 3 & soal tiket: cocokkan grafik */
   function kartuSoal(item, o) {
-    const s = B.SITUASI[item.situasi], w = el('div', { kelas: 'cocok-isi' }), kiri = el('div', { kelas: 'kartu cocok-sit' }), pil = el('div', { kelas: 'cocok-pilihan' });
-    kiri.innerHTML = '<div class="eyebrow">Masalah sehari-hari</div><h3>' + esc(s.judul) + '</h3><p style="font-size:1.2rem">' + esc(s.teks) + '</p>' + tabelSit(s) + '<p class="muted kecil" style="margin:.4rem 0 0">Grafik mana yang bentuknya paling cocok?</p>';
-    item.opsi.forEach((f, k) => { const tombol = el('button', { kelas: 'opsi-grafik' + (o.jawab != null ? (k === item.kunci ? ' benar' : (k === o.jawab ? ' salah' : '')) : ''), type: 'button', disabled: o.jawab != null, onclick: () => o.pilih(k) }, el('span', { kelas: 'hrf' }, 'ABC'[k]), miniGrafik(f, o.jawab != null), o.jawab != null ? el('span', { kelas: 'nm-fam' }, NAMA[f]) : null); pil.append(tombol); });
+    const s = B.SITUASI[item.situasi], w = el('div', { kelas: 'cocok-isi' }), kiri = el('div', { kelas: 'kartu cocok-sit gulir' }), pil = el('div', { kelas: 'cocok-nama' });
+    kiri.innerHTML = '<div class="eyebrow">Masalah sehari-hari</div><h3>' + esc(s.judul) + '</h3><p style="font-size:1.12rem;margin:.1rem 0 .3rem">' + esc(s.teks) + '</p><div class="data-baris"><div>' + tabelData(s) + '</div><div class="plot-kecil"></div></div>'; kiri.querySelector('.plot-kecil').append(plotData(s));
+    pil.append(el('div', { kelas: 'eyebrow' }, 'Data di atas cocok dengan fungsi…'));
+    item.opsi.forEach((f, k) => { const st = o.reveal ? (k === item.kunci ? ' benar' : (k === o.jawab ? ' salah' : '')) : (k === o.jawab ? ' dipilih' : ''); pil.append(el('button', { kelas: 'opsi-nama fx-' + f + st, type: 'button', disabled: !!o.reveal, onclick: () => o.pilih(k), html: '<span class="hrf">' + 'ABC'[k] + '</span><span class="nm"><b>' + NAMA[f] + '</b><span class="muted kecil">' + K[f].alias.slice(0, 2).join(' · ') + '</span></span>' + (st.indexOf('benar') >= 0 ? ik('centang') : (st.indexOf('salah') >= 0 ? ik('silang') : '')) })); });
     w.append(kiri, pil); return w;
   }
+  function umpanCocok(item, k) {
+    const s = B.SITUASI[item.situasi], ok = k === item.kunci, f = item.fam, pilihF = item.opsi[k], isi = el('div', { kelas: 'umpan-isi' });
+    isi.innerHTML = '<div class="umpan-g"></div><div><p style="font-size:1.25rem;margin:0 0 .3rem">Ini fungsi <b>' + NAMA[f] + '</b>' + (ok ? '' : ', bukan ' + NAMA[pilihF]) + '.</p><p style="margin:.2rem 0"><b>Mengapa?</b> ' + esc(s.alasan) + '</p>' + (ok ? '' : '<p class="muted" style="margin:.3rem 0">Ciri <b>' + NAMA[pilihF] + '</b>: ' + esc(K[pilihF].ciri[0]) + ' Data di atas tidak seperti itu.</p>') + '</div>'; isi.querySelector('.umpan-g').append(miniGrafik(f, true)); return isi;
+  }
   function cocok() {
-    E.bawahKosong(); const t = T(), soal = B.cocokSiswa(E.idx()); let no = Math.min(t.cocok.jawab.length, 4); const w = el('div', { kelas: 'cocok-wrap' }); E.layar(w);
+    E.bawahKosong(); const t = T(), soal = B.cocokSiswa(E.idx()); let no = Math.min(4, t.cocok.jawab.filter((v) => v != null).length); const w = el('div', { kelas: 't2-bingkai' }); E.layar(w);
     function gambar() {
-      w.innerHTML = ''; const selesai = t.cocok.jawab.length >= 5;
-      if (selesai && t.cocok.tampilHasil !== false) return hasil();
-      const item = soal[no], terjawab = t.cocok.jawab[no];
-      w.append(el('div', { kelas: 'baris', gaya: 'justify-content:space-between;margin-bottom:.5rem' }, el('div', null, el('div', { kelas: 'eyebrow' }, 'Langkah 3 · masalah ' + (no + 1) + ' dari 5'), el('h2', { gaya: 'margin:0' }, 'Cocokkan dengan grafik')), el('div', { kelas: 'baris' }, el('div', { kelas: 'nomor-grid', gaya: 'grid-template-columns:repeat(5,2.6rem)' }, soal.map((_, i) => el('button', { kelas: 'no' + (i === no ? ' aktif' : '') + (t.cocok.jawab[i] != null ? ' isi' : ''), type: 'button', onclick: () => { no = i; gambar(); } }, i + 1))), el('button', { kelas: 'btn sekunder kecil', type: 'button', html: ik('kembali', 'kecil') + 'Ke pusat', onclick: hub }))));
-      w.append(kartuSoal(item, { jawab: terjawab, pilih: async (k) => { t.cocok.jawab[no] = k; E.simpan(); const ok = k === item.kunci; await UI.dialog({ judul: ok ? 'Tepat!' : 'Belum tepat', ikon: ik(ok ? 'centang' : 'silang', 'besar'), isi: '<div class="tengah"><p style="font-size:1.3rem">Ini fungsi <b>' + NAMA[item.fam] + '</b>.</p><p>' + esc(K[item.fam].ciri[0]) + '</p></div>', tombol: [{ t: no < 4 && t.cocok.jawab.length < 5 ? 'Berikutnya' : 'Lihat hasil', nilai: true }] }); if (ok) E.konfeti(innerWidth / 2, innerHeight / 3, 24); const sisa = soal.findIndex((_, i) => t.cocok.jawab[i] == null); if (sisa < 0) { t.cocok.benar = soal.filter((s, i) => t.cocok.jawab[i] === s.kunci).length; t.cocok.selesai = true; E.simpan(); kirim({ cocok: { benar: t.cocok.benar } }); t.cocok.tampilHasil = true; hasil(); } else { no = sisa; gambar(); } } }));
+      if (t.cocok.selesai && t.cocok.tampilHasil !== false && no > 4) return hasil();
+      w.innerHTML = ''; const item = soal[no], jwb = t.cocok.jawab[no], terjawab = jwb != null;
+      const k = kerangka('Langkah 3 · masalah ' + (no + 1) + ' dari 5', 'Cocokkan grafik', { titik: soal.map((_, i) => (i === no ? 'now' : (t.cocok.jawab[i] != null ? 'isi' : ''))), ke: (i) => { no = i; gambar(); } });
+      k.isi.append(kartuSoal(item, { jawab: jwb, reveal: terjawab, pilih: async (p) => { t.cocok.jawab[no] = p; t.cocok.benar = soal.filter((s, i) => t.cocok.jawab[i] === s.kunci).length; if (t.cocok.jawab.filter((v) => v != null).length >= 5) t.cocok.selesai = true; sinkron({ cocok: { benar: t.cocok.benar } }); const ok = p === item.kunci; gambar(); if (ok) E.konfeti(innerWidth / 2, innerHeight / 3, 26); await UI.dialog({ lebar: true, judul: ok ? 'Tepat!' : 'Belum tepat', ikon: ik(ok ? 'centang' : 'info', 'besar'), isi: umpanCocok(item, p), tombol: [{ t: t.cocok.selesai && no === 4 ? 'Lihat hasil' : 'Lanjut', nilai: true }] }); if (t.cocok.selesai && no === 4) { t.cocok.tampilHasil = true; no = 5; return hasil(); } if (no < 4) { no++; gambar(); } } }));
+      k.nav.append(tombol('Sebelumnya', 'kembali', { kelas: 'sekunder', kiri: true, p: { disabled: no === 0, onclick: () => { no--; gambar(); } } }), el('span', { kelas: 'muted' }, terjawab ? 'Sudah dijawab' : 'Pilih satu jawaban'), no < 4 ? tombol('Berikutnya', 'panah', { p: { disabled: !terjawab, onclick: () => { no++; gambar(); } } }) : tombol('Lihat hasil', 'centang', { kelas: 'hijau', kiri: true, p: { disabled: !t.cocok.selesai, onclick: () => { no = 5; hasil(); } } }));
+      w.append(k.w);
     }
     function hasil() {
       w.innerHTML = ''; const b = soal.filter((s, i) => t.cocok.jawab[i] === s.kunci).length;
-      const k = el('div', { kelas: 'tengah-isi kartu', gaya: 'padding:2rem 3rem' }); k.innerHTML = '<div class="eyebrow" style="justify-content:center">Langkah 3 selesai</div><h2>' + b + ' dari 5 masalah tepat</h2><div class="baris" style="justify-content:center;flex-wrap:wrap">' + soal.map((s, i) => '<span class="chip ' + (t.cocok.jawab[i] === s.kunci ? 'ok' : 'warn') + '">' + (i + 1) + '. ' + esc(B.SITUASI[s.situasi].judul) + ' · ' + NAMA[s.fam] + '</span>').join('') + '</div><p class="muted">Yang belum tepat tidak apa-apa. Kamu bisa membahasnya bersama kelompok.</p>';
-      k.append(el('div', { kelas: 'baris', gaya: 'justify-content:center' }, el('button', { kelas: 'btn sekunder', type: 'button', html: ik('ulang') + 'Lihat lagi', onclick: () => { t.cocok.tampilHasil = false; no = 0; gambar(); } }), el('button', { kelas: 'btn', type: 'button', html: 'Ke pusat' + ik('panah'), onclick: hub })));
-      w.append(k);
+      const k = el('div', { kelas: 'tengah-isi kartu', gaya: 'padding:2rem 3rem;margin:auto' }); k.innerHTML = '<div class="eyebrow" style="justify-content:center">Langkah 3 selesai</div><h2>' + b + ' dari 5 masalah tepat</h2><div class="baris" style="justify-content:center;flex-wrap:wrap">' + soal.map((s, i) => '<span class="chip ' + (t.cocok.jawab[i] === s.kunci ? 'ok' : 'warn') + '">' + (i + 1) + '. ' + esc(B.SITUASI[s.situasi].judul) + ' · ' + NAMA[s.fam] + '</span>').join('') + '</div><p class="muted">Yang belum tepat tidak apa-apa. Bahas bersama kelompokmu.</p>';
+      k.append(el('div', { kelas: 'baris', gaya: 'justify-content:center' }, el('button', { kelas: 'btn sekunder', type: 'button', html: ik('ulang') + 'Lihat lagi', onclick: () => { no = 0; gambar(); } }), el('button', { kelas: 'btn', type: 'button', html: 'Ke pusat' + ik('panah'), onclick: hub }))); w.append(k); E.konfeti(innerWidth / 2, innerHeight * .3, 40);
     }
     gambar();
   }
 
   /* ============================================================ langkah 4: tiket keluar + refleksi */
   function tiket() {
-    E.bawahKosong(); const t = T(), idx = E.idx(), soal = B.tiketSiswa(idx), tk = t.tiket; tk.jawab = tk.jawab || [null, null, null]; let no = 0; const w = el('div', { kelas: 'cocok-wrap' }); E.layar(w);
+    E.bawahKosong(); const t = T(), idx = E.idx(), soal = B.tiketSiswa(idx), tk = t.tiket; tk.jawab = tk.jawab || [null, null, null]; if (tk.selesai) return refleksi(); let no = 0; const w = el('div', { kelas: 't2-bingkai' }); E.layar(w);
     const terisi = () => tk.jawab.filter((v) => v != null).length;
     function gambar() {
-      if (tk.selesai && !tk.ref) { return; } w.innerHTML = ''; const q = soal[no], j = tk.jawab[no];
-      w.append(el('div', { kelas: 'baris', gaya: 'justify-content:space-between;margin-bottom:.5rem' }, el('div', null, el('div', { kelas: 'eyebrow' }, 'Tiket keluar · soal ' + (no + 1) + ' dari 3'), el('h2', { gaya: 'margin:0' }, 'Kerjakan sendiri')), el('div', { kelas: 'baris' }, el('div', { kelas: 'nomor-grid', gaya: 'grid-template-columns:repeat(3,2.6rem)' }, soal.map((_, i) => el('button', { kelas: 'no' + (i === no ? ' aktif' : '') + (tk.jawab[i] != null ? ' isi' : ''), type: 'button', onclick: () => { no = i; gambar(); } }, i + 1))), el('button', { kelas: 'btn sekunder kecil', type: 'button', html: ik('kembali', 'kecil') + 'Ke pusat', onclick: hub }), el('button', { kelas: 'btn hijau', type: 'button', disabled: terisi() < 3, html: ik('kirim') + 'Kumpulkan tiket', onclick: kumpul }))));
-      if (q.jenis === 'hitung') { const k = el('div', { kelas: 'kartu tengah-isi', gaya: 'padding:2rem 3rem;max-width:44rem' }); k.innerHTML = '<div class="teks-soal" style="font-size:2.2rem">' + q.tanya + '</div><div class="layar-angka' + (j == null ? ' kosong' : '') + '" style="min-width:10rem">' + (j == null ? '…' : String(j).replace('-', '−')) + '</div>'; k.append(el('button', { kelas: 'btn besar', type: 'button', html: ik('pensil') + 'Isi jawaban', onclick: async () => { const v = await UI.keypadAngka({ judul: 'Jawabanmu', tanya: q.tanya }); if (v != null) { tk.jawab[no] = v; E.simpan(); gambar(); } } })); w.append(k); }
-      else if (q.jenis === 'nama') { const k = el('div', { kelas: 'cocok-isi' }), kiri = el('div', { kelas: 'kartu cocok-sit' }); kiri.append(el('div', { kelas: 'eyebrow' }, 'Perhatikan grafik'), el('div', { gaya: 'height:15rem' }, miniGrafik(q.fam, false)), el('p', { kelas: 'teks-soal', gaya: 'font-size:1.3rem;margin-top:.6rem' }, q.tanya)); const op = el('div', { kelas: 'opsi-wrap', gaya: 'grid-template-columns:1fr;align-content:center' }); q.opsi.forEach((f, i) => op.append(el('button', { kelas: 'opsi' + (j === i ? ' pilih' : ''), type: 'button', html: '<span class="huruf">' + 'ABCD'[i] + '</span><span>' + NAMA[f] + '</span>', onclick: () => { tk.jawab[no] = i; E.simpan(); gambar(); } }))); k.append(kiri, op); w.append(k); }
-      else { w.append(kartuSoal(q, { jawab: null, pilih: (k) => { tk.jawab[no] = k; E.simpan(); gambar(); } })); if (j != null) { const pl = w.querySelectorAll('.opsi-grafik'); pl[j] && pl[j].classList.add('dipilih'); } }
-      const sel = w.querySelectorAll('.opsi-grafik'); if (j != null && sel[j]) sel[j].classList.add('dipilih');
+      w.innerHTML = ''; const q = soal[no], j = tk.jawab[no];
+      const k = kerangka('Tiket keluar · soal ' + (no + 1) + ' dari 3', 'Kerjakan sendiri', { titik: soal.map((_, i) => (i === no ? 'now' : (tk.jawab[i] != null ? 'isi' : ''))), ke: (i) => { no = i; gambar(); } });
+      if (q.jenis === 'hitung') { const c = el('div', { kelas: 'kartu tengah-isi', gaya: 'padding:2rem 3rem;max-width:44rem;margin:auto' }); c.innerHTML = '<div class="teks-soal" style="font-size:2.1rem">' + q.tanya + '</div><div class="layar-angka' + (j == null ? ' kosong' : '') + '" style="min-width:10rem">' + (j == null ? '…' : F(j)) + '</div>'; c.append(el('button', { kelas: 'btn besar', type: 'button', html: ik('pensil') + (j == null ? 'Isi jawaban' : 'Ubah jawaban'), onclick: async () => { const v = await UI.keypadAngka({ judul: 'Jawabanmu', tanya: q.tanya }); if (v != null) { tk.jawab[no] = v; E.simpan(); gambar(); } } })); k.isi.append(c); }
+      else if (q.jenis === 'nama') { const c = el('div', { kelas: 'cocok-isi' }), kiri = el('div', { kelas: 'kartu cocok-sit gulir' }); kiri.append(el('div', { kelas: 'eyebrow' }, 'Perhatikan grafik'), el('div', { gaya: 'height:15rem' }, miniGrafik(q.fam, false)), el('p', { kelas: 'teks-soal', gaya: 'font-size:1.3rem;margin-top:.6rem' }, q.tanya)); const op = el('div', { kelas: 'cocok-nama' }); q.opsi.forEach((f, i) => op.append(el('button', { kelas: 'opsi-nama fx-' + f + (j === i ? ' dipilih' : ''), type: 'button', html: '<span class="hrf">' + 'ABCD'[i] + '</span><span class="nm"><b>' + NAMA[f] + '</b></span>', onclick: () => { tk.jawab[no] = i; E.simpan(); gambar(); } }))); c.append(kiri, op); k.isi.append(c); }
+      else { k.isi.append(kartuSoal(q, { jawab: j, reveal: false, pilih: (p) => { tk.jawab[no] = p; E.simpan(); gambar(); } })); }
+      k.nav.append(tombol('Sebelumnya', 'kembali', { kelas: 'sekunder', kiri: true, p: { disabled: no === 0, onclick: () => { no--; gambar(); } } }), el('span', { kelas: 'muted' }, terisi() + ' dari 3 soal terjawab'), no < 2 ? tombol('Berikutnya', 'panah', { p: { onclick: () => { no++; gambar(); } } }) : tombol('Kumpulkan tiket', 'kirim', { kelas: 'hijau', kiri: true, p: { disabled: terisi() < 3, onclick: kumpul } }));
+      w.append(k.w);
     }
     async function kumpul() {
       const ya = await UI.konfirmasi('Kumpulkan tiket?', '<div class="tengah"><p style="font-size:1.25rem">Semua soal sudah terjawab.</p><p class="muted">Setelah dikumpulkan, jawaban tidak bisa diubah.</p></div>', 'Ya, kumpulkan', 'Periksa lagi'); if (!ya) return;
-      const ok = soal.map((q, i) => (q.jenis === 'hitung' ? tk.jawab[i] === q.kunci : tk.jawab[i] === q.kunci)); tk.skor = ok.filter(Boolean).length; tk.selesai = true; tk.ok = ok; E.simpan(); kirim({ tiket: { skor: tk.skor } });
-      await UI.dialog({ lebar: true, judul: 'Hasil tiket: ' + tk.skor + ' dari 3', ikon: ik(tk.skor >= 2 ? 'centang' : 'info', 'besar'), isi: soal.map((q, i) => '<div class="umpan ' + (ok[i] ? 'ok' : 'hint') + '" style="margin:.4rem 0;align-items:flex-start">' + ik(ok[i] ? 'centang' : 'info') + '<span><b>Soal ' + (i + 1) + ':</b> ' + (q.jenis === 'cocok' ? 'Masalah “' + esc(B.SITUASI[q.situasi].judul) + '”: fungsi ' + NAMA[q.fam] + '.' : esc(q.jelas)) + '</span></div>').join(''), tombol: [{ t: 'Lanjut ke refleksi', nilai: true }] });
+      const ok = soal.map((q, i) => tk.jawab[i] === q.kunci); tk.skor = ok.filter(Boolean).length; tk.selesai = true; tk.ok = ok; sinkron({ tiket: { skor: tk.skor } });
+      await UI.dialog({ lebar: true, judul: 'Hasil tiket: ' + tk.skor + ' dari 3', ikon: ik(tk.skor >= 2 ? 'centang' : 'info', 'besar'), isi: soal.map((q, i) => '<div class="umpan ' + (ok[i] ? 'ok' : 'hint') + '" style="margin:.4rem 0;align-items:flex-start">' + ik(ok[i] ? 'centang' : 'info') + '<span><b>Soal ' + (i + 1) + ':</b> ' + (q.jenis === 'cocok' ? 'Masalah “' + esc(B.SITUASI[q.situasi].judul) + '”: fungsi ' + NAMA[q.fam] + '. ' + esc(B.SITUASI[q.situasi].alasan) : q.jelas) + '</span></div>').join(''), tombol: [{ t: 'Lanjut ke refleksi', nilai: true }] });
       refleksi();
-    }
-    if (tk.selesai) return refleksi(); gambar();
-  }
-  function refleksi() {
-    const t = T(); t.ref = t.ref || { mudah: null, bingung: null }; const w = el('div', { kelas: 'ref-wrap' }); E.layar(w);
-    function gambar() {
-      w.innerHTML = ''; const pil = (jenis) => el('div', { kelas: 'ref-grid' }, B.SET.flat().map((f) => el('button', { kelas: 'ref-pil fx-' + f + (t.ref[jenis] === f ? ' on' : ''), type: 'button', html: UI.ubin(f) + '<span>' + NAMA[f] + '</span>', onclick: () => { t.ref[jenis] = f; E.simpan(); gambar(); } })));
-      w.append(el('div', { kelas: 'baris', gaya: 'justify-content:space-between;margin-bottom:.4rem' }, el('div', null, el('div', { kelas: 'eyebrow' }, 'Refleksi'), el('h2', { gaya: 'margin:0' }, 'Bagaimana belajarmu hari ini?')), el('button', { kelas: 'btn hijau', type: 'button', disabled: !(t.ref.mudah && t.ref.bingung), html: ik('centang') + 'Selesai', onclick: () => { kirim({ ref: t.ref, selesai: true }); t.tamat = true; E.simpan(); tamat(); } })), el('div', { kelas: 'kartu', gaya: 'margin-bottom:.6rem' }, el('h3', null, 'Grafik yang paling mudah kupahami'), pil('mudah')), el('div', { kelas: 'kartu' }, el('h3', null, 'Grafik yang masih membuatku bingung'), pil('bingung')));
     }
     gambar();
   }
-  function tamat() {
-    E.bawahKosong(); const t = T(); const w = el('div', { kelas: 'tengah-isi kartu', gaya: 'padding:2.4rem 3.4rem' }); const b = B.cocokSiswa(E.idx()).filter((s, i) => t.cocok.jawab[i] === s.kunci).length;
-    w.innerHTML = '<span class="ubin fx-akar" style="width:5.5rem;height:5.5rem;margin:0 auto">' + ik('bintang') + '</span><h1 style="font-size:2.6rem">Kerja bagus, ' + esc(B.nama(E.idx()).split(' ')[0]) + '!</h1><div class="baris" style="justify-content:center;flex-wrap:wrap"><span class="chip ok" style="font-size:1.05rem">' + (t.fam || []).filter((f) => t.kartu[f]).length + ' kartu pakar</span><span class="chip ok" style="font-size:1.05rem">Cocokkan: ' + b + ' dari 5</span><span class="chip ok" style="font-size:1.05rem">Tiket: ' + (t.tiket.skor || 0) + ' dari 3</span></div><p class="muted" style="font-size:1.2rem;max-width:34rem">Hari ini kamu belajar menghitung nilai fungsi, menggambar grafiknya, dan mengenal 9 jenis grafik. Tugas kecil: temukan satu hal di sekitarmu yang grafiknya mirip salah satu dari 9 jenis ini.</p>';
-    w.append(el('button', { kelas: 'btn sekunder', type: 'button', html: ik('kembali') + 'Kembali ke pusat', onclick: hub })); E.layar(w, 'tengah-layar'); setTimeout(() => E.konfeti(innerWidth / 2, innerHeight * .3, 90), 400);
+  function refleksi() {
+    E.bawahKosong(); const t = T(); t.ref = t.ref || { kuasai: [], bingung: [] }; t.ref.kuasai = t.ref.kuasai || []; t.ref.bingung = t.ref.bingung || []; const w = el('div', { kelas: 't2-bingkai' }); E.layar(w);
+    function gambar() {
+      w.innerHTML = ''; const total = t.ref.kuasai.length + t.ref.bingung.length;
+      const k = kerangka('Refleksi', 'Bagaimana belajarmu hari ini?', { pusat: false });
+      const kartu = (judul, ket, jenis, lain) => { const c = el('div', { kelas: 'kartu ref-kartu' }), g = el('div', { kelas: 'ref-grid' }); c.append(el('h3', { gaya: 'margin:0' }, judul), el('div', { kelas: 'muted kecil', gaya: 'margin-bottom:.4rem' }, ket)); B.SET.flat().forEach((f) => { const on = adaFam(f, t.ref[jenis]), mati = adaFam(f, t.ref[lain]); g.append(el('button', { kelas: 'ref-pil fx-' + f + (on ? ' on' : '') + (mati ? ' mati' : ''), type: 'button', disabled: mati, title: mati ? 'Sudah kamu pilih di kotak lainnya' : '', html: UI.ubin(f) + '<span>' + NAMA[f] + '</span><span class="cek">' + ik('centang', 'kecil') + '</span>', onclick: () => { const a = t.ref[jenis], i = a.indexOf(f); if (i >= 0) a.splice(i, 1); else a.push(f); E.simpan(); gambar(); } })); }); c.append(g); return c; };
+      k.isi.append(el('div', { kelas: 'ref-dua' }, kartu('Grafik yang sudah kukuasai', 'Boleh pilih lebih dari satu.', 'kuasai', 'bingung'), kartu('Grafik yang masih membuatku bingung', 'Jenis yang sudah kamu kuasai tidak bisa dipilih di sini.', 'bingung', 'kuasai')));
+      k.nav.append(el('span', { kelas: 'muted' }, total + ' jenis grafik dipilih'), el('span'), tombol('Selesai dan lihat penghargaan', 'bintang', { kelas: 'hijau denyut-h', kiri: true, p: { disabled: total === 0, onclick: () => { t.tamat = true; sinkron({ kuasai: t.ref.kuasai, bingung: t.ref.bingung, selesai: true }); tamat(); } } }));
+      w.append(k.w);
+    }
+    gambar();
   }
 
-  root.Tahap2 = { mulai: (env) => { E = env; const P = E.P(); P.t2 = P.t2 || {}; const t = P.t2; t.kartu = t.kartu || {}; t.jelas = t.jelas || {}; t.paham = t.paham || {}; t.cocok = t.cocok || { jawab: [] }; t.cocok.jawab = t.cocok.jawab || []; t.tiket = t.tiket || {}; hub(); } };
+  /* ============================================================ penutup: kartu penghargaan */
+  function tamat() {
+    E.bawahKosong(); const t = T(), p = hitung(), b = B.cocokSiswa(E.idx()).filter((s, i) => t.cocok.jawab[i] === s.kunci).length;
+    const w = el('div', { kelas: 'penghargaan' }); const nama = B.nama(E.idx());
+    w.innerHTML = '<div class="kartu-hadiah"><div class="pita">Kartu Penghargaan</div><div class="eyebrow" style="justify-content:center">Matematika Tingkat Lanjut · Fungsi</div><h1 class="ph-nama">' + esc(nama) + '</h1><div class="gelar">' + esc(p.gelar) + '</div>'
+      + '<div class="poin-besar"><span id="angkaPoin">0</span><small>poin</small></div>'
+      + '<div class="lencana-baris">' + (p.lencana.length ? p.lencana.map((l) => '<span class="lencana">' + ik('bintang', 'kecil') + esc(l) + '</span>').join('') : '<span class="muted">Kumpulkan lencana dengan menyelesaikan langkah-langkahnya.</span>') + '</div>'
+      + '<div class="ph-stat"><div><b>' + (t.fam || []).filter((f) => t.kartu[f]).length + '/' + (t.fam || []).length + '</b><span>kartu pakar</span></div><div><b>' + ((t.dis && t.dis.benar) || 0) + '/6</b><span>tebakan tepat</span></div><div><b>' + b + '/5</b><span>cocokkan grafik</span></div><div><b>' + ((t.tiket && t.tiket.skor) || 0) + '/3</b><span>tiket keluar</span></div></div>'
+      + '<p class="muted ph-tugas">Tugas kecil: temukan satu hal di sekitarmu yang grafiknya mirip salah satu dari 9 jenis tadi.</p></div>';
+    w.append(el('button', { kelas: 'btn sekunder', type: 'button', gaya: 'align-self:center', html: ik('kembali') + 'Kembali ke pusat', onclick: hub }));
+    E.layar(w, 'tengah-layar');
+    const a = w.querySelector('#angkaPoin'), t0 = performance.now(), dur = 1600; const f = (now) => { const k = Math.min(1, (now - t0) / dur); a.textContent = Math.round(p.poin * (1 - Math.pow(1 - k, 3))); if (k < 1 && a.isConnected) requestAnimationFrame(f); }; requestAnimationFrame(f);
+    [300, 1100, 2000].forEach((ms) => setTimeout(() => { if (w.isConnected) E.konfeti(innerWidth * (0.25 + Math.random() * .5), innerHeight * .25, 70); }, ms));
+  }
+
+  root.Tahap2 = { mulai: (env) => {
+    E = env; const P = E.P(); P.t2 = P.t2 || {}; const t = P.t2; t.kartu = t.kartu || {}; t.dis = t.dis || { rnd: [] }; t.cocok = t.cocok || { jawab: [] }; t.cocok.jawab = t.cocok.jawab || []; t.tiket = t.tiket || {}; t.buka = t.buka || 1;
+    if (t.ref && !Array.isArray(t.ref.kuasai)) t.ref = { kuasai: [], bingung: [] };
+    hub();
+  } };
 })(window);

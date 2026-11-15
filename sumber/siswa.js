@@ -7,7 +7,7 @@
   let token = lsGet('token', null); if (!token) { token = Math.random().toString(36).slice(2) + Date.now().toString(36); lsSet('token', token); }
   let net = 'cek', idx = null, P = null, intro = null, tmr = null, ping = null;
   const warnaNama = ['poli', 'eksp', 'log', 'trig', 'rasional', 'akar', 'mutlak', 'tangga', 'sepotong'];
-  const inisial = (n) => { const k = n.split(/\s+/); return (k[0][0] + (k.length > 1 ? k[k.length - 1][0] : '')).toUpperCase(); };
+  const inisial = (n) => { const k = n.split(/\s+/).filter((x) => /^[A-Za-z]/.test(x)); if (!k.length) return '?'; return (k[0][0] + (k.length > 1 ? k[k.length - 1][0] : '')).toUpperCase(); };
 
   /* ---------------------------------------------------------------- jaringan */
   async function api(a, data) {
@@ -92,7 +92,7 @@
     kosongkanBawah(); gambarAtas(); const host = el('div', { gaya: 'position:absolute;inset:0' });
     if (P.intro === 0) { layar(host); await UI.dialog({ judul: 'Tunggu aba-aba dari guru', ikon: ik('jam', 'besar'), isi: '<div class="tengah"><p style="font-size:1.4rem">Jangan klik <b>Mulai</b> dulu.</p><p class="muted">Tunggu sampai gurumu mengatakan kita mulai bersama-sama.</p></div>', tombol: [{ t: 'Mulai pengantar', nilai: true, ikon: 'main' }] }); }
     else layar(host);
-    intro = Intro.mount(host, { mulai: P.intro, labelAkhir: 'Mulai tes awal', saatLangkah: (i) => { P.intro = i; simpan(); }, saatSelesai: () => { P.tahap = 'tes'; P.intro = 0; simpan(); sTes(); } });
+    intro = Intro.mount(host, { mulai: P.intro, played: P.played || [], saatMain: (a) => { P.played = a; simpan(); }, labelAkhir: 'Mulai tes awal', saatLangkah: (i) => { P.intro = i; simpan(); }, saatSelesai: () => { P.tahap = 'tes'; P.intro = 0; simpan(); sTes(); } });
   }
 
   /* ---------------------------------------------------------------- 5. tes awal */

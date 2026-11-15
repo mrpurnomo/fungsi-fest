@@ -33,7 +33,7 @@ const nama = (i) => (i === DUMMY ? 'Siswa Uji Coba (Guru)' : judulKata(DAFTAR[i]
     // 2. nilai fungsi kuadrat dengan x negatif
     { const k = rint(r, 2, 9), mm = rint(r, 2, 5), kunci = mm * mm - k;
       const o = ambilOpsi(kunci, [-(mm * mm) - k, mm * mm + k, -mm - k, 2 * mm - k, mm - k], mn);
-      S.push({ tanya: 'Diketahui fungsi <i>f</i>(<i>x</i>) = <i>x</i>² − ' + k + '. Nilai <i>f</i>(−' + mm + ') adalah …', opsi: o, kunci: mn(kunci), jelas: 'Ganti x dengan −' + mm + ': f(−' + mm + ') = (−' + mm + ')² − ' + k + ' = ' + mm * mm + ' − ' + k + ' = ' + kunci + '. Ingat: (−' + mm + ')² = ' + mm * mm + ' (bukan −' + mm * mm + ').' }); }
+      S.push({ tanya: 'Diketahui fungsi <i>f</i>(<i>x</i>) = <i>x</i><sup>2</sup> − ' + k + '. Nilai <i>f</i>(−' + mm + ') adalah …', opsi: o, kunci: mn(kunci), jelas: 'Ganti x dengan −' + mm + ': f(−' + mm + ') = (−' + mm + ')² − ' + k + ' = ' + mm * mm + ' − ' + k + ' = ' + kunci + '. Ingat: (−' + mm + ')² = ' + mm * mm + ' (bukan −' + mm * mm + ').' }); }
     // 3. titik koordinat pada grafik
     { const p = rint(r, 2, 5), q = [-5, -4, -3, -2, -1, 1, 2, 3, 4, 5][rint(r, 0, 9)], x = [-3, -2, -1, 1, 2, 3][rint(r, 0, 5)], y = p * x + q, P = (u, v) => '(' + mn(u) + ', ' + mn(v) + ')';
       const kand = [P(y, x), P(x, p * x - q), P(x, p + x + q), P(p * x, q), P(x, y + 2), P(x, y - 3), P(-x, y), P(x + 1, y)]; const kunci = P(x, y); const set = [kunci]; kand.forEach((v) => { if (!set.includes(v)) set.push(v); });
@@ -45,7 +45,7 @@ const nama = (i) => (i === DUMMY ? 'Siswa Uji Coba (Guru)' : judulKata(DAFTAR[i]
     // 5. bentuk grafik
     { const OP = ['garis lurus', 'melengkung seperti huruf U (parabola)', 'berulang seperti gelombang', 'berbentuk huruf V (patah)', 'berbentuk anak tangga'];
       if (r() < .5) { const a = rint(r, 2, 6), b = rint(r, 1, 7) * (r() < .5 ? -1 : 1); S.push({ tanya: 'Grafik fungsi <i>f</i>(<i>x</i>) = ' + fLin(a, b).replace('x', '<i>x</i>') + ' berbentuk …', opsi: OP.slice(), kunci: OP[0], jelas: 'Fungsi yang berbentuk ax + b disebut fungsi linear. Grafiknya garis lurus.' }); }
-      else { const k = rint(r, 1, 9); S.push({ tanya: 'Grafik fungsi <i>f</i>(<i>x</i>) = <i>x</i>² − ' + k + ' berbentuk …', opsi: OP.slice(), kunci: OP[1], jelas: 'Fungsi yang memuat x² disebut fungsi kuadrat. Grafiknya melengkung seperti huruf U (parabola).' }); } }
+      else { const k = rint(r, 1, 9); S.push({ tanya: 'Grafik fungsi <i>f</i>(<i>x</i>) = <i>x</i><sup>2</sup> − ' + k + ' berbentuk …', opsi: OP.slice(), kunci: OP[1], jelas: 'Fungsi yang memuat x² disebut fungsi kuadrat. Grafiknya melengkung seperti huruf U (parabola).' }); } }
     return S.map((s, i) => { const rr = mulberry(31 + idx * 101 + i * 17); const urut = (i === 3 || i === 4) ? acak(rr, s.opsi.map((_, k) => k)) : acak(rr, s.opsi.map((_, k) => k)); const opsi = urut.map((k) => s.opsi[k]); return { no: i + 1, tanya: s.tanya, opsi, kunci: opsi.indexOf(s.kunci), jelas: s.jelas }; });
   }
   function nilai(idx, jawab) { const so = soalSiswa(idx), hasil = so.map((s, i) => ({ no: i + 1, pilih: jawab[i] == null || jawab[i] === 5 ? null : jawab[i], benar: jawab[i] === s.kunci })); return { benar: hasil.filter((h) => h.benar).length, salah: hasil.filter((h) => !h.benar).length, hasil }; }
@@ -81,15 +81,15 @@ const nama = (i) => (i === DUMMY ? 'Siswa Uji Coba (Guru)' : judulKata(DAFTAR[i]
   /* pos = urutan siswa dalam kelompok (0..), n = jumlah anggota. Tiga himpunan keluarga dibagi ke semua pasangan. */
   function bagianPasangan(pos, n) { const k = Math.max(1, Math.ceil(n / 2)), pas = Math.min(k - 1, Math.floor(pos / 2)), fam = []; SET.forEach((h, j) => { if (j % k === pas) fam.push(...h); }); return { pasangan: pas, jumlahPasangan: k, keluarga: fam, huruf: 'ABC'[pas] }; }
   const TANTANGAN = {
-    poli: { tanya: 'Diketahui <i>f</i>(<i>x</i>) = <i>x</i>² − 4. Berapa <i>f</i>(−3)?', kunci: 5, jelas: 'f(−3) = (−3)² − 4 = 9 − 4 = 5.' },
-    eksp: { tanya: 'Diketahui <i>f</i>(<i>x</i>) = 2<sup><i>x</i></sup>. Berapa <i>f</i>(3)?', kunci: 8, jelas: 'f(3) = 2 × 2 × 2 = 8.' },
-    log: { tanya: 'Diketahui <i>f</i>(<i>x</i>) = log₂ <i>x</i>. Berapa <i>f</i>(8)?', kunci: 3, jelas: 'log₂ 8 menanyakan: 2 dipangkatkan berapa agar hasilnya 8? Jawabannya 3, karena 2³ = 8.' },
-    trig: { tanya: 'Diketahui <i>f</i>(<i>x</i>) = sin <i>x</i> (x dalam derajat). Berapa <i>f</i>(90)?', kunci: 1, jelas: 'sin 90° = 1. Itulah puncak gelombang sinus.' },
-    rasional: { tanya: 'Diketahui <i>f</i>(<i>x</i>) = 6 ÷ <i>x</i>. Berapa <i>f</i>(2)?', kunci: 3, jelas: 'f(2) = 6 ÷ 2 = 3.' },
-    akar: { tanya: 'Diketahui <i>f</i>(<i>x</i>) = √<i>x</i>. Berapa <i>f</i>(9)?', kunci: 3, jelas: '√9 = 3, karena 3 × 3 = 9.' },
-    mutlak: { tanya: 'Diketahui <i>f</i>(<i>x</i>) = |<i>x</i> − 2|. Berapa <i>f</i>(−1)?', kunci: 3, jelas: 'f(−1) = |−1 − 2| = |−3| = 3. Nilai mutlak selalu tidak negatif.' },
-    tangga: { tanya: 'Diketahui <i>f</i>(<i>x</i>) = pembulatan ke atas dari <i>x</i>. Berapa <i>f</i>(2,3)?', kunci: 3, jelas: 'Dibulatkan ke atas: 2,3 menjadi 3.' },
-    sepotong: { tanya: 'Diketahui <i>f</i>(<i>x</i>) = <i>x</i> untuk <i>x</i> ≤ 2, dan 2<i>x</i> − 2 untuk <i>x</i> > 2. Berapa <i>f</i>(4)?', kunci: 6, jelas: 'x = 4 lebih dari 2, jadi pakai potongan kedua: 2(4) − 2 = 6.' }
+    poli: { tanya: 'Karton dilipat menjadi kotak tanpa tutup. Volume kotak (cm³) adalah <i>V</i>(<i>x</i>) = <i>x</i>(12 − 2<i>x</i>)<sup>2</sup>, dengan <i>x</i> = tinggi lipatan (cm). Berapa volume kotak jika tinggi lipatannya 2 cm?', kunci: 128, jelas: 'Ganti x dengan 2: V(2) = 2 × (12 − 4)² = 2 × 8² = 2 × 64 = 128 cm³. Setelah dijabarkan, pangkat tertingginya 3, jadi ini fungsi polinomial (derajat 3): grafiknya mulus dan melengkung.' },
+    eksp: { tanya: 'Pengikut sebuah akun menjadi dua kali lipat setiap minggu: <i>P</i>(<i>t</i>) = 500 × 2<sup><i>t</i></sup>, dengan <i>t</i> = minggu ke-. Berapa pengikut pada minggu ke-3?', kunci: 4000, jelas: '2³ = 2 × 2 × 2 = 8, jadi P(3) = 500 × 8 = 4.000. Peubah t berada di pangkat. Itulah ciri fungsi eksponensial: naik makin lama makin cepat.' },
+    log: { tanya: 'Kepuasan pembeli donat dirumuskan <i>K</i>(<i>q</i>) = 10 × <sup>2</sup>log <i>q</i>, dengan <i>q</i> = isi kotak. Berapa kepuasan untuk kotak berisi 8 buah?', kunci: 30, jelas: '²log 8 menanyakan: 2 dipangkatkan berapa agar hasilnya 8? Jawabannya 3, karena 2³ = 8. Jadi K(8) = 10 × 3 = 30. Logaritma cocok untuk “makin banyak, tambahannya makin kecil”.' },
+    trig: { tanya: 'Tinggi gelombang di pantai (meter) adalah <i>h</i>(<i>x</i>) = 2 sin <i>x</i>, dengan <i>x</i> dalam derajat. Berapa tinggi gelombang saat <i>x</i> = 90?', kunci: 2, jelas: 'sin 90° = 1, jadi h = 2 × 1 = 2 meter. Sinus berayun naik turun dan berulang, cocok untuk gelombang dan pasang surut.' },
+    rasional: { tanya: 'Patungan sewa bus Rp600.000. Iuran tiap orang (ribu rupiah) adalah <i>I</i>(<i>n</i>) = 600 ÷ <i>n</i>, dengan <i>n</i> = banyak peserta. Berapa iuran jika 20 orang ikut?', kunci: 30, jelas: '600 ÷ 20 = 30, jadi Rp30.000 per orang. Peubah n ada di penyebut: ciri fungsi rasional. Makin banyak peserta, iuran makin kecil tetapi tidak pernah nol.' },
+    akar: { tanya: 'Lahan berbentuk persegi seluas <i>L</i> m² memiliki panjang sisi <i>s</i>(<i>L</i>) = √<i>L</i> meter. Berapa panjang sisi lahan seluas 49 m²?', kunci: 7, jelas: '√49 = 7 karena 7 × 7 = 49. Fungsi akar naik makin landai: luas 4 kali lipat, sisinya hanya 2 kali lipat.' },
+    mutlak: { tanya: 'Harga acuan sebuah barang Rp50.000. Selisih harga adalah <i>d</i>(<i>p</i>) = |<i>p</i> − 50| (ribu rupiah). Berapa selisihnya jika harga di toko Rp35.000 (<i>p</i> = 35)?', kunci: 15, jelas: '|35 − 50| = |−15| = 15. Nilai mutlak tidak pernah negatif, jadi lebih murah maupun lebih mahal sama-sama dihitung sebagai selisih.' },
+    tangga: { tanya: 'Tarif parkir motor: Rp3.000 untuk jam pertama, lalu Rp2.000 tiap jam berikutnya atau sebagiannya. Dengan rumus <i>T</i>(<i>t</i>) = 1 + 2 × (<i>t</i> dibulatkan ke atas) ribu rupiah, berapa tarif parkir 2,5 jam?', kunci: 7, jelas: '2,5 dibulatkan ke atas menjadi 3, jadi T = 1 + 2 × 3 = 7 ribu. Pembulatan ke atas membuat tarif naik dalam anak tangga.' },
+    sepotong: { tanya: 'Tarif air (ribu rupiah): 3<i>x</i> jika pemakaian <i>x</i> ≤ 10 m³, dan 30 + 5(<i>x</i> − 10) jika <i>x</i> &gt; 10 m³. Berapa biaya pemakaian 14 m³?', kunci: 50, jelas: 'x = 14 lebih dari 10, jadi pakai rumus kedua: 30 + 5(14 − 10) = 30 + 20 = 50 ribu. Dua rumus berbeda dipakai pada rentang berbeda: itulah fungsi sepotong-sepotong.' }
   };
   const SITUASI = [
     { fam: 'poli', judul: 'Kotak dari karton', teks: 'Selembar karton dilipat membentuk kotak. Volume kotak bergantung pada tinggi lipatan: mula-mula naik, mencapai puncak, lalu turun lagi.', x: 'tinggi lipatan (cm)', y: 'volume (cm³)', baris: [[1, 100], [2, 128], [3, 108], [4, 64]] },
@@ -102,6 +102,45 @@ const nama = (i) => (i === DUMMY ? 'Siswa Uji Coba (Guru)' : judulKata(DAFTAR[i]
     { fam: 'tangga', judul: 'Tarif parkir', teks: 'Rp3.000 untuk 1 jam pertama, lalu Rp2.000 setiap jam berikutnya atau sebagiannya (dibulatkan ke atas).', x: 'lama (jam)', y: 'tarif (ribu)', baris: [['0,5', 3], [1, 3], ['1,5', 5], ['2,5', 7]] },
     { fam: 'sepotong', judul: 'Tagihan air', teks: 'Rp3.000 per m³ untuk 10 m³ pertama, lalu Rp5.000 per m³ untuk pemakaian di atasnya.', x: 'pemakaian (m³)', y: 'tagihan (ribu)', baris: [[5, 15], [10, 30], [15, 55], [20, 80]] }
   ];
+
+  const ALASAN = {
+    poli: 'Volume naik dulu sampai puncak (128 pada 2 cm), lalu turun lagi. Grafiknya melengkung mulus dengan satu “bukit”. Itu ciri polinomial (di sini derajat 3).',
+    eksp: 'Tiap minggu dikali 2: 500 → 1.000 → 2.000 → 4.000. Kenaikannya makin besar sehingga grafik makin curam. Itu ciri eksponensial.',
+    log: 'Isi dilipatduakan, kepuasan hanya bertambah 10 (0 → 10 → 20 → 30). Naik terus tetapi makin landai: ciri logaritma.',
+    trig: 'Naik ke puncak 4.000 di bulan ke-6, turun ke 2.000 di bulan ke-12, lalu mengulang pola yang sama. Pola berulang adalah ciri trigonometri (sinus/kosinus).',
+    rasional: 'Hasil kali x dan y selalu 600 (2 × 300, 4 × 150, 10 × 60). Makin banyak peserta, iuran turun tajam lalu landai mendekati nol: ciri rasional.',
+    akar: 'Luas 1, 4, 25, 100 menghasilkan sisi 1, 2, 5, 10. Mulai dari titik awal lalu makin landai: ciri fungsi akar.',
+    mutlak: 'Selisih 20, 10, 0, 10: turun sampai harga acuan, lalu naik lagi. Bentuk huruf V dan tidak pernah negatif: ciri nilai mutlak.',
+    tangga: 'Tarif tetap 3 untuk 0,5 dan 1 jam, lalu naik ke 5 dan 7. Nilainya berubah dengan lompatan dan mendatar di antaranya: ciri fungsi tangga.',
+    sepotong: 'Sampai 10 m³ naik 3 tiap m³ (15 → 30), setelah itu naik 5 tiap m³ (30 → 55 → 80). Dua aturan berbeda dalam satu grafik: ciri sepotong-sepotong.'
+  };
+  SITUASI.forEach((x) => { x.alasan = ALASAN[x.fam]; });
+  /* bank diskusi kelompok: konteks sehari-hari lain, ditebak bersama jenis fungsinya */
+  const DISKUSI = [
+    { fam: 'poli', judul: 'Tendangan bola', konteks: 'Bola ditendang ke atas. Tinggi bola dicatat setiap detik.', x: 'detik ke-', y: 'tinggi (m)', baris: [[0, 0], [1, 4], [2, 6], [3, 6], [4, 4], [5, 0]], alasan: 'Tinggi naik, mencapai puncak di tengah, lalu turun simetris. Lintasan bola berbentuk parabola, yaitu polinomial derajat 2.' },
+    { fam: 'eksp', judul: 'Tabungan berbunga', konteks: 'Tabungan Rp1.000.000 berbunga 10% per tahun, bunganya ikut berbunga.', x: 'tahun ke-', y: 'saldo (ribu)', baris: [[0, '1.000'], [1, '1.100'], [2, '1.210'], [3, '1.331']], alasan: 'Setiap tahun dikali 1,1: 1.000 → 1.100 → 1.210 → 1.331. Tambahannya makin besar. Pertumbuhan dengan faktor kali yang tetap adalah ciri eksponensial.' },
+    { fam: 'log', judul: 'Kerasnya suara', konteks: 'Tingkat kebisingan (desibel) diukur dari bunyi yang makin keras. Setiap bunyi 10 kali lebih kuat, desibel naik sama banyak.', x: 'kekuatan bunyi (kali)', y: 'desibel', baris: [[1, 0], [10, 10], [100, 20], [1000, 30]], alasan: 'Kekuatan dikali 10 membuat desibel hanya bertambah 10. Tambahan tetap untuk kali yang tetap adalah ciri logaritma.' },
+    { fam: 'trig', judul: 'Jam sibuk jalan raya', konteks: 'Jumlah kendaraan yang lewat per jam di sebuah jalan, dicatat sepanjang hari. Pola yang sama berulang setiap hari.', x: 'jam ke-', y: 'kendaraan', baris: [[0, 200], [6, 600], [12, 1000], [18, 600], [24, 200]], alasan: 'Naik ke puncak siang hari, turun malam hari, dan kembali ke 200 pada jam ke-24: pola berulang tiap 24 jam. Itu ciri trigonometri (periodik).' },
+    { fam: 'rasional', judul: 'Waktu perjalanan', konteks: 'Jarak ke kota tujuan 120 km. Waktu tempuh bergantung pada kecepatan kendaraan.', x: 'kecepatan (km/jam)', y: 'waktu (jam)', baris: [[40, 3], [60, 2], [80, '1,5'], [120, 1]], alasan: 'Kecepatan dikali 2 membuat waktu menjadi setengahnya, dan hasil kali x dan y selalu 120. Itu ciri fungsi rasional (kebalikan).' },
+    { fam: 'akar', judul: 'Benda jatuh', konteks: 'Sebuah benda dijatuhkan dari ketinggian tertentu. Waktu jatuhnya dicatat.', x: 'tinggi (m)', y: 'waktu (detik)', baris: [[5, 1], [20, 2], [45, 3], [80, 4]], alasan: 'Tinggi 4 kali lipat membuat waktu hanya 2 kali lipat (5 → 20, 1 → 2). Naik makin landai dan berawal dari titik awal: ciri fungsi akar.' },
+    { fam: 'mutlak', judul: 'Jarak ke halte', konteks: 'Halte berada di km ke-3 pada jalan lurus. Kamu mencatat jarak dari beberapa rumah ke halte, tanpa peduli di kiri atau kanan halte.', x: 'posisi rumah (km)', y: 'jarak ke halte (km)', baris: [[0, 3], [1, 2], [3, 0], [5, 2]], alasan: 'Jarak mengecil sampai 0 di halte lalu membesar lagi, dan tidak pernah negatif. Bentuk huruf V: ciri nilai mutlak.' },
+    { fam: 'tangga', judul: 'Ongkos kirim', konteks: 'Paket Rp9.000 untuk 1 kg pertama, lalu Rp3.000 tiap kilogram berikutnya atau sebagiannya.', x: 'berat (kg)', y: 'ongkos (ribu)', baris: [['0,8', 9], [1, 9], ['1,5', 12], ['2,2', 15]], alasan: 'Ongkos tetap sama untuk rentang berat tertentu, lalu melompat saat melewati kilogram penuh. Bentuk anak tangga: fungsi tangga.' },
+    { fam: 'sepotong', judul: 'Tarif ojek', konteks: '5 km pertama dikenai Rp3.000 per km. Setelah itu Rp2.000 per km.', x: 'jarak (km)', y: 'tarif (ribu)', baris: [[2, 6], [5, 15], [8, 21], [10, 25]], alasan: 'Sampai 5 km naik 3 per km, setelah itu hanya naik 2 per km. Dua aturan dalam satu grafik: sepotong-sepotong.' }
+  ];
+  const PROMPT = ['Siapa yang bisa membaca konteksnya dengan kata-kata sendiri?', 'Apa yang terjadi pada y saat x makin besar: naik, turun, berulang, atau melompat?', 'Mirip dengan contoh grafik yang mana? Beri satu alasan.'];
+  function diskusiSiswa(seed) { const r = mulberry(1300 + seed * 733); return acak(r, DISKUSI.map((_, i) => i)).slice(0, 6).map((i, n) => Object.assign({ no: n + 1, ref: i }, DISKUSI[i])); }
+  /* poin dan lencana tahap lanjutan */
+  function hitungPoin(t) {
+    const kartu = Object.keys(t.kartu || {}).reduce((a, f) => a + (t.kartu[f] === 1 ? 10 : 5), 0), dis = ((t.diskusi && t.diskusi.benar) || 0) * 10, coc = ((t.cocok && t.cocok.benar) || 0) * 10, tik = ((t.tiket && t.tiket.skor) || 0) * 20, bonus = t.tamat ? 10 : 0;
+    const poin = Math.min(400, kartu + dis + coc + tik + bonus), L = [];
+    if ((t.fam || []).length && (t.fam || []).every((f) => t.kartu && t.kartu[f])) L.push('Pakar Kartu');
+    if (t.diskusi && t.diskusi.benar >= 5) L.push('Penebak Jitu');
+    if (t.cocok && t.cocok.benar >= 4) L.push('Pemburu Masalah');
+    if (t.tiket && t.tiket.skor === 3) L.push('Tiket Sempurna');
+    if (t.tamat) L.push('Pembelajar Reflektif');
+    const gelar = poin >= 170 ? 'Maestro Grafik' : (poin >= 130 ? 'Ahli Grafik' : (poin >= 90 ? 'Penjelajah Grafik' : 'Calon Ahli Grafik'));
+    return { poin, lencana: L, gelar };
+  }
   const PENGECOH = { poli: ['eksp', 'trig'], eksp: ['poli', 'akar'], log: ['akar', 'eksp'], trig: ['poli', 'mutlak'], rasional: ['eksp', 'log'], akar: ['log', 'poli'], mutlak: ['sepotong', 'trig'], tangga: ['sepotong', 'mutlak'], sepotong: ['mutlak', 'tangga'] };
   function cocokSiswa(idx, jumlah, mulaiDari) {
     const r = mulberry(9100 + idx * 6007), urut = acak(r, SITUASI.map((_, i) => i)), m0 = mulaiDari || 0, pilih = urut.slice(m0, m0 + (jumlah || 5));
@@ -117,6 +156,6 @@ const nama = (i) => (i === DUMMY ? 'Siswa Uji Coba (Guru)' : judulKata(DAFTAR[i]
     ];
   }
 
-  const api = { KELAS, SET, NAMA_FAM, bagianPasangan, TANTANGAN, SITUASI, PENGECOH, cocokSiswa, tiketSiswa, DAFTAR, DUMMY, PIN_GURU, nama, judulKata, DURASI, JUMLAH_SOAL, KELOMPOK, MAKS_ANGGOTA, soalSiswa, nilai, buatKode, bacaKode, bentukKelompok, tambahKelompok, ALFA };
+  const api = { KELAS, SET, NAMA_FAM, DISKUSI, PROMPT, diskusiSiswa, hitungPoin, bagianPasangan, TANTANGAN, SITUASI, PENGECOH, cocokSiswa, tiketSiswa, DAFTAR, DUMMY, PIN_GURU, nama, judulKata, DURASI, JUMLAH_SOAL, KELOMPOK, MAKS_ANGGOTA, soalSiswa, nilai, buatKode, bacaKode, bentukKelompok, tambahKelompok, ALFA };
   if (typeof module !== 'undefined' && module.exports) module.exports = api; else root.BS = api;
 })(typeof window !== 'undefined' ? window : globalThis);

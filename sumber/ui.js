@@ -44,13 +44,14 @@
     return e;
   }
   const esc = (s) => String(s == null ? '' : s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
-  const tidur = (ms) => new Promise((r) => setTimeout(r, ms));
-  const anim = (e, kf, opt) => { try { return e.animate(kf, Object.assign({ duration: 500, easing: 'cubic-bezier(.2,.8,.2,1)', fill: 'both' }, opt)).finished; } catch (x) { return Promise.resolve(); } };
+  const faktor = () => (root.UI && root.UI.instan ? 1e6 : (root.UI ? root.UI.speed : 1));
+  const tidur = (ms) => new Promise((r) => setTimeout(r, ms / faktor()));
+  const anim = (e, kf, opt) => { try { const o = Object.assign({ duration: 500, easing: 'cubic-bezier(.2,.8,.2,1)', fill: 'both' }, opt), k = faktor(); o.duration = o.duration / k; if (o.delay) o.delay = o.delay / k; return e.animate(kf, o).finished; } catch (x) { return Promise.resolve(); } };
 
   /* token pembatal: menghentikan animasi yang sedang berjalan saat berpindah layar */
   class Batal extends Error {}
   function token() {
-    const t = { batal: false, tidur(ms) { return new Promise((res, rej) => { setTimeout(() => (t.batal ? rej(new Batal()) : res()), ms); }); }, cek() { if (t.batal) throw new Batal(); }, stop() { t.batal = true; }, async anim(e, kf, o) { const r = await anim(e, kf, o); t.cek(); return r; } };
+    const t = { batal: false, tidur(ms) { return new Promise((res, rej) => { setTimeout(() => (t.batal ? rej(new Batal()) : res()), ms / faktor()); }); }, cek() { if (t.batal) throw new Batal(); }, stop() { t.batal = true; }, async anim(e, kf, o) { const r = await anim(e, kf, o); t.cek(); return r; } };
     return t;
   }
 
@@ -133,5 +134,5 @@
   }
   async function layarPenuh() { try { const d = document.documentElement; if (!document.fullscreenElement && d.requestFullscreen) await d.requestFullscreen(); if (screen.orientation && screen.orientation.lock) await screen.orientation.lock('landscape'); } catch (e) { /* abaikan */ } }
 
-  root.UI = { IK, ik, glif, ubin, GLIF, URUT, NAMA, untaian, el, esc, tidur, anim, token, Batal, dialog, konfirmasi, info, toast, papanKetik, keypadAngka, seret, pasangPutar, layarPenuh, ALFA };
+  root.UI = { speed: 1, instan: false, IK, ik, glif, ubin, GLIF, URUT, NAMA, untaian, el, esc, tidur, anim, token, Batal, dialog, konfirmasi, info, toast, papanKetik, keypadAngka, seret, pasangPutar, layarPenuh, ALFA };
 })(window);

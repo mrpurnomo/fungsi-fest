@@ -2,7 +2,7 @@
 const fs = require('fs'), path = require('path');
 const S = __dirname, R = path.join(S, '..'); const baca = (f) => fs.readFileSync(path.join(S, f), 'utf8');
 const font = (f) => 'url(data:font/ttf;base64,' + fs.readFileSync(path.join(S, 'fonts', f)).toString('base64') + ')';
-const fonts = '@font-face{font-family:"Bricolage";font-weight:700;font-display:swap;src:' + font('BricolageGrotesque-Bold.ttf') + '}@font-face{font-family:"Bricolage";font-weight:400;font-display:swap;src:' + font('BricolageGrotesque-Bold.ttf') + '}@font-face{font-family:"Instrument";font-weight:400;font-display:swap;src:' + font('InstrumentSans-Regular.ttf') + '}@font-face{font-family:"Instrument";font-weight:700;font-display:swap;src:' + font('InstrumentSans-Bold.ttf') + '}';
+const fonts = '@font-face{font-family:"Bricolage";font-weight:700;font-display:swap;src:' + font('BricolageGrotesque-Bold.ttf') + '}@font-face{font-family:"Bricolage";font-weight:400;font-display:swap;src:' + font('BricolageGrotesque-Bold.ttf') + '}@font-face{font-family:"Instrument";font-weight:400;font-display:swap;src:' + font('InstrumentSans-Regular.ttf') + '}@font-face{font-family:"Instrument";font-weight:700;font-display:swap;src:' + font('InstrumentSans-Bold.ttf') + '}' + '@font-face{font-family:"Lora Math";font-style:italic;font-weight:400;font-display:swap;src:' + font('Lora-Italic.ttf') + '}';
 const css = ['tema.css', 'intro.css', 'layar.css', 'guru.css', 'tahap2.css'].map(baca).join('\n');
 const bersama = fs.readFileSync(path.join(R, 'api', '_lib', 'bersama.js'), 'utf8');
 function rakit(judul, jsAkhir, keluar, tambahan) {

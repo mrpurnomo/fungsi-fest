@@ -5,7 +5,7 @@
   const { el, ik, tidur, anim, esc } = UI, { S, fmt, K } = GF;
   const m = (n) => String(n).replace('-', '−');
   const NAMA = UI.NAMA;
-  const pesta = (x, y) => { for (let i = 0; i < 26; i++) { const c = el('div', { kelas: 'konfeti', gaya: 'left:' + x + 'px;top:' + y + 'px;background:' + ['#FFC233', '#6D35E8', '#12B886', '#F15BB5', '#2EA7F2', '#FF8A1F'][i % 6] }); document.body.append(c); const a = Math.random() * Math.PI * 2, d = 60 + Math.random() * 140; anim(c, [{ transform: 'translate(0,0) rotate(0)', opacity: 1 }, { transform: 'translate(' + Math.cos(a) * d + 'px,' + (Math.sin(a) * d + 90) + 'px) rotate(' + (Math.random() * 540) + 'deg)', opacity: 0 }], { duration: 900 + Math.random() * 500, easing: 'cubic-bezier(.2,.7,.3,1)' }).then(() => c.remove()); } };
+  const pesta = (x, y) => { if (UI.instan) return; for (let i = 0; i < 26; i++) { const c = el('div', { kelas: 'konfeti', gaya: 'left:' + x + 'px;top:' + y + 'px;background:' + ['#FFC233', '#6D35E8', '#12B886', '#F15BB5', '#2EA7F2', '#FF8A1F'][i % 6] }); document.body.append(c); const a = Math.random() * Math.PI * 2, d = 60 + Math.random() * 140; anim(c, [{ transform: 'translate(0,0) rotate(0)', opacity: 1 }, { transform: 'translate(' + Math.cos(a) * d + 'px,' + (Math.sin(a) * d + 90) + 'px) rotate(' + (Math.random() * 540) + 'deg)', opacity: 0 }], { duration: 900 + Math.random() * 500, easing: 'cubic-bezier(.2,.7,.3,1)' }).then(() => c.remove()); } };
   const pop = (e) => anim(e, [{ transform: 'scale(.4)', opacity: 0 }, { transform: 'scale(1.18)', opacity: 1, offset: .6 }, { transform: 'scale(1)', opacity: 1 }], { duration: 520, easing: 'ease-out' });
   const muncul = (e, d) => anim(e, [{ opacity: 0, transform: 'translateY(.9rem)' }, { opacity: 1, transform: 'none' }], { duration: d || 480 });
 
@@ -21,7 +21,7 @@
   /* ======================================================== adegan: pengenalan fungsi linear */
   async function adLinear(c) {
     const { a, t } = c; const w = el('div', { kelas: 'subst' }); a.append(w);
-    w.innerHTML = '<div class="eyebrow">Fungsi pertama</div><div class="rumus" id="rm" style="font-size:5.4rem;opacity:0">f(<span class="warna-x">x</span>) = 2<span class="warna-x">x</span> + 1</div><div id="pt" style="opacity:0" class="pita">Ini fungsi <b>linear</b></div><div id="pj" style="opacity:0;max-width:46rem" class="sorotan tengah">Linear artinya grafiknya berupa <b>garis lurus</b>.</div><div id="pk" style="opacity:0;font-size:1.3rem" class="tengah muted">Kita isi <b style="color:var(--f-eksp)">x</b> dengan bilangan apa saja, lalu hitung hasilnya.</div>';
+    w.innerHTML = '<div class="eyebrow">Fungsi pertama</div><div class="rumus" id="rm" style="font-size:5.4rem;opacity:0"><i>f</i>(<span class="warna-x v">x</span>) = 2<span class="warna-x v">x</span> + 1</div><div id="pt" style="opacity:0" class="pita">Ini fungsi <b>linear</b></div><div id="pj" style="opacity:0;max-width:46rem" class="sorotan tengah">Linear artinya grafiknya berupa <b>garis lurus</b>.</div><div id="pk" style="opacity:0;font-size:1.3rem" class="tengah muted">Kita isi <b style="color:var(--f-eksp)">x</b> dengan bilangan apa saja, lalu hitung hasilnya.</div>';
     await anim(w.querySelector('#rm'), [{ opacity: 0, transform: 'scale(.7)' }, { opacity: 1, transform: 'scale(1.06)', offset: .7 }, { opacity: 1, transform: 'scale(1)' }], { duration: 800 }); t.cek();
     await t.tidur(500); await pop(w.querySelector('#pt')); await t.tidur(500); await muncul(w.querySelector('#pj')); await t.tidur(700); await muncul(w.querySelector('#pk')); c.siap();
   }
@@ -32,10 +32,11 @@
     const v1 = kuad ? x * x : 2 * x, y = kuad ? v1 - 4 : v1 + 1;
     const w = el('div', { kelas: 'subst' }); a.append(w);
     const X = '<span class="tok warna-x v">x</span>', slot = (i, par) => '<span class="tok slot" data-s="' + i + '" data-par="' + (par ? 1 : 0) + '" style="visibility:hidden">' + (par ? '(' + m(x) + ')' : m(x)) + '</span>';
-    const L1 = kuad ? 'f(' + X + ') = ' + X + '² − 4' : 'f(' + X + ') = 2' + X + ' + 1';
-    const L2 = kuad ? 'f(' + slot(0) + ') = ' + slot(1, true) + '² − 4' : 'f(' + slot(0) + ') = 2' + slot(1, true) + ' + 1';
-    const L3 = 'f(' + m(x) + ') = <span class="tok antara">' + m(v1) + '</span> ' + (kuad ? '− 4' : '+ 1');
-    const L4 = 'f(' + m(x) + ') = <span class="tok hasil">' + m(y) + '</span>';
+    const FF = '<i>f</i>(';
+    const L1 = kuad ? FF + X + ') = ' + X + '<sup>2</sup> − 4' : FF + X + ') = 2' + X + ' + 1';
+    const L2 = kuad ? FF + slot(0) + ') = ' + slot(1, true) + '<sup>2</sup> − 4' : FF + slot(0) + ') = 2' + slot(1, true) + ' + 1';
+    const L3 = FF + m(x) + ') = <span class="tok antara">' + m(v1) + '</span> ' + (kuad ? '− 4' : '+ 1');
+    const L4 = FF + m(x) + ') = <span class="tok hasil">' + m(y) + '</span>';
     w.innerHTML = '<div class="eyebrow">' + (cfg.judul || 'Mari mencoba') + '</div><div class="baris" style="gap:1.4rem"><span class="cip-x" id="cx">x = ' + m(x) + '</span></div>'
       + [L1, L2, L3, L4].map((r, i) => '<div class="baris-rumus" id="b' + i + '"><div class="rumus">' + r + '</div></div>').join('') + '<div class="titik-hasil" id="th">Titik koordinat <span class="mat">(x, y)</span> = <span style="font-family:var(--mat);font-size:2.2rem">(' + m(x) + ', ' + m(y) + ')</span></div>';
     const b = (i) => w.querySelector('#b' + i), cx = w.querySelector('#cx');
@@ -57,9 +58,11 @@
   async function adMesin(c, cfg) {
     const { a, t } = c; let sibuk = false, selesai = 0;
     const w = el('div', { gaya: 'flex:1;display:flex;flex-direction:column;min-height:0' }); a.append(w);
-    w.innerHTML = '<div class="sorotan tengah" id="ins" style="align-self:center;margin-bottom:.5rem">' + cfg.petunjuk + '</div><div class="mesin-adegan"><div class="baki" id="bm"><h4>Masukan (x)</h4></div><div class="mesin" id="ms"><div class="judul-mesin">f(x) = ' + cfg.rumus + '</div><div class="lubang" id="lb">Letakkan angka di sini</div><div class="roda-baris"><div class="roda">' + RODA + '</div><div class="roda">' + RODA + '</div><div class="roda">' + RODA + '</div></div><div class="layar-hitung" id="lh">siap</div><div class="corong" id="cr"></div></div><div class="baki" id="bk"><h4>Keluaran (y)</h4></div></div><div class="panel-titik" id="pt"><span class="lab">Titik yang terkumpul</span></div>';
+    w.innerHTML = '<div class="sorotan tengah" id="ins" style="align-self:center;margin-bottom:.5rem">' + cfg.petunjuk + '</div><div class="mesin-adegan"><div class="baki" id="bm"><h4>Masukan (x)</h4></div><div class="mesin" id="ms"><div class="judul-mesin"><i>f</i>(<i>x</i>) = ' + cfg.rumus + '</div><div class="lubang" id="lb">Letakkan angka di sini</div><div class="roda-baris"><div class="roda">' + RODA + '</div><div class="roda">' + RODA + '</div><div class="roda">' + RODA + '</div></div><div class="layar-hitung" id="lh">siap</div><div class="corong" id="cr"></div></div><div class="baki" id="bk"><h4>Keluaran (y)</h4></div></div><div class="panel-titik" id="pt"><span class="lab">Titik yang terkumpul</span></div>';
     const bm = w.querySelector('#bm'), bk = w.querySelector('#bk'), ms = w.querySelector('#ms'), lb = w.querySelector('#lb'), lh = w.querySelector('#lh'), cr = w.querySelector('#cr'), pt = w.querySelector('#pt'), ins = w.querySelector('#ins');
     (cfg.awal || []).forEach((p) => pt.append(el('span', { kelas: 'cip-titik' }, '(' + m(p.x) + ', ' + m(p.y) + ')')));
+    const fit = () => { lh.style.fontSize = ''; let s = 1.5; while (lh.scrollWidth > lh.clientWidth + 1 && s > .8) { s -= .08; lh.style.fontSize = s + 'rem'; } };
+    const chips = [];
     const dalam = (cx, cy) => { const r = ms.getBoundingClientRect(); return cx > r.left - 30 && cx < r.right + 30 && cy > r.top - 30 && cy < r.bottom + 30; };
     async function proses(chip, x) {
       if (sibuk || chip.classList.contains('pakai')) return; sibuk = true; chip.classList.add('pakai'); lb.classList.add('sambut');
@@ -67,16 +70,17 @@
       const f = el('div', { kelas: 'terbang', gaya: 'left:' + r1.left + 'px;top:' + r1.top + 'px', html: m(x) }); document.body.append(f);
       await anim(f, [{ transform: 'translate(0,0) scale(1)', opacity: 1 }, { transform: 'translate(' + (r2.left + r2.width / 2 - r1.left - 20) + 'px,' + (r2.top + r2.height / 2 - r1.top - 14) + 'px) scale(.4)', opacity: .1 }], { duration: 550, easing: 'cubic-bezier(.5,0,.8,.5)' }).catch(() => {}); f.remove(); t.cek();
       lb.classList.remove('sambut'); ms.classList.add('jalan'); const y = cfg.f(x), cepat = cfg.cepat;
-      lh.textContent = cfg.tulis(x); await t.tidur(cepat ? 450 : 1100); lh.innerHTML = cfg.tulis(x) + ' = <b style="color:#FFC233">' + m(y) + '</b>'; await t.tidur(cepat ? 250 : 650); ms.classList.remove('jalan');
+      lh.innerHTML = cfg.tulis(x); fit(); await t.tidur(cepat ? 450 : 1100); lh.innerHTML = cfg.tulis(x) + ' = <b style="color:#FFC233">' + m(y) + '</b>'; fit(); await t.tidur(cepat ? 250 : 650); ms.classList.remove('jalan');
       const out = el('div', { kelas: 'chip-angka keluar', html: m(y), gaya: 'opacity:0' }); bk.append(out);
       const rc = cr.getBoundingClientRect(), ro = out.getBoundingClientRect(), dx = rc.left + rc.width / 2 - (ro.left + ro.width / 2), dy = rc.top - ro.top;
       await anim(out, [{ opacity: 1, transform: 'translate(' + dx + 'px,' + dy + 'px) scale(.3)' }, { opacity: 1, transform: 'translate(' + dx * .35 + 'px,' + (dy * .15 + 14) + 'px) scale(1.25)', offset: .45 }, { transform: 'translate(' + dx * .08 + 'px,-.9rem) scale(.92)', offset: .7 }, { transform: 'translate(0,.2rem) scale(1.04)', offset: .88 }, { transform: 'none', opacity: 1 }], { duration: cepat ? 650 : 1050, easing: 'cubic-bezier(.3,.9,.4,1)' }); t.cek();
       const cp = el('span', { kelas: 'cip-titik', html: '(' + m(x) + ', ' + m(y) + ')' }); pt.append(cp); pop(cp); lh.textContent = 'siap'; selesai++; sibuk = false;
       if (selesai >= cfg.masukan.length) { ins.innerHTML = cfg.akhir; ins.style.background = 'var(--mint-100)'; ins.style.color = 'var(--mint-800)'; pop(ins); c.siap(); }
     }
-    cfg.masukan.forEach((x) => { const chip = el('div', { kelas: 'chip-angka', html: m(x) }); bm.append(chip);
-      UI.seret(chip, { aktif: () => !sibuk, jatuh: dalam, saatJatuh: () => proses(chip, x).catch((e) => { if (!(e instanceof UI.Batal)) throw e; }), saatKetuk: () => proses(chip, x).catch((e) => { if (!(e instanceof UI.Batal)) throw e; }) }); });
+    cfg.masukan.forEach((x) => { const chip = el('div', { kelas: 'chip-angka' + (c.guru ? '' : ' ketuk'), html: m(x) }); bm.append(chip); chips.push(chip);
+      (c.guru ? (e0, o0) => UI.seret(e0, o0) : (e0, o0) => e0.addEventListener('click', () => { if (!sibuk) o0.saatKetuk(); }))(chip, { aktif: () => !sibuk, jatuh: dalam, saatJatuh: () => proses(chip, x).catch((e) => { if (!(e instanceof UI.Batal)) throw e; }), saatKetuk: () => proses(chip, x).catch((e) => { if (!(e instanceof UI.Batal)) throw e; }) }); });
     await muncul(w, 400);
+    if (c.instan) { for (let i = 0; i < cfg.masukan.length; i++) await proses(chips[i], cfg.masukan[i]); }
   }
 
   /* ======================================================== adegan: titik → bidang Kartesius → grafik */
@@ -119,10 +123,10 @@
       isi.innerHTML = ''; const baris = el('div', { kelas: 'isi fx-' + id, gaya: 'flex:1' }); isi.append(baris); if (tt) tt.stop(); tt = UI.token();
       const kiri = el('div', { kelas: 'kotak-grafik' }), wad = el('div', { kelas: 'wadah' }); kiri.append(wad); const kanan = el('div', { kelas: 'info gulir' }); baris.append(kiri, kanan);
       const nama = el('div', { kelas: 'baris' }, el('div', { html: UI.ubin(id) }).firstChild, el('h3', { gaya: 'margin:0;font-size:1.6rem;color:var(--td)' }, NAMA[id])); const rk = el('div', { kelas: 'rumus-kartu' }); const sv = el('div', { kelas: 'seg-varian' });
-      kanan.append(nama, rk); if (d.varian.length > 1) kanan.append(sv);
+      kanan.append(nama, el('div', { kelas: 'baris', gaya: 'flex-wrap:wrap;gap:.35rem' }, el('span', { kelas: 'muted kecil' }, 'Nama lain:'), d.alias.map((x) => el('span', { kelas: 'chip abu' }, x))), rk); if (d.varian.length > 1) kanan.append(sv);
       kanan.append(el('div', null, el('div', { kelas: 'eyebrow' }, 'Ciri grafik'), el('ul', null, d.ciri.map((x) => el('li', null, x)))), el('div', null, el('div', { kelas: 'eyebrow' }, 'Contoh dalam kehidupan'), el('ul', null, d.konteks.map((x) => el('li', null, x)))));
       const gb = el('div', { kelas: 'baris', gaya: 'justify-content:space-between;margin-top:auto' }, el('button', { kelas: 'btn sekunder kecil', type: 'button', html: ik('kembali', 'kecil') + 'Sebelumnya', disabled: i === 0, onclick: () => tampil(i - 1) }), el('button', { kelas: 'btn kecil', type: 'button', html: 'Berikutnya' + ik('panah', 'kecil'), disabled: i === 8, onclick: () => tampil(i + 1) })); kanan.append(gb);
-      const gambar = (v) => { const cur = tt; wad.innerHTML = ''; const r = GF.gambarVarian(d.varian[v], 'var(--t)'); wad.append(r.b.svg); rk.innerHTML = '<div class="eyebrow" style="margin:0">Contoh fungsi · ' + esc(d.varian[v].nama) + '</div><div class="mat" style="font-size:' + (d.varian[v].rumus.length > 18 ? '1.35rem' : '2.1rem') + '">' + esc(d.varian[v].rumus) + '</div>';
+      const gambar = (v) => { const cur = tt; wad.innerHTML = ''; const r = GF.gambarVarian(d.varian[v], 'var(--t)'); wad.append(r.b.svg); rk.innerHTML = '<div class="eyebrow" style="margin:0">Contoh fungsi · ' + esc(d.varian[v].nama) + '</div><div class="mat" style="font-size:' + ((d.varian[v].panjang || d.varian[v].rumus.replace(/<[^>]+>/g, '').length > 24) ? '1.4rem' : '2.1rem') + '">' + d.varian[v].rumus + '</div>';
         (async () => { try { await GF.gambarKurva(r.kurva, 1300, cur); r.b.svg.querySelectorAll('.tk').forEach((c2) => c2.setAttribute('opacity', 1)); } catch (e) { if (!(e instanceof UI.Batal)) throw e; } })(); };
       if (d.varian.length > 1) d.varian.forEach((v, k) => sv.append(el('button', { type: 'button', kelas: k === 0 ? 'aktif' : '', onclick: (e) => { [...sv.children].forEach((x) => x.classList.remove('aktif')); e.currentTarget.classList.add('aktif'); gambar(k); } }, v.nama.split('·')[0].trim())));
       gambar(0); if (lihat.size >= 9 || guru) c.siap(true);
@@ -149,42 +153,43 @@
     { judul: 'Fungsi linear', f: adLinear },
     { judul: 'Mengisi x = 0', f: (c) => adSubst(c, { tipe: 'lin', x: 0, judul: 'Mari mencoba: x = 0' }) },
     { judul: 'Mengisi x = 1', f: (c) => adSubst(c, { tipe: 'lin', x: 1, judul: 'Sekarang: x = 1' }) },
-    { judul: 'Mesin fungsi', f: (c) => adMesin(c, { rumus: '2x + 1', f: (x) => 2 * x + 1, tulis: (x) => '2(' + m(x) + ') + 1', masukan: [-1, 2, 3], awal: [{ x: 0, y: 1 }, { x: 1, y: 3 }], petunjuk: 'Seret angka ke mesin (atau ketuk angkanya). Ada 3 angka untuk dicoba.', akhir: 'Rumusnya sama, hanya x yang berbeda — kita mendapat <b>banyak titik koordinat</b>!' }) },
+    { judul: 'Mesin fungsi', f: (c) => adMesin(c, { rumus: '2<i>x</i> + 1', f: (x) => 2 * x + 1, tulis: (x) => '2(' + m(x) + ') + 1', masukan: [-1, 2, 3], awal: [{ x: 0, y: 1 }, { x: 1, y: 3 }], petunjuk: (c.guru ? 'Seret angka ke mesin (tahan lalu geser), atau klik angkanya.' : 'Ketuk angka untuk memasukkannya ke mesin.') + ' Ada 3 angka untuk dicoba.', akhir: 'Rumusnya sama, hanya x yang berbeda — kita mendapat <b>banyak titik koordinat</b>!' }) },
     { judul: 'Menggambar grafik', f: (c) => adPlot(c, { titik: LIN.titik, spec: { xmin: -4, xmax: 5, ymin: -4, ymax: 9, xt: [-4, -3, -2, -1, 0, 1, 2, 3, 4, 5], yt: [-4, -2, 0, 2, 4, 6, 8], labelX: 'x', labelY: 'y' }, garis: () => [[[-1.7, -2.4], [3.4, 7.8]]], warna: '#2EA7F2', label: 'f(x) = 2x + 1', jenis: 'Fungsi linear: garis lurus', ingatkan: true }) },
     { judul: 'Fungsi lain', f: (c) => adLinearKuad(c) },
     { judul: 'Mengisi x = 0', f: (c) => adSubst(c, { tipe: 'kuad', x: 0, judul: 'f(x) = x² − 4, coba x = 0' }) },
-    { judul: 'Mesin fungsi', f: (c) => adMesin(c, { rumus: 'x² − 4', f: (x) => x * x - 4, tulis: (x) => '(' + m(x) + ')² − 4', masukan: [-3, -2, -1, 1, 2, 3], cepat: true, awal: [{ x: 0, y: -4 }], petunjuk: 'Coba 6 angka ini. Animasinya lebih cepat.', akhir: 'Perhatikan: <b>x = −2 dan x = 2</b> menghasilkan y yang sama.' }) },
+    { judul: 'Mesin fungsi', f: (c) => adMesin(c, { rumus: '<i>x</i><sup>2</sup> − 4', f: (x) => x * x - 4, tulis: (x) => '(' + m(x) + ')<sup>2</sup> − 4', masukan: [-3, -2, -1, 1, 2, 3], cepat: true, awal: [{ x: 0, y: -4 }], petunjuk: 'Coba 6 angka ini. Animasinya lebih cepat.', akhir: 'Perhatikan: <b>x = −2 dan x = 2</b> menghasilkan y yang sama.' }) },
     { judul: 'Grafik fungsi kuadrat', f: (c) => adPlot(c, { titik: KUA.titik, spec: { xmin: -4, xmax: 4, ymin: -6, ymax: 8, xt: [-4, -3, -2, -1, 0, 1, 2, 3, 4], yt: [-6, -4, -2, 0, 2, 4, 6, 8] }, garis: () => GF.sampel((x) => x * x - 4, -3.2, 3.2, 120, -6, 8), warna: '#F15BB5', label: 'f(x) = x² − 4', jenis: 'Melengkung, berbeda dari garis lurus' }) },
     { judul: 'Sembilan jenis grafik', f: adGaleri },
     { judul: 'Tujuan pembelajaran', f: adTujuan }
   ];
   async function adLinearKuad(c) {
     const { a, t } = c; const w = el('div', { kelas: 'subst' }); a.append(w);
-    w.innerHTML = '<div class="eyebrow">Fungsi yang berbeda</div><div class="rumus" id="rm" style="font-size:5.4rem;opacity:0">f(<span class="warna-x">x</span>) = <span class="warna-x">x</span>² − 4</div><div id="pj" style="opacity:0;max-width:50rem" class="sorotan tengah">Rumus yang berbeda menghasilkan <b>gambar grafik yang berbeda</b>.</div><div id="pk" style="opacity:0;font-size:1.3rem" class="tengah muted">Cara menggambarnya sama: hitung beberapa titik, gambar titiknya, lalu hubungkan.</div>';
+    w.innerHTML = '<div class="eyebrow">Fungsi yang berbeda</div><div class="rumus" id="rm" style="font-size:5.4rem;opacity:0"><i>f</i>(<span class="warna-x v">x</span>) = <span class="warna-x v">x</span><sup>2</sup> − 4</div><div id="pj" style="opacity:0;max-width:50rem" class="sorotan tengah">Rumus yang berbeda menghasilkan <b>gambar grafik yang berbeda</b>.</div><div id="pk" style="opacity:0;font-size:1.3rem" class="tengah muted">Cara menggambarnya sama: hitung beberapa titik, gambar titiknya, lalu hubungkan.</div>';
     await anim(w.querySelector('#rm'), [{ opacity: 0, transform: 'scale(.7)' }, { opacity: 1, transform: 'scale(1)' }], { duration: 800 }); t.cek(); await t.tidur(600); await muncul(w.querySelector('#pj')); await t.tidur(900); await muncul(w.querySelector('#pk')); c.siap();
   }
 
   /* ======================================================== pemutar */
   function mount(host, o) {
-    o = o || {}; const guru = !!o.guru; let idx = o.mulai || 0, tok = null, siap = false, ulangFn = null;
+    o = o || {}; const guru = !!o.guru; let idx = o.mulai || 0, tok = null, siap = false; const played = new Set(o.played || []); try { UI.speed = [1, 2, 3].includes(+localStorage.getItem('gf_speed')) ? +localStorage.getItem('gf_speed') : 1; } catch (e) { UI.speed = 1; }
     host.innerHTML = '';
     const root0 = el('div', { kelas: 'intro' }), kepala = el('div', { kelas: 'kepala-intro' }), adegan = el('div', { kelas: 'adegan' }), kendali = el('div', { kelas: 'kendali' });
     const judul = el('h2'), no = el('span', { kelas: 'chip' }); kepala.append(judul, no, el('div', { gaya: 'flex:1' }), el('span', { id: 'infoGaleri', kelas: 'chip abu', hidden: true }));
     const titik = el('div', { kelas: 'titik-langkah' }); ADEGAN.forEach((x, i) => titik.append(el('i', { 'aria-label': 'Langkah ' + (i + 1) })));
     const bMundur = el('button', { kelas: 'btn sekunder', type: 'button', html: ik('kembali') + 'Kembali', onclick: () => ke(idx - 1) });
-    const bUlang = el('button', { kelas: 'btn sekunder', type: 'button', html: ik('ulang') + 'Ulangi', onclick: () => ke(idx) });
+    const kec = el('div', { kelas: 'kecepatan', role: 'group', 'aria-label': 'Kecepatan animasi' }, el('span', { kelas: 'muted kecil' }, 'Kecepatan'), [1, 2, 3].map((n) => el('button', { type: 'button', kelas: UI.speed === n ? 'aktif' : '', onclick: (e) => { UI.speed = n; try { localStorage.setItem('gf_speed', n); } catch (x) { /* abaikan */ } [...kec.querySelectorAll('button')].forEach((b) => b.classList.toggle('aktif', b === e.currentTarget)); } }, n + '×')));
+    const bUlang = el('button', { kelas: 'btn sekunder', type: 'button', html: ik('ulang') + 'Ulangi animasi', onclick: () => ke(idx, true) });
     const bMaju = el('button', { kelas: 'btn', type: 'button', onclick: () => { if (idx === ADEGAN.length - 1) { if (o.saatSelesai) o.saatSelesai(); } else ke(idx + 1); } });
-    kendali.append(bMundur, titik, bUlang, bMaju); root0.append(kepala, adegan, kendali); host.append(root0);
+    kendali.append(bMundur, titik, kec, bUlang, bMaju); root0.append(kepala, adegan, kendali); host.append(root0);
     function perbarui() {
       judul.textContent = ADEGAN[idx].judul; no.textContent = (idx + 1) + ' / ' + ADEGAN.length; [...titik.children].forEach((d, i) => { d.className = i === idx ? 'aktif' : (i < idx ? 'sudah' : ''); });
       bMundur.disabled = idx === 0; const akhir = idx === ADEGAN.length - 1;
       bMaju.innerHTML = (akhir ? (o.labelAkhir || 'Selesai') : 'Lanjut') + ik(akhir ? 'centang' : 'panah'); bMaju.className = 'btn' + (akhir ? ' hijau' : '') + ((siap || guru) ? ' denyut' : ' mati');
       document.getElementById('infoGaleri') && (document.getElementById('infoGaleri').hidden = ADEGAN[idx].f !== adGaleri);
     }
-    async function ke(i) {
+    async function ke(i, ulang) {
       if (i < 0 || i >= ADEGAN.length) return; if (tok) tok.stop(); tok = UI.token(); idx = i; siap = false; adegan.innerHTML = ''; perbarui(); if (o.saatLangkah) o.saatLangkah(i);
-      const t = tok; const ctx = { a: adegan, t, guru, siap: () => { if (t.batal) return; siap = true; perbarui(); } };
-      try { await ADEGAN[i].f(ctx); } catch (e) { if (!(e instanceof UI.Batal)) console.error(e); }
+      const t = tok, instan = played.has(i) && !ulang; UI.instan = instan; const ctx = { a: adegan, t, guru, instan, siap: () => { if (t.batal) return; siap = true; perbarui(); } };
+      try { await ADEGAN[i].f(ctx); } catch (e) { if (!(e instanceof UI.Batal)) console.error(e); } finally { if (tok === t) { UI.instan = false; if (!played.has(i)) { played.add(i); if (o.saatMain) o.saatMain([...played]); } } }
     }
     const tombol = (e) => { if (!guru && !o.papan) return; if (e.key === 'ArrowRight') { if (idx < ADEGAN.length - 1) ke(idx + 1); } else if (e.key === 'ArrowLeft') ke(idx - 1); };
     document.addEventListener('keydown', tombol);
