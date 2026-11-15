@@ -1,0 +1,14 @@
+.tabs-guru { display: flex; gap: .4rem; background: #fff; border: 1px solid var(--garis); border-radius: 99px; padding: .25rem; box-shadow: var(--bayang); }
+.tabs-guru button { display: inline-flex; gap: .45rem; align-items: center; min-height: 2.5rem; padding: 0 1.1rem; border: 0; border-radius: 99px; background: transparent; font-weight: 700; color: var(--tinta-2); cursor: pointer; }
+.tabs-guru button.aktif { background: var(--markisa); color: #fff; box-shadow: 0 .15rem 0 var(--markisa-tua); }
+.pantau, .kode-wrap { position: absolute; inset: 0; display: flex; flex-direction: column; }
+.stat-guru { display: flex; gap: .8rem; align-items: stretch; margin-bottom: .7rem; } .stat-guru .stat { padding: .6rem 1.2rem; min-width: 11rem; background: var(--tt); border: 0; box-shadow: none; } .stat-guru .stat b { font-family: var(--tampil); font-size: 2.2rem; color: var(--td); line-height: 1.1; display: block; }
+.grid-pantau { flex: 1; min-height: 0; display: grid; grid-template-columns: repeat(6, 1fr); grid-auto-rows: 1fr; gap: .6rem; overflow: auto; }
+.tile-pantau { position: relative; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: .25rem; padding: .4rem; background: #fff; border: .12rem solid var(--garis); border-radius: 1.1rem; cursor: pointer; text-align: center; }
+.tile-pantau .av { width: 2.4rem; height: 2.4rem; border-radius: 50%; background: var(--t); color: #fff; display: grid; place-items: center; font-weight: 700; font-size: .95rem; font-family: var(--tampil); } .tile-pantau .nm { font-weight: 700; font-size: .85rem; line-height: 1.12; max-height: 2.3em; overflow: hidden; } .tile-pantau .st { font-size: .74rem; font-weight: 700; padding: .05rem .5rem; border-radius: 99px; background: #EEEDF7; color: var(--tinta-2); }
+.tile-pantau.belum { background: #F6F5FB; } .tile-pantau.belum .nm { color: var(--tinta-3); } .tile-pantau.aktif { border-color: var(--f-trig); } .tile-pantau.aktif .st { background: var(--f-trig-t); color: var(--f-trig-d); }
+.tile-pantau.selesai { border-color: var(--mint); background: var(--mint-100); } .tile-pantau.selesai .st { background: var(--mint); color: #04382A; } .tile-pantau.diam .st { background: var(--jingga-100); color: var(--jingga-800); }
+.tile-pantau .kg { position: absolute; top: .3rem; right: .35rem; font-size: .7rem; font-weight: 700; background: var(--markisa); color: #fff; border-radius: 99px; padding: 0 .45rem; }
+
+.stat-guru .btn { align-self: center; }
+.kode-wrap .grid-pantau { flex: none; grid-auto-rows: 7.2rem; align-content: start; }
