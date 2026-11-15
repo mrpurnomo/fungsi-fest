@@ -73,6 +73,6 @@
 .konfeti { position: fixed; width: .6rem; height: 1rem; z-index: 450; pointer-events: none; border-radius: .15rem; }
 
 .layar-hitung { white-space: nowrap; overflow: hidden; display: block; text-align: center; line-height: 2.1rem; }
-.layar-hitung sup { font-size: .65em; line-height: 0; }
+
 .kecepatan { display: flex; align-items: center; gap: .35rem; padding: .2rem .3rem .2rem .7rem; border: 1px solid var(--garis); border-radius: 99px; background: #F8F7FD; } .kecepatan button { min-width: 2.6rem; min-height: 2.2rem; border: 0; border-radius: 99px; background: transparent; font-weight: 700; color: var(--tinta-2); cursor: pointer; } .kecepatan button.aktif { background: var(--markisa); color: #fff; box-shadow: 0 .12rem 0 var(--markisa-tua); }
 .chip-angka.ketuk { cursor: pointer; }

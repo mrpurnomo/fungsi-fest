@@ -128,7 +128,7 @@ button { font: inherit; color: inherit; }
 @media (prefers-reduced-motion: reduce) { .tablet, .btn.denyut { animation: none; } }
 
 /* ---------- rumus ---------- */
-.rumus { font-family: var(--mat); font-size: 3.2rem; line-height: 1.3; white-space: nowrap; }
+.rumus { font-family: var(--mat); font-size: 3.2rem; line-height: 1.3; white-space: pre; }
 .rumus .v { font-style: italic; } .rumus .tok { display: inline-block; transition: color .3s; }
 .warna-x { color: var(--f-eksp); } .warna-y { color: var(--mint); } .warna-hasil { color: var(--markisa); }
 
@@ -137,7 +137,7 @@ button { font: inherit; color: inherit; }
 .teks-soal-d { font-size: 1.5rem; line-height: 1.4; text-align: center; } .teks-soal-d i, .teks-soal i { font-family: var(--mat); }
 
 /* ---------- matematika ---------- */
-sup { font-size: .68em; line-height: 0; vertical-align: .55em; } i { font-family: var(--mat); padding-right: .07em; }
+sup { font-size: .68em; line-height: 0; vertical-align: baseline; position: relative; top: -.62em; margin-left: .04em; } i { font-family: var(--mat); padding-right: .07em; }
 .frak { display: inline-flex; flex-direction: column; align-items: center; vertical-align: middle; line-height: 1.15; font-size: .85em; } .frak .at { border-bottom: .08em solid currentColor; padding: 0 .25em; } .frak .bw { padding: 0 .25em; }
 .akar { display: inline-flex; align-items: flex-end; } .akar .di { border-top: .07em solid currentColor; padding: 0 .15em; margin-left: -.04em; }
 .cabang { display: inline-flex; align-items: center; gap: .3em; white-space: nowrap; } .kurawal { font-size: 3em; line-height: 1; font-weight: 300; transform: scaleX(.6); font-family: var(--isi); } .isi-cabang { display: flex; flex-direction: column; gap: .2em; text-align: left; }
@@ -217,7 +217,7 @@ sup { font-size: .68em; line-height: 0; vertical-align: .55em; } i { font-family
 .konfeti { position: fixed; width: .6rem; height: 1rem; z-index: 450; pointer-events: none; border-radius: .15rem; }
 
 .layar-hitung { white-space: nowrap; overflow: hidden; display: block; text-align: center; line-height: 2.1rem; }
-.layar-hitung sup { font-size: .65em; line-height: 0; }
+
 .kecepatan { display: flex; align-items: center; gap: .35rem; padding: .2rem .3rem .2rem .7rem; border: 1px solid var(--garis); border-radius: 99px; background: #F8F7FD; } .kecepatan button { min-width: 2.6rem; min-height: 2.2rem; border: 0; border-radius: 99px; background: transparent; font-weight: 700; color: var(--tinta-2); cursor: pointer; } .kecepatan button.aktif { background: var(--markisa); color: #fff; box-shadow: 0 .12rem 0 var(--markisa-tua); }
 .chip-angka.ketuk { cursor: pointer; }
 
@@ -310,6 +310,12 @@ sup { font-size: .68em; line-height: 0; vertical-align: .55em; } i { font-family
 .seg-langkah button .no { width: 1.8rem; height: 1.8rem; border-radius: 50%; background: var(--garis); display: grid; place-items: center; font-family: var(--tampil); } .seg-langkah button.aktif { background: var(--markisa); border-color: var(--markisa); color: #fff; box-shadow: 0 .15rem 0 var(--markisa-tua); } .seg-langkah button.aktif .no { background: #fff; color: var(--markisa); } .seg-langkah button.lalu { background: var(--mint-100); border-color: var(--mint); color: var(--mint-800); } .seg-langkah button.lalu .no { background: var(--mint); color: #04382A; }
 .panggung-kelas { display: grid; grid-template-columns: 1fr 1.2fr; gap: 1.2rem; min-height: 18rem; } .pk-kol h3 { margin-bottom: .1rem; } .pk-baris { display: flex; align-items: center; gap: .7rem; padding: .45rem .8rem; margin: .4rem 0; background: var(--markisa-muda); border-radius: 1rem; } .pk-baris.sembunyi { opacity: 0; } .pk-baris .rk { width: 2rem; height: 2rem; border-radius: 50%; color: #fff; display: grid; place-items: center; font-family: var(--tampil); font-weight: 700; flex: none; } .pk-baris b { flex: 1; font-size: 1.1rem; } .pk-baris .pt { font-family: var(--tampil); font-weight: 700; font-size: 1.5rem; color: var(--markisa); } .pk-baris .pt small { font-size: .75rem; color: var(--tinta-3); font-family: var(--isi); }
 
+.tm-chip { display: inline-flex; align-items: center; gap: .4rem; min-height: 2.3rem; padding: 0 .9rem; border: .12rem solid var(--garis-2); background: #fff; border-radius: 99px; font-weight: 700; font-variant-numeric: tabular-nums; color: var(--tinta-2); cursor: pointer; flex: none; }
+.tm-chip.jalan { background: var(--mint-100); border-color: var(--mint); color: var(--mint-800); } .tm-chip.hampir { background: var(--jingga-100); border-color: var(--jingga); color: var(--jingga-800); animation: denyutl 1s infinite; } .tm-chip.habis { background: var(--koral-100); border-color: var(--koral); color: var(--koral-800); animation: denyutl 1s infinite; }
+.panel-waktu { text-align: center; } .tm-tahap { display: flex; flex-wrap: wrap; gap: .4rem; justify-content: center; margin: .3rem 0 .6rem; } .tm-tahap button { border: .12rem solid var(--garis-2); background: #fff; border-radius: 99px; padding: .3rem .9rem; font-weight: 700; font-size: .92rem; cursor: pointer; color: var(--tinta-2); } .tm-tahap button.aktif { background: var(--markisa); border-color: var(--markisa); color: #fff; }
+.tm-besar { font-family: var(--tampil); font-weight: 700; font-size: 6.5rem; line-height: 1.1; color: var(--markisa); margin: .2rem 0 .6rem; font-variant-numeric: tabular-nums; } .tm-besar.habis { color: var(--koral); }
+.tm-atur { justify-content: center; flex-wrap: wrap; }
+
 /* Tahap lanjutan: pakar berpasangan */
 .t2-hub { position: absolute; inset: 0; display: grid; grid-template-columns: 21rem 1fr; gap: 1.1rem; }
 .t2-sisi { margin: 0; display: flex; flex-direction: column; gap: .6rem; min-height: 0; overflow: auto; padding: 1rem 1.1rem; scrollbar-width: thin; }
@@ -381,6 +387,10 @@ sup { font-size: .68em; line-height: 0; vertical-align: .55em; } i { font-family
 .ph-tugas { margin: .6rem 0 0; font-size: 1.05rem; }
 
 .t2-prog { display: flex; gap: .45rem; margin: .5rem 0 .2rem; } .t2-prog .pt { flex: 1; height: .8rem; max-width: 3.2rem; border-radius: 99px; background: var(--garis); } .t2-prog .pt.on { background: var(--t); } .t2-kartu.selesai .t2-prog .pt.on { background: var(--mint); } .t2-kartu.terkunci .t2-prog .pt { background: #E4E2F0; }
+
+.tabel-besar { max-width: 28rem; } .tabel-besar .tabel-mini { font-size: 1.25rem; } .tabel-besar .tabel-mini th { font-size: .95rem; }
+.gd { display: grid; grid-template-columns: 1fr 1fr; gap: 1.2rem; } .gd-g { height: 17rem; } .gd-g svg { width: 100%; height: 100%; }
+.t2-catatan { width: 100%; }
 </style>
 </head>
 <body>
@@ -605,7 +615,8 @@ sup { font-size: .68em; line-height: 0; vertical-align: .55em; } i { font-family
     (v.titik || []).forEach((p) => { const c = S('circle', { cx: b.sx(p.x), cy: b.sy(p.y), r: 8, fill: p.t === 'kosong' ? '#fff' : warna, stroke: warna, 'stroke-width': 3.4, opacity: 0, class: 'tk' }); b.lapis.titik.append(c); });
     return { b, kurva: g };
   }
-  root.GF = { S, fmt, sampel, bidang, tumbuh, gambarKurva, K, gambarVarian };
+  function statis(v, warna, tebal) { const b = bidang(Object.assign({ W: 640, H: 440 }, v.spec)); if (v.tegak) v.tegak.forEach((x) => b.tegak(x, warna)); b.kurva(v.garis(), { warna, tebal: tebal || 5 }); (v.titik || []).forEach((p) => b.lapis.titik.append(S('circle', { cx: b.sx(p.x), cy: b.sy(p.y), r: 8, fill: p.t === 'kosong' ? '#fff' : warna, stroke: warna, 'stroke-width': 3.4 }))); return b; }
+  root.GF = { S, fmt, sampel, bidang, tumbuh, gambarKurva, K, gambarVarian, statis };
 })(window);
 
 ;
@@ -706,7 +717,7 @@ const nama = (i) => (i === DUMMY ? 'Siswa Uji Coba (Guru)' : judulKata(DAFTAR[i]
     { fam: 'poli', judul: 'Kotak dari karton', teks: 'Selembar karton dilipat membentuk kotak. Volume kotak bergantung pada tinggi lipatan: mula-mula naik, mencapai puncak, lalu turun lagi.', x: 'tinggi lipatan (cm)', y: 'volume (cm³)', baris: [[1, 100], [2, 128], [3, 108], [4, 64]] },
     { fam: 'eksp', judul: 'Pengikut akun', teks: 'Jumlah pengikut sebuah akun menjadi dua kali lipat setiap minggu.', x: 'minggu ke-', y: 'pengikut', baris: [[0, 500], [1, '1.000'], [2, '2.000'], [3, '4.000']] },
     { fam: 'log', judul: 'Kepuasan pembeli donat', teks: 'Isi kotak donat dilipatduakan, kepuasan hanya bertambah 10 poin. Makin banyak, pertambahannya makin kecil.', x: 'isi kotak', y: 'kepuasan', baris: [[1, 0], [2, 10], [4, 20], [8, 30]] },
-    { fam: 'trig', judul: 'Wisatawan musiman', teks: 'Jumlah wisatawan di pantai naik turun mengikuti musim dan pola yang sama berulang setiap 12 bulan.', x: 'bulan ke-', y: 'wisatawan', baris: [[0, '2.000'], [3, '3.000'], [6, '4.000'], [9, '3.000'], [12, '2.000']] },
+    { fam: 'trig', judul: 'Wisatawan musiman', teks: 'Jumlah wisatawan di pantai naik turun mengikuti musim dan pola yang sama berulang setiap 12 bulan.', x: 'bulan ke-', y: 'wisatawan', baris: [[0, '2.000'], [2, '2.500'], [4, '3.500'], [6, '4.000'], [8, '3.500'], [10, '2.500'], [12, '2.000']] },
     { fam: 'rasional', judul: 'Patungan sewa bus', teks: 'Biaya bus Rp600.000 dibagi rata. Makin banyak peserta, iuran tiap orang makin kecil tetapi tidak pernah nol.', x: 'peserta', y: 'iuran (ribu)', baris: [[2, 300], [4, 150], [10, 60], [24, 25]] },
     { fam: 'akar', judul: 'Lahan persegi', teks: 'Panjang sisi lahan persegi adalah akar dari luasnya. Luas 4 kali lipat, sisi hanya 2 kali lipat.', x: 'luas (m²)', y: 'sisi (m)', baris: [[1, 1], [4, 2], [25, 5], [100, 10]] },
     { fam: 'mutlak', judul: 'Selisih dari harga acuan', teks: 'Selisih harga barang dari harga acuan Rp50.000, tanpa peduli lebih mahal atau lebih murah.', x: 'harga (ribu)', y: 'selisih (ribu)', baris: [[30, 20], [40, 10], [50, 0], [60, 10]] },
@@ -714,11 +725,31 @@ const nama = (i) => (i === DUMMY ? 'Siswa Uji Coba (Guru)' : judulKata(DAFTAR[i]
     { fam: 'sepotong', judul: 'Tagihan air', teks: 'Rp3.000 per m³ untuk 10 m³ pertama, lalu Rp5.000 per m³ untuk pemakaian di atasnya.', x: 'pemakaian (m³)', y: 'tagihan (ribu)', baris: [[5, 15], [10, 30], [15, 55], [20, 80]] }
   ];
 
+
+  /* soal cerita kartu pakar: aljabar dan angka diacak tiap percobaan */
+  const SUPD = '⁰¹²³⁴⁵⁶⁷⁸⁹'; const sp = (n) => String(n).split('').map((c) => SUPD[+c]).join(''); const pil = (r, a) => a[rint(r, 0, a.length - 1)];
+  const rb = (n) => String(n).replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+  function tantanganAcak(fam, seed) {
+    const r = mulberry(seed | 0), t = rint(r, 0, 1);
+    if (fam === 'poli') {
+      if (t === 0) { const a = pil(r, [12, 14, 16, 18, 20]), x = rint(r, 1, 3), v = x * (a - 2 * x) * (a - 2 * x); return { kunci: v, tanya: 'Karton dilipat menjadi kotak tanpa tutup. Volume kotak (cm³) adalah <i>V</i>(<i>x</i>) = <i>x</i>(' + a + ' − 2<i>x</i>)<sup>2</sup>, dengan <i>x</i> = tinggi lipatan (cm). Berapa volume kotak jika tinggi lipatannya ' + x + ' cm?', jelas: 'Ganti x dengan ' + x + ': V(' + x + ') = ' + x + ' × (' + a + ' − ' + 2 * x + ')² = ' + x + ' × ' + (a - 2 * x) + '² = ' + x + ' × ' + (a - 2 * x) * (a - 2 * x) + ' = ' + v + ' cm³. Jika dijabarkan, pangkat tertingginya 3, jadi ini polinomial derajat 3.' }; }
+      const u = pil(r, [20, 30, 40]), tt = rint(r, 1, 3), v = u * tt - 5 * tt * tt; return { kunci: v, tanya: 'Bola dilempar ke atas. Tinggi bola (meter) adalah <i>h</i>(<i>t</i>) = ' + u + '<i>t</i> − 5<i>t</i><sup>2</sup>, dengan <i>t</i> = waktu (detik). Berapa tinggi bola pada detik ke-' + tt + '?', jelas: 'Ganti t dengan ' + tt + ': h(' + tt + ') = ' + u + ' × ' + tt + ' − 5 × ' + tt + '² = ' + u * tt + ' − ' + 5 * tt * tt + ' = ' + v + ' meter. Pangkat tertingginya 2, jadi ini polinomial derajat 2 (parabola).' };
+    }
+    if (fam === 'eksp') { const b = pil(r, [2, 3]), A = pil(r, [100, 200, 250, 500]), e = b === 2 ? rint(r, 3, 5) : rint(r, 2, 4), v = A * Math.pow(b, e), kata = t === 0 ? ['Pengikut sebuah akun', 'minggu'] : ['Jumlah bakteri', 'jam']; return { kunci: v, tanya: kata[0] + ' menjadi ' + (b === 2 ? 'dua' : 'tiga') + ' kali lipat setiap ' + kata[1] + ': <i>P</i>(<i>t</i>) = ' + A + ' × ' + b + '<sup><i>t</i></sup>, dengan <i>t</i> = ' + kata[1] + ' ke-. Berapa jumlahnya pada ' + kata[1] + ' ke-' + e + '?', jelas: b + sp(e) + ' = ' + Math.pow(b, e) + ', jadi P(' + e + ') = ' + A + ' × ' + Math.pow(b, e) + ' = ' + rb(v) + '. Peubah t berada di pangkat: ciri fungsi eksponensial yang naik makin cepat.' }; }
+    if (fam === 'log') { const b = pil(r, [2, 3]), k = b === 2 ? rint(r, 2, 5) : rint(r, 2, 4), q = Math.pow(b, k), c = pil(r, [5, 10, 20]); return { kunci: c * k, tanya: 'Kepuasan pembeli dirumuskan <i>K</i>(<i>q</i>) = ' + c + ' × <sup>' + b + '</sup>log <i>q</i>, dengan <i>q</i> = jumlah barang. Berapa kepuasan untuk ' + q + ' barang?', jelas: sp(b) + 'log ' + q + ' menanyakan: ' + b + ' dipangkatkan berapa agar hasilnya ' + q + '? Jawabannya ' + k + ', karena ' + b + sp(k) + ' = ' + q + '. Jadi K(' + q + ') = ' + c + ' × ' + k + ' = ' + c * k + '.' }; }
+    if (fam === 'trig') { const A = pil(r, [2, 4, 6, 8]), x = pil(r, [30, 90, 150, 270]), sv = { 30: 1 / 2, 90: 1, 150: 1 / 2, 270: -1 }[x], v = A * sv; return { kunci: v, tanya: 'Tinggi gelombang di pantai (meter) adalah <i>h</i>(<i>x</i>) = ' + A + ' sin <i>x</i>, dengan <i>x</i> dalam derajat. Berapa tinggi gelombang saat <i>x</i> = ' + x + '?', jelas: 'sin ' + x + '° = ' + (sv === 1 / 2 ? '½' : (sv === 1 ? '1' : '−1')) + ', jadi h = ' + A + ' × ' + (sv === 1 / 2 ? '½' : (sv === 1 ? '1' : '(−1)')) + ' = ' + v + '. Sinus berayun antara −1 dan 1 dan berulang: ciri fungsi trigonometri.' }; }
+    if (fam === 'rasional') { const T = pil(r, [240, 360, 480, 600, 720, 1200]), ds = [4, 5, 6, 8, 10, 12, 15, 20, 24, 30, 40].filter((d) => T % d === 0), n = pil(r, ds); return { kunci: T / n, tanya: 'Patungan sewa bus Rp' + rb(T * 1000) + '. Iuran tiap orang (ribu rupiah) adalah <i>I</i>(<i>n</i>) = ' + T + ' ÷ <i>n</i>, dengan <i>n</i> = banyak peserta. Berapa iuran jika ' + n + ' orang ikut?', jelas: T + ' ÷ ' + n + ' = ' + T / n + ', jadi Rp' + rb(T / n * 1000) + ' per orang. Peubah n ada di penyebut: ciri fungsi rasional. Makin banyak peserta, iuran makin kecil.' }; }
+    if (fam === 'akar') { if (t === 0) { const L = pil(r, [16, 25, 36, 49, 64, 81, 100, 121, 144]); return { kunci: Math.sqrt(L), tanya: 'Lahan berbentuk persegi seluas <i>L</i> m² memiliki panjang sisi <i>s</i>(<i>L</i>) = √<i>L</i> meter. Berapa panjang sisi lahan seluas ' + L + ' m²?', jelas: '√' + L + ' = ' + Math.sqrt(L) + ' karena ' + Math.sqrt(L) + ' × ' + Math.sqrt(L) + ' = ' + L + '. Fungsi akar naik makin landai.' }; } const k = rint(r, 2, 6), h = 5 * k * k; return { kunci: k, tanya: 'Waktu jatuh benda (detik) dari ketinggian <i>h</i> meter adalah <i>t</i>(<i>h</i>) = √(<i>h</i> ÷ 5). Berapa waktu jatuh dari ketinggian ' + h + ' m?', jelas: h + ' ÷ 5 = ' + k * k + ', lalu √' + k * k + ' = ' + k + ' detik. Fungsi akar naik makin landai.' }; }
+    if (fam === 'mutlak') { const c = pil(r, [40, 50, 60, 75]), d = rint(r, 5, 30), p = t === 0 ? c - d : c + d, kata = t === 0 ? ['harga acuan', 'ribu rupiah'] : ['harga acuan', 'ribu rupiah']; return { kunci: d, tanya: 'Harga acuan sebuah barang Rp' + c + '.000. Selisih harga adalah <i>d</i>(<i>p</i>) = |<i>p</i> − ' + c + '| (' + kata[1] + '). Berapa selisihnya jika harga di toko Rp' + p + '.000 (<i>p</i> = ' + p + ')?', jelas: '|' + p + ' − ' + c + '| = |' + (p - c < 0 ? '−' + (c - p) : (p - c)) + '| = ' + d + '. Nilai mutlak tidak pernah negatif, jadi lebih murah maupun lebih mahal sama-sama dihitung sebagai selisih.' }; }
+    if (fam === 'tangga') { const a = pil(r, [3, 4, 5]), b = pil(r, [2, 3]), tm = pil(r, [1.5, 2.2, 2.5, 3.1, 3.5]), n = Math.ceil(tm), v = a + b * (n - 1), tk = String(tm).replace('.', ','); return { kunci: v, tanya: 'Tarif parkir: ' + a + ' ribu untuk jam pertama, lalu ' + b + ' ribu tiap jam berikutnya atau sebagiannya. Dengan rumus <i>T</i>(<i>t</i>) = ' + a + ' + ' + b + ' × (<i>t</i> dibulatkan ke atas − 1) ribu rupiah, berapa tarif parkir ' + tk + ' jam?', jelas: tk + ' dibulatkan ke atas menjadi ' + n + ', jadi T = ' + a + ' + ' + b + ' × (' + n + ' − 1) = ' + v + ' ribu. Pembulatan ke atas membuat tarif naik seperti anak tangga.' }; }
+    /* sepotong */ { const p1 = pil(r, [2, 3, 4]), p2 = pil(r, [5, 6, 7, 8]), bt = pil(r, [10, 20]), atas = rint(r, 0, 1) === 1, x = atas ? bt + rint(r, 2, 8) : rint(r, 3, bt - 2), v = atas ? p1 * bt + p2 * (x - bt) : p1 * x; return { kunci: v, tanya: 'Tarif air (ribu rupiah): ' + p1 + '<i>x</i> jika pemakaian <i>x</i> ≤ ' + bt + ' m³, dan ' + p1 * bt + ' + ' + p2 + '(<i>x</i> − ' + bt + ') jika <i>x</i> &gt; ' + bt + ' m³. Berapa biaya pemakaian ' + x + ' m³?', jelas: atas ? 'x = ' + x + ' lebih dari ' + bt + ', jadi pakai rumus kedua: ' + p1 * bt + ' + ' + p2 + '(' + x + ' − ' + bt + ') = ' + p1 * bt + ' + ' + p2 * (x - bt) + ' = ' + v + ' ribu. Dua rumus berlaku pada rentang berbeda: fungsi sepotong-sepotong.' : 'x = ' + x + ' tidak lebih dari ' + bt + ', jadi pakai rumus pertama: ' + p1 + ' × ' + x + ' = ' + v + ' ribu. Dua rumus berlaku pada rentang berbeda: fungsi sepotong-sepotong.' }; }
+  }
+
   const ALASAN = {
     poli: 'Volume naik dulu sampai puncak (128 pada 2 cm), lalu turun lagi. Grafiknya melengkung mulus dengan satu “bukit”. Itu ciri polinomial (di sini derajat 3).',
     eksp: 'Tiap minggu dikali 2: 500 → 1.000 → 2.000 → 4.000. Kenaikannya makin besar sehingga grafik makin curam. Itu ciri eksponensial.',
     log: 'Isi dilipatduakan, kepuasan hanya bertambah 10 (0 → 10 → 20 → 30). Naik terus tetapi makin landai: ciri logaritma.',
-    trig: 'Naik ke puncak 4.000 di bulan ke-6, turun ke 2.000 di bulan ke-12, lalu mengulang pola yang sama. Pola berulang adalah ciri trigonometri (sinus/kosinus).',
+    trig: 'Naik ke puncak 4.000 di bulan ke-6, turun lagi ke 2.000 di bulan ke-12, lalu mengulang pola yang sama. Pola berulang adalah ciri trigonometri (sinus/kosinus).',
     rasional: 'Hasil kali x dan y selalu 600 (2 × 300, 4 × 150, 10 × 60). Makin banyak peserta, iuran turun tajam lalu landai mendekati nol: ciri rasional.',
     akar: 'Luas 1, 4, 25, 100 menghasilkan sisi 1, 2, 5, 10. Mulai dari titik awal lalu makin landai: ciri fungsi akar.',
     mutlak: 'Selisih 20, 10, 0, 10: turun sampai harga acuan, lalu naik lagi. Bentuk huruf V dan tidak pernah negatif: ciri nilai mutlak.',
@@ -728,10 +759,10 @@ const nama = (i) => (i === DUMMY ? 'Siswa Uji Coba (Guru)' : judulKata(DAFTAR[i]
   SITUASI.forEach((x) => { x.alasan = ALASAN[x.fam]; });
   /* bank diskusi kelompok: konteks sehari-hari lain, ditebak bersama jenis fungsinya */
   const DISKUSI = [
-    { fam: 'poli', judul: 'Tendangan bola', konteks: 'Bola ditendang ke atas. Tinggi bola dicatat setiap detik.', x: 'detik ke-', y: 'tinggi (m)', baris: [[0, 0], [1, 4], [2, 6], [3, 6], [4, 4], [5, 0]], alasan: 'Tinggi naik, mencapai puncak di tengah, lalu turun simetris. Lintasan bola berbentuk parabola, yaitu polinomial derajat 2.' },
+    { fam: 'poli', judul: 'Tendangan bola', konteks: 'Bola ditendang ke atas. Tinggi bola dicatat setiap detik.', x: 'detik ke-', y: 'tinggi (m)', baris: [[0, 0], [1, 5], [2, 8], [3, 9], [4, 8], [5, 5], [6, 0]], alasan: 'Tinggi naik, mencapai puncak (9 m) di detik ke-3, lalu turun simetris. Lintasan bola berbentuk parabola, yaitu polinomial derajat 2.' },
     { fam: 'eksp', judul: 'Tabungan berbunga', konteks: 'Tabungan Rp1.000.000 berbunga 10% per tahun, bunganya ikut berbunga.', x: 'tahun ke-', y: 'saldo (ribu)', baris: [[0, '1.000'], [1, '1.100'], [2, '1.210'], [3, '1.331']], alasan: 'Setiap tahun dikali 1,1: 1.000 → 1.100 → 1.210 → 1.331. Tambahannya makin besar. Pertumbuhan dengan faktor kali yang tetap adalah ciri eksponensial.' },
     { fam: 'log', judul: 'Kerasnya suara', konteks: 'Tingkat kebisingan (desibel) diukur dari bunyi yang makin keras. Setiap bunyi 10 kali lebih kuat, desibel naik sama banyak.', x: 'kekuatan bunyi (kali)', y: 'desibel', baris: [[1, 0], [10, 10], [100, 20], [1000, 30]], alasan: 'Kekuatan dikali 10 membuat desibel hanya bertambah 10. Tambahan tetap untuk kali yang tetap adalah ciri logaritma.' },
-    { fam: 'trig', judul: 'Jam sibuk jalan raya', konteks: 'Jumlah kendaraan yang lewat per jam di sebuah jalan, dicatat sepanjang hari. Pola yang sama berulang setiap hari.', x: 'jam ke-', y: 'kendaraan', baris: [[0, 200], [6, 600], [12, 1000], [18, 600], [24, 200]], alasan: 'Naik ke puncak siang hari, turun malam hari, dan kembali ke 200 pada jam ke-24: pola berulang tiap 24 jam. Itu ciri trigonometri (periodik).' },
+    { fam: 'trig', judul: 'Jam sibuk jalan raya', konteks: 'Jumlah kendaraan yang lewat per jam di sebuah jalan, dicatat sepanjang hari. Pola yang sama berulang setiap hari.', x: 'jam ke-', y: 'kendaraan', baris: [[0, 200], [4, 400], [8, 800], [12, 1000], [16, 800], [20, 400], [24, 200]], alasan: 'Naik ke puncak 1000 pada jam ke-12 (siang), turun lagi, dan kembali ke 200 pada jam ke-24: pola berulang tiap 24 jam. Itu ciri trigonometri (periodik).' },
     { fam: 'rasional', judul: 'Waktu perjalanan', konteks: 'Jarak ke kota tujuan 120 km. Waktu tempuh bergantung pada kecepatan kendaraan.', x: 'kecepatan (km/jam)', y: 'waktu (jam)', baris: [[40, 3], [60, 2], [80, '1,5'], [120, 1]], alasan: 'Kecepatan dikali 2 membuat waktu menjadi setengahnya, dan hasil kali x dan y selalu 120. Itu ciri fungsi rasional (kebalikan).' },
     { fam: 'akar', judul: 'Benda jatuh', konteks: 'Sebuah benda dijatuhkan dari ketinggian tertentu. Waktu jatuhnya dicatat.', x: 'tinggi (m)', y: 'waktu (detik)', baris: [[5, 1], [20, 2], [45, 3], [80, 4]], alasan: 'Tinggi 4 kali lipat membuat waktu hanya 2 kali lipat (5 → 20, 1 → 2). Naik makin landai dan berawal dari titik awal: ciri fungsi akar.' },
     { fam: 'mutlak', judul: 'Jarak ke halte', konteks: 'Halte berada di km ke-3 pada jalan lurus. Kamu mencatat jarak dari beberapa rumah ke halte, tanpa peduli di kiri atau kanan halte.', x: 'posisi rumah (km)', y: 'jarak ke halte (km)', baris: [[0, 3], [1, 2], [3, 0], [5, 2]], alasan: 'Jarak mengecil sampai 0 di halte lalu membesar lagi, dan tidak pernah negatif. Bentuk huruf V: ciri nilai mutlak.' },
@@ -767,7 +798,7 @@ const nama = (i) => (i === DUMMY ? 'Siswa Uji Coba (Guru)' : judulKata(DAFTAR[i]
     ];
   }
 
-  const api = { KELAS, SET, NAMA_FAM, DISKUSI, PROMPT, diskusiSiswa, hitungPoin, bagianPasangan, TANTANGAN, SITUASI, PENGECOH, cocokSiswa, tiketSiswa, DAFTAR, DUMMY, PIN_GURU, nama, judulKata, DURASI, JUMLAH_SOAL, KELOMPOK, MAKS_ANGGOTA, soalSiswa, nilai, buatKode, bacaKode, bentukKelompok, tambahKelompok, ALFA };
+  const api = { tantanganAcak, KELAS, SET, NAMA_FAM, DISKUSI, PROMPT, diskusiSiswa, hitungPoin, bagianPasangan, TANTANGAN, SITUASI, PENGECOH, cocokSiswa, tiketSiswa, DAFTAR, DUMMY, PIN_GURU, nama, judulKata, DURASI, JUMLAH_SOAL, KELOMPOK, MAKS_ANGGOTA, soalSiswa, nilai, buatKode, bacaKode, bentukKelompok, tambahKelompok, ALFA };
   if (typeof module !== 'undefined' && module.exports) module.exports = api; else root.BS = api;
 })(typeof window !== 'undefined' ? window : globalThis);
 
@@ -990,7 +1021,7 @@ const nama = (i) => (i === DUMMY ? 'Siswa Uji Coba (Guru)' : judulKata(DAFTAR[i]
   function gambarAtas() {
     atas.innerHTML = ''; atas.append(el('span', { kelas: 'logo' }, 'Grafik ', el('b', null, 'Fungsi'), el('span', { kelas: 'chip sorot', gaya: 'margin-left:.4rem' }, 'Guru')));
     const tabs = el('div', { kelas: 'tabs-guru' }); [['penjelasan', 'layar', 'Penjelasan'], ['pantau', 'siswa', 'Pantau'], ['kelompok', 'kelompok', 'Kelompok'], ['t2', 'bintang', 'Tahap 2'], ['kode', 'salin', 'Kode']].forEach(([id, ikon, t]) => tabs.append(el('button', { type: 'button', kelas: id === tab ? 'aktif' : '', html: ik(ikon, 'kecil') + t, onclick: () => ke(id) }))); atas.append(el('span', { kelas: 'ruang' }), tabs, el('span', { kelas: 'ruang' }));
-    atas.append(el('span', { kelas: 'chip ' + (net === 'online' ? 'ok' : (net === 'cek' ? 'abu' : 'warn')), html: ik(net === 'online' ? 'wifi' : 'putus', 'kecil') + (net === 'online' ? 'Server aktif' : (net === 'cek' ? 'Memeriksa…' : 'Mode mandiri')) }), el('button', { kelas: 'btn sekunder kecil', type: 'button', html: ik('layar', 'kecil'), 'aria-label': 'Layar penuh', title: 'Layar penuh', onclick: UI.layarPenuh }), el('button', { kelas: 'btn bahaya kecil', type: 'button', html: ik('kembali', 'kecil') + 'Keluar', onclick: keluar }));
+    atas.append(tmChip(), el('span', { kelas: 'chip ' + (net === 'online' ? 'ok' : (net === 'cek' ? 'abu' : 'warn')), html: ik(net === 'online' ? 'wifi' : 'putus', 'kecil') + (net === 'online' ? 'Server aktif' : (net === 'cek' ? 'Memeriksa…' : 'Mode mandiri')) }), el('button', { kelas: 'btn sekunder kecil', type: 'button', html: ik('layar', 'kecil'), 'aria-label': 'Layar penuh', title: 'Layar penuh', onclick: UI.layarPenuh }), el('button', { kelas: 'btn bahaya kecil', type: 'button', html: ik('kembali', 'kecil') + 'Keluar', onclick: keluar }));
   }
   async function keluar() { if (!(await UI.konfirmasi('Keluar dari halaman guru?', '<p class="tengah">Kamu akan kembali ke layar sambutan dan harus memasukkan PIN lagi.</p>', 'Keluar', 'Batal'))) return; try { sessionStorage.removeItem('gfg_pin'); } catch (e) { /* abaikan */ } location.href = 'index.html'; }
   function bersih() { clearInterval(poll); if (intro) { intro.stop(); intro = null; } pg.innerHTML = ''; }
@@ -1070,7 +1101,7 @@ const nama = (i) => (i === DUMMY ? 'Siswa Uji Coba (Guru)' : judulKata(DAFTAR[i]
       w.innerHTML = ''; if (net !== 'online' || !data || !data.tahap2) { w.append(el('div', { kelas: 'tengah-isi' }, el('h2', null, 'Perlu server'), el('p', { kelas: 'muted' }, 'Pemantauan tahap lanjutan hanya tersedia saat server terhubung.'))); return; }
       const t = data.tahap2, fmt = (v, d) => (v == null ? '–' : v.toFixed(d == null ? 1 : d).replace('.', ',')), lk = t.langkah || 1;
       const ctrl = el('div', { kelas: 'kartu ctrl-langkah' }); ctrl.append(el('div', null, el('div', { kelas: 'eyebrow', gaya: 'margin:0' }, 'Langkah yang dibuka untuk siswa'), el('div', { kelas: 'muted kecil' }, 'Siswa mengerjakan berurutan. Langkah berikutnya terbuka saat kamu menekannya.')));
-      const seg = el('div', { kelas: 'seg-langkah' }); LANGKAH.forEach((nm, i) => seg.append(el('button', { type: 'button', kelas: (i + 1) === lk ? 'aktif' : ((i + 1) < lk ? 'lalu' : ''), html: '<span class="no">' + (i + 1) + '</span>' + nm + ((i + 1) < lk ? ik('centang', 'kecil') : ''), onclick: async () => { await ga('g-langkah', { n: i + 1 }); UI.toast('Langkah ' + (i + 1) + ' dibuka: ' + nm, 'centang'); muat(); } })));
+      const seg = el('div', { kelas: 'seg-langkah' }); LANGKAH.forEach((nm, i) => seg.append(el('button', { type: 'button', kelas: (i + 1) === lk ? 'aktif' : ((i + 1) < lk ? 'lalu' : ''), html: '<span class="no">' + (i + 1) + '</span>' + nm + ((i + 1) < lk ? ik('centang', 'kecil') : ''), onclick: async () => { await ga('g-langkah', { n: i + 1 }); if (TM.i !== 3 + i) tmPilih(3 + i, false); UI.toast('Langkah ' + (i + 1) + ' dibuka: ' + nm, 'centang'); muat(); } })));
       ctrl.append(seg, el('button', { kelas: 'btn sorot', type: 'button', html: ik('bintang', 'kecil') + 'Panggung Kelas', onclick: () => panggungKelas(t) })); w.append(ctrl);
       w.append(el('div', { kelas: 'stat-guru' }, el('div', { kelas: 'kartu stat fx-log', html: '<div class="eyebrow" style="margin:0">Selesai tahap lanjutan</div><b>' + t.selesai + '/24</b>' }), el('div', { kelas: 'kartu stat fx-trig', html: '<div class="eyebrow" style="margin:0">Tebak fungsinya</div><b>' + fmt(t.diskusi) + ' / 6</b>' }), el('div', { kelas: 'kartu stat fx-eksp', html: '<div class="eyebrow" style="margin:0">Cocokkan grafik</div><b>' + fmt(t.cocok) + ' / 5</b>' }), el('div', { kelas: 'kartu stat fx-poli', html: '<div class="eyebrow" style="margin:0">Tiket keluar</div><b>' + fmt(t.tiket) + ' / 3</b>' })));
       const k = el('div', { kelas: 'kartu gulir', gaya: 'flex:1;min-height:0' }); k.append(el('h3', null, 'Pemahaman per jenis grafik'), el('p', { kelas: 'muted kecil' }, 'Dari refleksi akhir siswa: jenis yang dikuasai dan yang masih membingungkan. Jenis dengan banyak “bingung” layak dibahas ulang.'));
@@ -1102,6 +1133,53 @@ const nama = (i) => (i === DUMMY ? 'Siswa Uji Coba (Guru)' : judulKata(DAFTAR[i]
     }
     render();
   }
+
+  /* ---------------- pengatur waktu per tahap ---------------- */
+  const TAHAP = [
+    { nama: 'Penjelasan', dur: 600, tab: 'penjelasan' }, { nama: 'Tes awal', dur: 600, tab: 'pantau' }, { nama: 'Kelompok', dur: 300, tab: 'kelompok' },
+    { nama: 'Langkah 1 · Kartu pakar', dur: 600, tab: 't2', langkah: 1 }, { nama: 'Langkah 2 · Tebak fungsinya', dur: 720, tab: 't2', langkah: 2 },
+    { nama: 'Langkah 3 · Cocokkan grafik', dur: 480, tab: 't2', langkah: 3 }, { nama: 'Langkah 4 · Tiket keluar', dur: 480, tab: 't2', langkah: 4 }
+  ];
+  const TM = Object.assign({ i: 0, sisa: TAHAP[0].dur, jalan: false, akhir: 0, dur: {}, habis: false }, LS('timer', {}));
+  const durasi = (i) => (TM.dur && TM.dur[i]) || TAHAP[i].dur, sisaNow = () => (TM.jalan ? Math.max(0, Math.round((TM.akhir - Date.now()) / 1000)) : TM.sisa), simpanTM = () => LSset('timer', TM);
+  const mmss = (v) => String(Math.floor(v / 60)).padStart(2, '0') + ':' + String(v % 60).padStart(2, '0');
+  function tmMulai() { if (!TM.jalan) { if (TM.sisa <= 0) TM.sisa = durasi(TM.i); TM.akhir = Date.now() + TM.sisa * 1000; TM.jalan = true; TM.habis = false; simpanTM(); } }
+  function tmJeda() { if (TM.jalan) { TM.sisa = sisaNow(); TM.jalan = false; simpanTM(); } }
+  function tmTambah(d) { const v = Math.max(0, sisaNow() + d); if (TM.jalan) TM.akhir = Date.now() + v * 1000; else TM.sisa = v; TM.habis = v <= 0 && TM.habis; if (v > 0) TM.habis = false; simpanTM(); }
+  function tmPilih(i, mulai) { TM.i = i; TM.sisa = durasi(i); TM.jalan = false; TM.habis = false; simpanTM(); if (mulai) tmMulai(); tmTick(); }
+  function beep() { try { const A = new (window.AudioContext || window.webkitAudioContext)(); [0, .38, .76].forEach((t) => { const o = A.createOscillator(), g = A.createGain(); o.frequency.value = 880; g.gain.value = .18; o.connect(g); g.connect(A.destination); o.start(A.currentTime + t); o.stop(A.currentTime + t + .24); }); } catch (e) { /* abaikan */ } }
+  function tmChip() { return el('button', { kelas: 'tm-chip', type: 'button', title: 'Pengatur waktu: ' + TAHAP[TM.i].nama, html: ik('jam', 'kecil') + '<span class="tm-live">' + mmss(sisaNow()) + '</span>', onclick: panelWaktu }); }
+  function tmTick() {
+    const v = sisaNow(); document.querySelectorAll('.tm-live').forEach((e) => { e.textContent = mmss(v); });
+    document.querySelectorAll('.tm-chip').forEach((c) => { c.classList.toggle('jalan', TM.jalan && v > 60); c.classList.toggle('hampir', TM.jalan && v <= 60 && v > 0); c.classList.toggle('habis', v <= 0 && TM.habis); c.title = 'Pengatur waktu: ' + TAHAP[TM.i].nama; });
+    if (TM.jalan && v <= 0 && !TM.habis) { TM.jalan = false; TM.sisa = 0; TM.habis = true; simpanTM(); beep(); popupHabis(); }
+  }
+  async function pindahTahap(i) {
+    if (i >= TAHAP.length) { tmJeda(); ke('t2'); setTimeout(() => { if (data && data.tahap2) panggungKelas(data.tahap2); }, 800); return; }
+    const t = TAHAP[i]; if (t.langkah) await ga('g-langkah', { n: t.langkah }); ke(t.tab); tmPilih(i, true); UI.toast('Pewaktu berjalan: ' + t.nama, 'jam');
+  }
+  let popupAktif = false;
+  async function popupHabis() {
+    if (popupAktif) return; popupAktif = true; const i = TM.i, akhir = i >= TAHAP.length - 1, nx = akhir ? null : TAHAP[i + 1];
+    const v = await UI.dialog({ judul: 'Waktu habis', ikon: ik('jam', 'besar'), isi: '<div class="tengah"><p style="font-size:1.4rem;margin:.2rem 0"><b>' + esc(TAHAP[i].nama) + '</b> sudah melewati waktunya.</p><p class="muted">Tambah waktu bila perlu, atau lanjutkan ke ' + (akhir ? 'penutup (Panggung Kelas).' : '<b>' + esc(nx.nama) + '</b>.') + '</p></div>', tombol: [{ t: '+1 menit', nilai: 'm1', kelas: 'sekunder' }, { t: '+5 menit', nilai: 'm5', kelas: 'sekunder' }, { t: akhir ? 'Buka Panggung Kelas' : 'Lanjut: ' + nx.nama, nilai: 'lanjut', ikon: 'panah' }] });
+    popupAktif = false; if (v === 'm1' || v === 'm5') { tmTambah(v === 'm1' ? 60 : 300); tmMulai(); } else if (v === 'lanjut') pindahTahap(i + 1); else { /* ditutup */ }
+  }
+  function panelWaktu() {
+    const isi = el('div', { kelas: 'panel-waktu' });
+    const gambar = () => {
+      isi.innerHTML = ''; const pil = el('div', { kelas: 'tm-tahap' });
+      TAHAP.forEach((t, i) => pil.append(el('button', { type: 'button', kelas: i === TM.i ? 'aktif' : '', onclick: () => { tmPilih(i, false); gambar(); } }, t.nama)));
+      const besar = el('div', { kelas: 'tm-besar' + (TM.habis ? ' habis' : '') }, el('span', { kelas: 'tm-live' }, mmss(sisaNow())));
+      const sel = (lab, d) => el('button', { kelas: 'btn sekunder', type: 'button', onclick: () => { tmTambah(d); tmTick(); gambar(); } }, lab);
+      isi.append(el('div', { kelas: 'eyebrow' }, 'Tahap'), pil, besar, el('div', { kelas: 'baris tm-atur' }, sel('−5 mnt', -300), sel('−1 mnt', -60), sel('−30 dtk', -30), sel('+30 dtk', 30), sel('+1 mnt', 60), sel('+5 mnt', 300)),
+        el('div', { kelas: 'baris', gaya: 'justify-content:center;margin-top:.8rem' }, el('button', { kelas: 'btn ' + (TM.jalan ? 'sorot' : 'hijau'), type: 'button', html: ik(TM.jalan ? 'jam' : 'main') + (TM.jalan ? 'Jeda' : (TM.sisa <= 0 ? 'Mulai ulang' : 'Mulai')), onclick: () => { if (TM.jalan) tmJeda(); else tmMulai(); tmTick(); gambar(); } }),
+          el('button', { kelas: 'btn sekunder', type: 'button', html: ik('ulang', 'kecil') + 'Atur ulang', onclick: () => { tmPilih(TM.i, false); gambar(); } }),
+          el('button', { kelas: 'btn sekunder', type: 'button', html: ik('centang', 'kecil') + 'Jadikan bawaan tahap ini', onclick: () => { TM.dur[TM.i] = Math.max(30, sisaNow() || durasi(TM.i)); simpanTM(); UI.toast('Durasi bawaan ' + TAHAP[TM.i].nama + ': ' + mmss(TM.dur[TM.i]), 'centang'); } }),
+          el('button', { kelas: 'btn', type: 'button', html: (TM.i >= TAHAP.length - 1 ? 'Selesai' : 'Lanjut ke tahap berikutnya') + ik('panah', 'kecil'), onclick: () => { document.querySelector('.panel-waktu').closest('.tirai').querySelector('.kaki .btn').click(); pindahTahap(TM.i + 1); } })));
+    };
+    gambar(); return UI.dialog({ lebar: true, judul: 'Pengatur waktu', ikon: ik('jam', 'besar'), isi, tombol: [{ t: 'Tutup', nilai: null, kelas: 'sekunder' }], tutupLuar: true });
+  }
+  setInterval(tmTick, 250);
 
   async function mintaPin(salah) {
     const v = await UI.papanKetik({ judul: 'PIN guru', ikon: ik('kunci', 'besar'), panjang: 5, alfabet: '0123456789', kolom: 5, sembunyi: true, otomatis: true, keyboard: true, catatan: salah ? 'PIN salah. Coba lagi.' : 'Masukkan PIN guru (5 angka).' });

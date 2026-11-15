@@ -117,7 +117,7 @@ button { font: inherit; color: inherit; }
 @media (prefers-reduced-motion: reduce) { .tablet, .btn.denyut { animation: none; } }
 
 /* ---------- rumus ---------- */
-.rumus { font-family: var(--mat); font-size: 3.2rem; line-height: 1.3; white-space: nowrap; }
+.rumus { font-family: var(--mat); font-size: 3.2rem; line-height: 1.3; white-space: pre; }
 .rumus .v { font-style: italic; } .rumus .tok { display: inline-block; transition: color .3s; }
 .warna-x { color: var(--f-eksp); } .warna-y { color: var(--mint); } .warna-hasil { color: var(--markisa); }
 
@@ -126,7 +126,7 @@ button { font: inherit; color: inherit; }
 .teks-soal-d { font-size: 1.5rem; line-height: 1.4; text-align: center; } .teks-soal-d i, .teks-soal i { font-family: var(--mat); }
 
 /* ---------- matematika ---------- */
-sup { font-size: .68em; line-height: 0; vertical-align: .55em; } i { font-family: var(--mat); padding-right: .07em; }
+sup { font-size: .68em; line-height: 0; vertical-align: baseline; position: relative; top: -.62em; margin-left: .04em; } i { font-family: var(--mat); padding-right: .07em; }
 .frak { display: inline-flex; flex-direction: column; align-items: center; vertical-align: middle; line-height: 1.15; font-size: .85em; } .frak .at { border-bottom: .08em solid currentColor; padding: 0 .25em; } .frak .bw { padding: 0 .25em; }
 .akar { display: inline-flex; align-items: flex-end; } .akar .di { border-top: .07em solid currentColor; padding: 0 .15em; margin-left: -.04em; }
 .cabang { display: inline-flex; align-items: center; gap: .3em; white-space: nowrap; } .kurawal { font-size: 3em; line-height: 1; font-weight: 300; transform: scaleX(.6); font-family: var(--isi); } .isi-cabang { display: flex; flex-direction: column; gap: .2em; text-align: left; }

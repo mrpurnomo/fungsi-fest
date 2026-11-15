@@ -14,7 +14,7 @@
   function gambarAtas() {
     atas.innerHTML = ''; atas.append(el('span', { kelas: 'logo' }, 'Grafik ', el('b', null, 'Fungsi'), el('span', { kelas: 'chip sorot', gaya: 'margin-left:.4rem' }, 'Guru')));
     const tabs = el('div', { kelas: 'tabs-guru' }); [['penjelasan', 'layar', 'Penjelasan'], ['pantau', 'siswa', 'Pantau'], ['kelompok', 'kelompok', 'Kelompok'], ['t2', 'bintang', 'Tahap 2'], ['kode', 'salin', 'Kode']].forEach(([id, ikon, t]) => tabs.append(el('button', { type: 'button', kelas: id === tab ? 'aktif' : '', html: ik(ikon, 'kecil') + t, onclick: () => ke(id) }))); atas.append(el('span', { kelas: 'ruang' }), tabs, el('span', { kelas: 'ruang' }));
-    atas.append(el('span', { kelas: 'chip ' + (net === 'online' ? 'ok' : (net === 'cek' ? 'abu' : 'warn')), html: ik(net === 'online' ? 'wifi' : 'putus', 'kecil') + (net === 'online' ? 'Server aktif' : (net === 'cek' ? 'Memeriksa…' : 'Mode mandiri')) }), el('button', { kelas: 'btn sekunder kecil', type: 'button', html: ik('layar', 'kecil'), 'aria-label': 'Layar penuh', title: 'Layar penuh', onclick: UI.layarPenuh }), el('button', { kelas: 'btn bahaya kecil', type: 'button', html: ik('kembali', 'kecil') + 'Keluar', onclick: keluar }));
+    atas.append(tmChip(), el('span', { kelas: 'chip ' + (net === 'online' ? 'ok' : (net === 'cek' ? 'abu' : 'warn')), html: ik(net === 'online' ? 'wifi' : 'putus', 'kecil') + (net === 'online' ? 'Server aktif' : (net === 'cek' ? 'Memeriksa…' : 'Mode mandiri')) }), el('button', { kelas: 'btn sekunder kecil', type: 'button', html: ik('layar', 'kecil'), 'aria-label': 'Layar penuh', title: 'Layar penuh', onclick: UI.layarPenuh }), el('button', { kelas: 'btn bahaya kecil', type: 'button', html: ik('kembali', 'kecil') + 'Keluar', onclick: keluar }));
   }
   async function keluar() { if (!(await UI.konfirmasi('Keluar dari halaman guru?', '<p class="tengah">Kamu akan kembali ke layar sambutan dan harus memasukkan PIN lagi.</p>', 'Keluar', 'Batal'))) return; try { sessionStorage.removeItem('gfg_pin'); } catch (e) { /* abaikan */ } location.href = 'index.html'; }
   function bersih() { clearInterval(poll); if (intro) { intro.stop(); intro = null; } pg.innerHTML = ''; }
@@ -94,7 +94,7 @@
       w.innerHTML = ''; if (net !== 'online' || !data || !data.tahap2) { w.append(el('div', { kelas: 'tengah-isi' }, el('h2', null, 'Perlu server'), el('p', { kelas: 'muted' }, 'Pemantauan tahap lanjutan hanya tersedia saat server terhubung.'))); return; }
       const t = data.tahap2, fmt = (v, d) => (v == null ? '–' : v.toFixed(d == null ? 1 : d).replace('.', ',')), lk = t.langkah || 1;
       const ctrl = el('div', { kelas: 'kartu ctrl-langkah' }); ctrl.append(el('div', null, el('div', { kelas: 'eyebrow', gaya: 'margin:0' }, 'Langkah yang dibuka untuk siswa'), el('div', { kelas: 'muted kecil' }, 'Siswa mengerjakan berurutan. Langkah berikutnya terbuka saat kamu menekannya.')));
-      const seg = el('div', { kelas: 'seg-langkah' }); LANGKAH.forEach((nm, i) => seg.append(el('button', { type: 'button', kelas: (i + 1) === lk ? 'aktif' : ((i + 1) < lk ? 'lalu' : ''), html: '<span class="no">' + (i + 1) + '</span>' + nm + ((i + 1) < lk ? ik('centang', 'kecil') : ''), onclick: async () => { await ga('g-langkah', { n: i + 1 }); UI.toast('Langkah ' + (i + 1) + ' dibuka: ' + nm, 'centang'); muat(); } })));
+      const seg = el('div', { kelas: 'seg-langkah' }); LANGKAH.forEach((nm, i) => seg.append(el('button', { type: 'button', kelas: (i + 1) === lk ? 'aktif' : ((i + 1) < lk ? 'lalu' : ''), html: '<span class="no">' + (i + 1) + '</span>' + nm + ((i + 1) < lk ? ik('centang', 'kecil') : ''), onclick: async () => { await ga('g-langkah', { n: i + 1 }); if (TM.i !== 3 + i) tmPilih(3 + i, false); UI.toast('Langkah ' + (i + 1) + ' dibuka: ' + nm, 'centang'); muat(); } })));
       ctrl.append(seg, el('button', { kelas: 'btn sorot', type: 'button', html: ik('bintang', 'kecil') + 'Panggung Kelas', onclick: () => panggungKelas(t) })); w.append(ctrl);
       w.append(el('div', { kelas: 'stat-guru' }, el('div', { kelas: 'kartu stat fx-log', html: '<div class="eyebrow" style="margin:0">Selesai tahap lanjutan</div><b>' + t.selesai + '/24</b>' }), el('div', { kelas: 'kartu stat fx-trig', html: '<div class="eyebrow" style="margin:0">Tebak fungsinya</div><b>' + fmt(t.diskusi) + ' / 6</b>' }), el('div', { kelas: 'kartu stat fx-eksp', html: '<div class="eyebrow" style="margin:0">Cocokkan grafik</div><b>' + fmt(t.cocok) + ' / 5</b>' }), el('div', { kelas: 'kartu stat fx-poli', html: '<div class="eyebrow" style="margin:0">Tiket keluar</div><b>' + fmt(t.tiket) + ' / 3</b>' })));
       const k = el('div', { kelas: 'kartu gulir', gaya: 'flex:1;min-height:0' }); k.append(el('h3', null, 'Pemahaman per jenis grafik'), el('p', { kelas: 'muted kecil' }, 'Dari refleksi akhir siswa: jenis yang dikuasai dan yang masih membingungkan. Jenis dengan banyak “bingung” layak dibahas ulang.'));
@@ -126,6 +126,53 @@
     }
     render();
   }
+
+  /* ---------------- pengatur waktu per tahap ---------------- */
+  const TAHAP = [
+    { nama: 'Penjelasan', dur: 600, tab: 'penjelasan' }, { nama: 'Tes awal', dur: 600, tab: 'pantau' }, { nama: 'Kelompok', dur: 300, tab: 'kelompok' },
+    { nama: 'Langkah 1 · Kartu pakar', dur: 600, tab: 't2', langkah: 1 }, { nama: 'Langkah 2 · Tebak fungsinya', dur: 720, tab: 't2', langkah: 2 },
+    { nama: 'Langkah 3 · Cocokkan grafik', dur: 480, tab: 't2', langkah: 3 }, { nama: 'Langkah 4 · Tiket keluar', dur: 480, tab: 't2', langkah: 4 }
+  ];
+  const TM = Object.assign({ i: 0, sisa: TAHAP[0].dur, jalan: false, akhir: 0, dur: {}, habis: false }, LS('timer', {}));
+  const durasi = (i) => (TM.dur && TM.dur[i]) || TAHAP[i].dur, sisaNow = () => (TM.jalan ? Math.max(0, Math.round((TM.akhir - Date.now()) / 1000)) : TM.sisa), simpanTM = () => LSset('timer', TM);
+  const mmss = (v) => String(Math.floor(v / 60)).padStart(2, '0') + ':' + String(v % 60).padStart(2, '0');
+  function tmMulai() { if (!TM.jalan) { if (TM.sisa <= 0) TM.sisa = durasi(TM.i); TM.akhir = Date.now() + TM.sisa * 1000; TM.jalan = true; TM.habis = false; simpanTM(); } }
+  function tmJeda() { if (TM.jalan) { TM.sisa = sisaNow(); TM.jalan = false; simpanTM(); } }
+  function tmTambah(d) { const v = Math.max(0, sisaNow() + d); if (TM.jalan) TM.akhir = Date.now() + v * 1000; else TM.sisa = v; TM.habis = v <= 0 && TM.habis; if (v > 0) TM.habis = false; simpanTM(); }
+  function tmPilih(i, mulai) { TM.i = i; TM.sisa = durasi(i); TM.jalan = false; TM.habis = false; simpanTM(); if (mulai) tmMulai(); tmTick(); }
+  function beep() { try { const A = new (window.AudioContext || window.webkitAudioContext)(); [0, .38, .76].forEach((t) => { const o = A.createOscillator(), g = A.createGain(); o.frequency.value = 880; g.gain.value = .18; o.connect(g); g.connect(A.destination); o.start(A.currentTime + t); o.stop(A.currentTime + t + .24); }); } catch (e) { /* abaikan */ } }
+  function tmChip() { return el('button', { kelas: 'tm-chip', type: 'button', title: 'Pengatur waktu: ' + TAHAP[TM.i].nama, html: ik('jam', 'kecil') + '<span class="tm-live">' + mmss(sisaNow()) + '</span>', onclick: panelWaktu }); }
+  function tmTick() {
+    const v = sisaNow(); document.querySelectorAll('.tm-live').forEach((e) => { e.textContent = mmss(v); });
+    document.querySelectorAll('.tm-chip').forEach((c) => { c.classList.toggle('jalan', TM.jalan && v > 60); c.classList.toggle('hampir', TM.jalan && v <= 60 && v > 0); c.classList.toggle('habis', v <= 0 && TM.habis); c.title = 'Pengatur waktu: ' + TAHAP[TM.i].nama; });
+    if (TM.jalan && v <= 0 && !TM.habis) { TM.jalan = false; TM.sisa = 0; TM.habis = true; simpanTM(); beep(); popupHabis(); }
+  }
+  async function pindahTahap(i) {
+    if (i >= TAHAP.length) { tmJeda(); ke('t2'); setTimeout(() => { if (data && data.tahap2) panggungKelas(data.tahap2); }, 800); return; }
+    const t = TAHAP[i]; if (t.langkah) await ga('g-langkah', { n: t.langkah }); ke(t.tab); tmPilih(i, true); UI.toast('Pewaktu berjalan: ' + t.nama, 'jam');
+  }
+  let popupAktif = false;
+  async function popupHabis() {
+    if (popupAktif) return; popupAktif = true; const i = TM.i, akhir = i >= TAHAP.length - 1, nx = akhir ? null : TAHAP[i + 1];
+    const v = await UI.dialog({ judul: 'Waktu habis', ikon: ik('jam', 'besar'), isi: '<div class="tengah"><p style="font-size:1.4rem;margin:.2rem 0"><b>' + esc(TAHAP[i].nama) + '</b> sudah melewati waktunya.</p><p class="muted">Tambah waktu bila perlu, atau lanjutkan ke ' + (akhir ? 'penutup (Panggung Kelas).' : '<b>' + esc(nx.nama) + '</b>.') + '</p></div>', tombol: [{ t: '+1 menit', nilai: 'm1', kelas: 'sekunder' }, { t: '+5 menit', nilai: 'm5', kelas: 'sekunder' }, { t: akhir ? 'Buka Panggung Kelas' : 'Lanjut: ' + nx.nama, nilai: 'lanjut', ikon: 'panah' }] });
+    popupAktif = false; if (v === 'm1' || v === 'm5') { tmTambah(v === 'm1' ? 60 : 300); tmMulai(); } else if (v === 'lanjut') pindahTahap(i + 1); else { /* ditutup */ }
+  }
+  function panelWaktu() {
+    const isi = el('div', { kelas: 'panel-waktu' });
+    const gambar = () => {
+      isi.innerHTML = ''; const pil = el('div', { kelas: 'tm-tahap' });
+      TAHAP.forEach((t, i) => pil.append(el('button', { type: 'button', kelas: i === TM.i ? 'aktif' : '', onclick: () => { tmPilih(i, false); gambar(); } }, t.nama)));
+      const besar = el('div', { kelas: 'tm-besar' + (TM.habis ? ' habis' : '') }, el('span', { kelas: 'tm-live' }, mmss(sisaNow())));
+      const sel = (lab, d) => el('button', { kelas: 'btn sekunder', type: 'button', onclick: () => { tmTambah(d); tmTick(); gambar(); } }, lab);
+      isi.append(el('div', { kelas: 'eyebrow' }, 'Tahap'), pil, besar, el('div', { kelas: 'baris tm-atur' }, sel('−5 mnt', -300), sel('−1 mnt', -60), sel('−30 dtk', -30), sel('+30 dtk', 30), sel('+1 mnt', 60), sel('+5 mnt', 300)),
+        el('div', { kelas: 'baris', gaya: 'justify-content:center;margin-top:.8rem' }, el('button', { kelas: 'btn ' + (TM.jalan ? 'sorot' : 'hijau'), type: 'button', html: ik(TM.jalan ? 'jam' : 'main') + (TM.jalan ? 'Jeda' : (TM.sisa <= 0 ? 'Mulai ulang' : 'Mulai')), onclick: () => { if (TM.jalan) tmJeda(); else tmMulai(); tmTick(); gambar(); } }),
+          el('button', { kelas: 'btn sekunder', type: 'button', html: ik('ulang', 'kecil') + 'Atur ulang', onclick: () => { tmPilih(TM.i, false); gambar(); } }),
+          el('button', { kelas: 'btn sekunder', type: 'button', html: ik('centang', 'kecil') + 'Jadikan bawaan tahap ini', onclick: () => { TM.dur[TM.i] = Math.max(30, sisaNow() || durasi(TM.i)); simpanTM(); UI.toast('Durasi bawaan ' + TAHAP[TM.i].nama + ': ' + mmss(TM.dur[TM.i]), 'centang'); } }),
+          el('button', { kelas: 'btn', type: 'button', html: (TM.i >= TAHAP.length - 1 ? 'Selesai' : 'Lanjut ke tahap berikutnya') + ik('panah', 'kecil'), onclick: () => { document.querySelector('.panel-waktu').closest('.tirai').querySelector('.kaki .btn').click(); pindahTahap(TM.i + 1); } })));
+    };
+    gambar(); return UI.dialog({ lebar: true, judul: 'Pengatur waktu', ikon: ik('jam', 'besar'), isi, tombol: [{ t: 'Tutup', nilai: null, kelas: 'sekunder' }], tutupLuar: true });
+  }
+  setInterval(tmTick, 250);
 
   async function mintaPin(salah) {
     const v = await UI.papanKetik({ judul: 'PIN guru', ikon: ik('kunci', 'besar'), panjang: 5, alfabet: '0123456789', kolom: 5, sembunyi: true, otomatis: true, keyboard: true, catatan: salah ? 'PIN salah. Coba lagi.' : 'Masukkan PIN guru (5 angka).' });

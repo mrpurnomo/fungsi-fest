@@ -77,5 +77,6 @@
     (v.titik || []).forEach((p) => { const c = S('circle', { cx: b.sx(p.x), cy: b.sy(p.y), r: 8, fill: p.t === 'kosong' ? '#fff' : warna, stroke: warna, 'stroke-width': 3.4, opacity: 0, class: 'tk' }); b.lapis.titik.append(c); });
     return { b, kurva: g };
   }
-  root.GF = { S, fmt, sampel, bidang, tumbuh, gambarKurva, K, gambarVarian };
+  function statis(v, warna, tebal) { const b = bidang(Object.assign({ W: 640, H: 440 }, v.spec)); if (v.tegak) v.tegak.forEach((x) => b.tegak(x, warna)); b.kurva(v.garis(), { warna, tebal: tebal || 5 }); (v.titik || []).forEach((p) => b.lapis.titik.append(S('circle', { cx: b.sx(p.x), cy: b.sy(p.y), r: 8, fill: p.t === 'kosong' ? '#fff' : warna, stroke: warna, 'stroke-width': 3.4 }))); return b; }
+  root.GF = { S, fmt, sampel, bidang, tumbuh, gambarKurva, K, gambarVarian, statis };
 })(window);
