@@ -3,8 +3,10 @@
    UPSTASH_REDIS_REST_URL + UPSTASH_REDIS_REST_TOKEN  (atau KV_REST_API_URL + KV_REST_API_TOKEN)  dan  GURU_PIN. */
 const B = require('./_lib/bersama.js');
 
-const URL_REDIS = process.env.UPSTASH_REDIS_REST_URL || process.env.KV_REST_API_URL;
-const TOK_REDIS = process.env.UPSTASH_REDIS_REST_TOKEN || process.env.KV_REST_API_TOKEN;
+// Nama variabel bisa berawalan apa pun (KV_, UPSTASH_REDIS_, STORAGE_, ...): cari yang berakhiran REST_API_URL / REST_URL dan *_TOKEN.
+const cariEnv = (akhir, jangan) => { const k = Object.keys(process.env).find((n) => n.endsWith(akhir) && !(jangan && n.includes(jangan))); return k ? process.env[k] : undefined; };
+const URL_REDIS = process.env.UPSTASH_REDIS_REST_URL || process.env.KV_REST_API_URL || cariEnv('REST_API_URL') || cariEnv('REDIS_REST_URL');
+const TOK_REDIS = process.env.UPSTASH_REDIS_REST_TOKEN || process.env.KV_REST_API_TOKEN || cariEnv('REST_API_TOKEN', 'READ_ONLY') || cariEnv('REDIS_REST_TOKEN');
 const PIN = String(process.env.GURU_PIN || '1611');
 const K_SISWA = 'gf:xif:siswa', K_KEL = 'gf:xif:kelompok', K_GERBANG = 'gf:xif:gerbang';
 
