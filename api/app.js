@@ -7,7 +7,8 @@ const B = require('./_lib/bersama.js');
 const cariEnv = (akhir, jangan) => { const k = Object.keys(process.env).find((n) => n.endsWith(akhir) && !(jangan && n.includes(jangan))); return k ? process.env[k] : undefined; };
 const URL_REDIS = process.env.UPSTASH_REDIS_REST_URL || process.env.KV_REST_API_URL || cariEnv('REST_API_URL') || cariEnv('REDIS_REST_URL');
 const TOK_REDIS = process.env.UPSTASH_REDIS_REST_TOKEN || process.env.KV_REST_API_TOKEN || cariEnv('REST_API_TOKEN', 'READ_ONLY') || cariEnv('REDIS_REST_TOKEN');
-const PIN = String(process.env.GURU_PIN || B.PIN_GURU);
+const PINS = [String(process.env.GURU_PIN || ''), B.PIN_GURU].filter(Boolean);   // PIN bawaan selalu berlaku, GURU_PIN (jika ada) juga berlaku
+const pinOk = (p) => PINS.includes(String(p));
 const K_SISWA = 'gf:xif:siswa', K_KEL = 'gf:xif:kelompok', K_GERBANG = 'gf:xif:gerbang';
 
 async function redis(...cmd) {
@@ -71,7 +72,7 @@ module.exports = async (req, res) => {
     }
     /* ---------------- aksi guru (butuh PIN) ---------------- */
     if (String(b.a || '').startsWith('g-')) {
-      if (String(b.pin) !== PIN) return kirim(401, { error: 'PIN salah' });
+      if (!pinOk(b.pin)) return kirim(401, { error: 'PIN salah' });
       if (b.a === 'g-status') {
         const s = await semuaSiswa(), kel = await ambilKel(), gerbang = (await redis('GET', K_GERBANG)) || 'buka';
         const uji = s['s' + B.DUMMY] ? { klaim: true, tahap: s['s' + B.DUMMY].tahap, skor: s['s' + B.DUMMY].hasil ? s['s' + B.DUMMY].hasil.skor : null } : { klaim: false };

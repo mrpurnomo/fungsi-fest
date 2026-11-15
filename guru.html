@@ -407,7 +407,8 @@ button { font: inherit; color: inherit; }
       alfabet.split('').forEach((c) => tuts.append(el('button', { kelas: 'tut', type: 'button', onclick: () => tekan(c) }, c)));
       tuts.append(el('button', { kelas: 'tut fungsi', type: 'button', html: ik('hapusKarakter'), 'aria-label': 'Hapus', onclick: () => { nilai = nilai.slice(0, -1); gambar(); } }));
       const papan = el('div', { kelas: 'papan-ketik' }, tampil, galat, tuts); gambar();
-      dialog({ judul: o.judul, isi: papan, ikon: o.ikon, tombol: [{ t: 'Batal', nilai: null, kelas: 'sekunder' }].concat(o.otomatis ? [] : [{ t: o.tombol || 'OK', nilai: '__ok' }]), tutupLuar: false, saatBuka: (b, tutup) => { tutupFn = tutup; if (o.catatan) b.prepend(el('p', { kelas: 'muted kecil tengah' }, o.catatan)); } }).then((v) => { if (v === '__ok') resolve(nilai); else resolve(v); });
+      let lepas = () => {}; if (o.keyboard) { const onKey = (e) => { if (e.ctrlKey || e.metaKey || e.altKey) return; const k = e.key; if (k === 'Backspace') { nilai = nilai.slice(0, -1); gambar(); e.preventDefault(); } else if (k === 'Escape') { tutupFn(null); } else if (k === 'Enter') { if (!o.otomatis && nilai.length === panjang) tutupFn('__ok'); } else if (k.length === 1 && alfabet.includes(k.toUpperCase())) { tekan(k.toUpperCase()); e.preventDefault(); } }; document.addEventListener('keydown', onKey, true); lepas = () => document.removeEventListener('keydown', onKey, true); }
+      dialog({ judul: o.judul, isi: papan, ikon: o.ikon, tombol: [{ t: 'Batal', nilai: null, kelas: 'sekunder' }].concat(o.otomatis ? [] : [{ t: o.tombol || 'OK', nilai: '__ok' }]), tutupLuar: false, saatBuka: (b, tutup) => { tutupFn = tutup; if (o.catatan) b.prepend(el('p', { kelas: 'muted kecil tengah' }, o.catatan)); } }).then((v) => { lepas(); if (v === '__ok') resolve(nilai); else resolve(v); });
     });
   }
 
@@ -421,7 +422,8 @@ button { font: inherit; color: inherit; }
       ['1', '2', '3', '4', '5', '6', '7', '8', '9', '−', '0'].forEach((c) => tuts.append(el('button', { kelas: 'tut', type: 'button', onclick: () => { if (nilai.length < 6 && !(c === '−' && nilai.length)) { nilai += c; gambar(); } } }, c)));
       tuts.append(el('button', { kelas: 'tut fungsi', type: 'button', html: ik('hapusKarakter'), 'aria-label': 'Hapus', onclick: () => { nilai = nilai.slice(0, -1); gambar(); } }));
       const isi = el('div', null, el('div', { kelas: 'teks-soal-d', html: o.tanya || '' }), tampil, tuts); gambar();
-      dialog({ judul: o.judul || 'Jawabanmu', isi, ikon: o.ikon, tombol: [{ t: 'Batal', nilai: null, kelas: 'sekunder' }, { t: 'Periksa', nilai: '__ok', kelas: 'hijau', ikon: 'centang' }] }).then((v) => resolve(v === '__ok' ? (nilai === '' ? null : Number(nilai.replace('−', '-'))) : null));
+      let lepas = () => {}; let tutupFn = null; if (o.keyboard) { const onKey = (e) => { if (e.ctrlKey || e.metaKey || e.altKey) return; const k = e.key; if (/^[0-9]$/.test(k) && nilai.length < 6) { nilai += k; gambar(); e.preventDefault(); } else if ((k === '-' || k === '−') && !nilai.length) { nilai = '−'; gambar(); } else if (k === 'Backspace') { nilai = nilai.slice(0, -1); gambar(); e.preventDefault(); } else if (k === 'Enter') { const b = [...document.querySelectorAll('.dialog .btn')].find((x) => x.textContent.includes('Periksa')); if (b) b.click(); } }; document.addEventListener('keydown', onKey, true); lepas = () => document.removeEventListener('keydown', onKey, true); }
+      dialog({ judul: o.judul || 'Jawabanmu', isi, ikon: o.ikon, tombol: [{ t: 'Batal', nilai: null, kelas: 'sekunder' }, { t: 'Periksa', nilai: '__ok', kelas: 'hijau', ikon: 'centang' }] }).then((v) => { lepas(); resolve(v === '__ok' ? (nilai === '' || nilai === '−' ? null : Number(nilai.replace('−', '-'))) : null); });
     });
   }
 
@@ -954,7 +956,7 @@ const nama = (i) => (i === DUMMY ? 'Siswa Uji Coba (Guru)' : judulKata(DAFTAR[i]
     };
     async function tambah() {
       for (;;) {
-        const k = await UI.papanKetik({ judul: 'Kode hasil siswa', ikon: ik('salin', 'besar'), panjang: 5, otomatis: true, kolom: 8, catatan: 'Ketik 5 karakter dari layar siswa.' }); if (!k) break;
+        const k = await UI.papanKetik({ judul: 'Kode hasil siswa', ikon: ik('salin', 'besar'), panjang: 5, otomatis: true, keyboard: true, kolom: 8, catatan: 'Ketik 5 karakter dari layar siswa (keyboard atau papan di layar).' }); if (!k) break;
         const r = B.bacaKode(k); if (r.error) { await UI.info('Kode ditolak', '<p class="tengah" style="font-size:1.2rem">' + esc(r.error) + '</p>', 'Coba lagi'); continue; }
         const n = B.nilai(r.idx, r.jawab); const h = hasilLokal(); h[r.idx] = n.benar; LSset('hasil', h); if (net === 'online') await ga('g-kode', { kode: k });
         const lagi = await UI.dialog({ judul: 'Kode diterima', ikon: ik('centang', 'besar'), isi: '<div class="tengah"><div style="font-family:var(--tampil);font-size:2rem;font-weight:700">' + esc(B.nama(r.idx)) + '</div><p style="font-size:1.5rem">Skor <b>' + n.benar + '</b> dari 5</p></div>', tombol: [{ t: 'Selesai', nilai: false, kelas: 'sekunder' }, { t: 'Kode berikutnya', nilai: true }] }); render(); if (!lagi) break;
@@ -965,7 +967,7 @@ const nama = (i) => (i === DUMMY ? 'Siswa Uji Coba (Guru)' : judulKata(DAFTAR[i]
   }
 
   async function mintaPin(salah) {
-    const v = await UI.papanKetik({ judul: 'PIN guru', ikon: ik('kunci', 'besar'), panjang: 5, alfabet: '0123456789', kolom: 5, sembunyi: true, otomatis: true, catatan: salah ? 'PIN salah. Coba lagi.' : 'Masukkan PIN guru (5 angka).' });
+    const v = await UI.papanKetik({ judul: 'PIN guru', ikon: ik('kunci', 'besar'), panjang: 5, alfabet: '0123456789', kolom: 5, sembunyi: true, otomatis: true, keyboard: true, catatan: salah ? 'PIN salah. Coba lagi.' : 'Masukkan PIN guru (5 angka).' });
     if (v == null) { location.href = 'index.html'; return; } pin = v; const r = await ga('g-status'); if (r._s === 401) return mintaPin(true); if (r.ok) { net = 'online'; data = r; } else { net = 'offline'; if (pin !== B.PIN_GURU) return mintaPin(true); } try { sessionStorage.setItem('gfg_pin', pin); } catch (e) { /* abaikan */ } gambarAtas(); ke(tab);
   }
   UI.pasangPutar(); gambarAtas(); bawah.style.display = 'none';

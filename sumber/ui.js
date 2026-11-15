@@ -86,7 +86,8 @@
       alfabet.split('').forEach((c) => tuts.append(el('button', { kelas: 'tut', type: 'button', onclick: () => tekan(c) }, c)));
       tuts.append(el('button', { kelas: 'tut fungsi', type: 'button', html: ik('hapusKarakter'), 'aria-label': 'Hapus', onclick: () => { nilai = nilai.slice(0, -1); gambar(); } }));
       const papan = el('div', { kelas: 'papan-ketik' }, tampil, galat, tuts); gambar();
-      dialog({ judul: o.judul, isi: papan, ikon: o.ikon, tombol: [{ t: 'Batal', nilai: null, kelas: 'sekunder' }].concat(o.otomatis ? [] : [{ t: o.tombol || 'OK', nilai: '__ok' }]), tutupLuar: false, saatBuka: (b, tutup) => { tutupFn = tutup; if (o.catatan) b.prepend(el('p', { kelas: 'muted kecil tengah' }, o.catatan)); } }).then((v) => { if (v === '__ok') resolve(nilai); else resolve(v); });
+      let lepas = () => {}; if (o.keyboard) { const onKey = (e) => { if (e.ctrlKey || e.metaKey || e.altKey) return; const k = e.key; if (k === 'Backspace') { nilai = nilai.slice(0, -1); gambar(); e.preventDefault(); } else if (k === 'Escape') { tutupFn(null); } else if (k === 'Enter') { if (!o.otomatis && nilai.length === panjang) tutupFn('__ok'); } else if (k.length === 1 && alfabet.includes(k.toUpperCase())) { tekan(k.toUpperCase()); e.preventDefault(); } }; document.addEventListener('keydown', onKey, true); lepas = () => document.removeEventListener('keydown', onKey, true); }
+      dialog({ judul: o.judul, isi: papan, ikon: o.ikon, tombol: [{ t: 'Batal', nilai: null, kelas: 'sekunder' }].concat(o.otomatis ? [] : [{ t: o.tombol || 'OK', nilai: '__ok' }]), tutupLuar: false, saatBuka: (b, tutup) => { tutupFn = tutup; if (o.catatan) b.prepend(el('p', { kelas: 'muted kecil tengah' }, o.catatan)); } }).then((v) => { lepas(); if (v === '__ok') resolve(nilai); else resolve(v); });
     });
   }
 
@@ -100,7 +101,8 @@
       ['1', '2', '3', '4', '5', '6', '7', '8', '9', '−', '0'].forEach((c) => tuts.append(el('button', { kelas: 'tut', type: 'button', onclick: () => { if (nilai.length < 6 && !(c === '−' && nilai.length)) { nilai += c; gambar(); } } }, c)));
       tuts.append(el('button', { kelas: 'tut fungsi', type: 'button', html: ik('hapusKarakter'), 'aria-label': 'Hapus', onclick: () => { nilai = nilai.slice(0, -1); gambar(); } }));
       const isi = el('div', null, el('div', { kelas: 'teks-soal-d', html: o.tanya || '' }), tampil, tuts); gambar();
-      dialog({ judul: o.judul || 'Jawabanmu', isi, ikon: o.ikon, tombol: [{ t: 'Batal', nilai: null, kelas: 'sekunder' }, { t: 'Periksa', nilai: '__ok', kelas: 'hijau', ikon: 'centang' }] }).then((v) => resolve(v === '__ok' ? (nilai === '' ? null : Number(nilai.replace('−', '-'))) : null));
+      let lepas = () => {}; let tutupFn = null; if (o.keyboard) { const onKey = (e) => { if (e.ctrlKey || e.metaKey || e.altKey) return; const k = e.key; if (/^[0-9]$/.test(k) && nilai.length < 6) { nilai += k; gambar(); e.preventDefault(); } else if ((k === '-' || k === '−') && !nilai.length) { nilai = '−'; gambar(); } else if (k === 'Backspace') { nilai = nilai.slice(0, -1); gambar(); e.preventDefault(); } else if (k === 'Enter') { const b = [...document.querySelectorAll('.dialog .btn')].find((x) => x.textContent.includes('Periksa')); if (b) b.click(); } }; document.addEventListener('keydown', onKey, true); lepas = () => document.removeEventListener('keydown', onKey, true); }
+      dialog({ judul: o.judul || 'Jawabanmu', isi, ikon: o.ikon, tombol: [{ t: 'Batal', nilai: null, kelas: 'sekunder' }, { t: 'Periksa', nilai: '__ok', kelas: 'hijau', ikon: 'centang' }] }).then((v) => { lepas(); resolve(v === '__ok' ? (nilai === '' || nilai === '−' ? null : Number(nilai.replace('−', '-'))) : null); });
     });
   }
 

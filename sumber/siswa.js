@@ -50,7 +50,7 @@
 
   /* ---------------------------------------------------------------- PIN guru */
   async function cekPinGuru(pin) { const r = await api('g-status', { pin }); if (r._s === 401) return false; if (r.ok) return true; return pin === B.PIN_GURU; }
-  async function mintaPin(judul, salah) { const v = await UI.papanKetik({ judul, ikon: ik('kunci', 'besar'), panjang: 5, alfabet: '0123456789', kolom: 5, sembunyi: true, otomatis: true, catatan: salah ? 'PIN salah. Coba lagi.' : 'Masukkan PIN guru (5 angka).' }); if (v == null) return null; if (await cekPinGuru(v)) return v; return mintaPin(judul, true); }
+  async function mintaPin(judul, salah) { const v = await UI.papanKetik({ judul, ikon: ik('kunci', 'besar'), panjang: 5, alfabet: '0123456789', kolom: 5, sembunyi: true, otomatis: true, keyboard: true, catatan: salah ? 'PIN salah. Coba lagi.' : 'Masukkan PIN guru (5 angka).' }); if (v == null) return null; if (await cekPinGuru(v)) return v; return mintaPin(judul, true); }
   async function loginGuru() { const v = await mintaPin('Masuk sebagai guru', false); if (v == null) return; try { sessionStorage.setItem('gfg_pin', v); } catch (e) { /* abaikan */ } location.href = 'guru.html'; }
   async function masukUji() { const v = await mintaPin('Akun uji coba (guru)', false); if (v == null) return; idx = B.DUMMY; lsSet('p' + idx, null); P = baruP(); const r = await api('klaim', { idx }); net = r.ok ? 'online' : 'offline'; gambarAtas(); mulaiPing(); lanjutDari(); }
 
