@@ -90,6 +90,20 @@
     });
   }
 
+
+  /* ---------- papan angka kustom (jawaban numerik) ---------- */
+  function keypadAngka(o) {
+    let nilai = '';
+    return new Promise((resolve) => {
+      const tampil = el('div', { kelas: 'layar-angka' }), tuts = el('div', { kelas: 'tuts-angka' });
+      const gambar = () => { tampil.textContent = nilai || '…'; tampil.classList.toggle('kosong', !nilai); };
+      ['1', '2', '3', '4', '5', '6', '7', '8', '9', '−', '0'].forEach((c) => tuts.append(el('button', { kelas: 'tut', type: 'button', onclick: () => { if (nilai.length < 6 && !(c === '−' && nilai.length)) { nilai += c; gambar(); } } }, c)));
+      tuts.append(el('button', { kelas: 'tut fungsi', type: 'button', html: ik('hapusKarakter'), 'aria-label': 'Hapus', onclick: () => { nilai = nilai.slice(0, -1); gambar(); } }));
+      const isi = el('div', null, el('div', { kelas: 'teks-soal-d', html: o.tanya || '' }), tampil, tuts); gambar();
+      dialog({ judul: o.judul || 'Jawabanmu', isi, ikon: o.ikon, tombol: [{ t: 'Batal', nilai: null, kelas: 'sekunder' }, { t: 'Periksa', nilai: '__ok', kelas: 'hijau', ikon: 'centang' }] }).then((v) => resolve(v === '__ok' ? (nilai === '' ? null : Number(nilai.replace('−', '-'))) : null));
+    });
+  }
+
   /* ---------- seret (drag) kustom ---------- */
   function seret(elm, o) {
     let aktif = false, sx = 0, sy = 0, klon = null, pid = null, jalan = false;
@@ -117,5 +131,5 @@
   }
   async function layarPenuh() { try { const d = document.documentElement; if (!document.fullscreenElement && d.requestFullscreen) await d.requestFullscreen(); if (screen.orientation && screen.orientation.lock) await screen.orientation.lock('landscape'); } catch (e) { /* abaikan */ } }
 
-  root.UI = { IK, ik, glif, ubin, GLIF, URUT, NAMA, untaian, el, esc, tidur, anim, token, Batal, dialog, konfirmasi, info, toast, papanKetik, seret, pasangPutar, layarPenuh, ALFA };
+  root.UI = { IK, ik, glif, ubin, GLIF, URUT, NAMA, untaian, el, esc, tidur, anim, token, Batal, dialog, konfirmasi, info, toast, papanKetik, keypadAngka, seret, pasangPutar, layarPenuh, ALFA };
 })(window);

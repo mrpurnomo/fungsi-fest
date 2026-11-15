@@ -13,11 +13,12 @@
 
   function gambarAtas() {
     atas.innerHTML = ''; atas.append(el('span', { kelas: 'logo' }, 'Grafik ', el('b', null, 'Fungsi'), el('span', { kelas: 'chip sorot', gaya: 'margin-left:.4rem' }, 'Guru')));
-    const tabs = el('div', { kelas: 'tabs-guru' }); [['penjelasan', 'layar', 'Penjelasan'], ['pantau', 'siswa', 'Pantau'], ['kelompok', 'kelompok', 'Kelompok'], ['kode', 'salin', 'Kode hasil']].forEach(([id, ikon, t]) => tabs.append(el('button', { type: 'button', kelas: id === tab ? 'aktif' : '', html: ik(ikon, 'kecil') + t, onclick: () => ke(id) }))); atas.append(el('span', { kelas: 'ruang' }), tabs, el('span', { kelas: 'ruang' }));
-    atas.append(el('span', { kelas: 'chip ' + (net === 'online' ? 'ok' : (net === 'cek' ? 'abu' : 'warn')), html: ik(net === 'online' ? 'wifi' : 'putus', 'kecil') + (net === 'online' ? 'Server aktif' : (net === 'cek' ? 'Memeriksa…' : 'Mode mandiri')) }), el('button', { kelas: 'btn sekunder kecil', type: 'button', html: ik('layar', 'kecil') + 'Layar penuh', onclick: UI.layarPenuh }));
+    const tabs = el('div', { kelas: 'tabs-guru' }); [['penjelasan', 'layar', 'Penjelasan'], ['pantau', 'siswa', 'Pantau'], ['kelompok', 'kelompok', 'Kelompok'], ['t2', 'bintang', 'Tahap 2'], ['kode', 'salin', 'Kode']].forEach(([id, ikon, t]) => tabs.append(el('button', { type: 'button', kelas: id === tab ? 'aktif' : '', html: ik(ikon, 'kecil') + t, onclick: () => ke(id) }))); atas.append(el('span', { kelas: 'ruang' }), tabs, el('span', { kelas: 'ruang' }));
+    atas.append(el('span', { kelas: 'chip ' + (net === 'online' ? 'ok' : (net === 'cek' ? 'abu' : 'warn')), html: ik(net === 'online' ? 'wifi' : 'putus', 'kecil') + (net === 'online' ? 'Server aktif' : (net === 'cek' ? 'Memeriksa…' : 'Mode mandiri')) }), el('button', { kelas: 'btn sekunder kecil', type: 'button', html: ik('layar', 'kecil'), 'aria-label': 'Layar penuh', title: 'Layar penuh', onclick: UI.layarPenuh }), el('button', { kelas: 'btn bahaya kecil', type: 'button', html: ik('kembali', 'kecil') + 'Keluar', onclick: keluar }));
   }
+  async function keluar() { if (!(await UI.konfirmasi('Keluar dari halaman guru?', '<p class="tengah">Kamu akan kembali ke layar sambutan dan harus memasukkan PIN lagi.</p>', 'Keluar', 'Batal'))) return; try { sessionStorage.removeItem('gfg_pin'); } catch (e) { /* abaikan */ } location.href = 'index.html'; }
   function bersih() { clearInterval(poll); if (intro) { intro.stop(); intro = null; } pg.innerHTML = ''; }
-  function ke(t) { tab = t; gambarAtas(); bersih(); ({ penjelasan: tPenjelasan, pantau: tPantau, kelompok: tKelompok, kode: tKode })[t](); }
+  function ke(t) { tab = t; gambarAtas(); bersih(); ({ penjelasan: tPenjelasan, pantau: tPantau, kelompok: tKelompok, t2: tTahap2, kode: tKode })[t](); }
 
   /* ---------------- penjelasan = pengantar yang sama dengan siswa ---------------- */
   function tPenjelasan() { const host = el('div', { gaya: 'position:absolute;inset:0' }); pg.append(host); intro = Intro.mount(host, { guru: true, mulai: LS('intro', 0), labelAkhir: 'Tes awal dimulai', saatLangkah: (i) => LSset('intro', i), saatSelesai: () => ke('pantau') }); }
@@ -29,7 +30,7 @@
       w.innerHTML = '';
       if (net !== 'online' || !data) { w.append(el('div', { kelas: 'tengah-isi' }, el('span', { kelas: 'ubin fx-tangga', gaya: 'width:5rem;height:5rem', html: ik('putus') }), el('h2', null, 'Mode mandiri'), el('p', { kelas: 'muted' }, 'Server belum terhubung (database belum diatur, atau halaman dibuka dari berkas). Pemantauan langsung tidak tersedia. Gunakan tab “Kode hasil” untuk memasukkan kode dari siswa.'))); return; }
       const d = data.daftar, masuk = d.filter((x) => x.klaim).length, selesai = d.filter((x) => x.skor != null), rata = selesai.length ? (selesai.reduce((a, b) => a + b.skor, 0) / selesai.length).toFixed(1).replace('.', ',') : '–';
-      w.append(el('div', { kelas: 'stat-guru' }, stat('Sudah masuk', masuk + '/24', 'poli'), stat('Selesai tes awal', selesai.length + '/24', 'log'), stat('Rata-rata skor', rata + ' / 5', 'eksp'), el('button', { kelas: 'btn bahaya kecil', type: 'button', gaya: 'margin-left:auto', html: ik('hapus', 'kecil') + 'Atur ulang semua', onclick: async () => { if (await UI.konfirmasi('Atur ulang semua?', '<p>Semua nama, hasil tes, dan kelompok akan dihapus. Ini tidak bisa dibatalkan.</p>', 'Ya, hapus semua', 'Batal')) { await ga('g-reset-semua'); muat(); } } })));
+      w.append(el('div', { kelas: 'stat-guru' }, stat('Sudah masuk', masuk + '/24', 'poli'), stat('Selesai tes awal', selesai.length + '/24', 'log'), stat('Rata-rata skor', rata + ' / 5', 'eksp'), el('button', { kelas: 'btn sekunder kecil', type: 'button', gaya: 'margin-left:auto', html: ik('pensil', 'kecil') + 'Akun uji coba: ' + (data.uji && data.uji.klaim ? (data.uji.skor != null ? 'selesai tes' : 'aktif') : 'kosong'), onclick: async () => { if (await UI.konfirmasi('Atur ulang akun uji coba?', '<p class="tengah">Akun uji coba dipakai guru untuk mencoba alur. Ini tidak memengaruhi siswa asli.</p>', 'Atur ulang', 'Tutup')) { await ga('g-reset', { idx: B.DUMMY }); UI.toast('Akun uji coba diatur ulang', 'centang'); muat(); } } }), el('button', { kelas: 'btn bahaya kecil', type: 'button', html: ik('hapus', 'kecil') + 'Atur ulang semua', onclick: async () => { if (await UI.konfirmasi('Atur ulang semua?', '<p>Semua nama, hasil tes, dan kelompok akan dihapus. Ini tidak bisa dibatalkan.</p>', 'Ya, hapus semua', 'Batal')) { await ga('g-reset-semua'); muat(); } } })));
       const grid = el('div', { kelas: 'grid-pantau' }); w.append(grid);
       d.forEach((x, i) => { const st = !x.klaim ? 'belum' : (x.skor != null ? 'selesai' : (Date.now() - x.aktif > 60000 ? 'diam' : 'aktif')); const lab = { belum: 'belum masuk', aktif: ({ intro: 'pengantar', tes: 'mengerjakan tes', hasil: 'melihat hasil', kelompok: 'melihat kelompok', lanjut: 'tahap lanjut', masuk: 'sudah masuk' })[x.tahap] || 'aktif', diam: 'tidak aktif >1 mnt', selesai: 'skor ' + x.skor + '/5' }[st];
         const t = el('button', { kelas: 'tile-pantau ' + st + ' fx-' + warna[i % 9], type: 'button', onclick: () => detail(x), html: '<span class="av">' + inisial(x.nama) + '</span><span class="nm">' + esc(x.nama) + '</span><span class="st">' + lab + '</span>' + (x.kel >= 0 ? '<span class="kg">K' + (x.kel + 1) + '</span>' : '') }); grid.append(t); });
@@ -66,6 +67,22 @@
     await muat(); poll = setInterval(() => { if (net === 'online') muat(); }, 4000);
   }
 
+  /* ---------------- tahap lanjutan: pemahaman per keluarga ---------------- */
+  async function tTahap2() {
+    const w = el('div', { kelas: 'pantau' }); pg.append(w);
+    const render = () => {
+      w.innerHTML = ''; if (net !== 'online' || !data || !data.tahap2) { w.append(el('div', { kelas: 'tengah-isi' }, el('h2', null, 'Perlu server'), el('p', { kelas: 'muted' }, 'Ringkasan pemahaman hanya tersedia saat server terhubung.'))); return; }
+      const t = data.tahap2, fmt = (v) => (v == null ? '–' : v.toFixed(1).replace('.', ','));
+      w.append(el('div', { kelas: 'stat-guru' }, el('div', { kelas: 'kartu stat fx-log', html: '<div class="eyebrow" style="margin:0">Selesai tahap lanjutan</div><b>' + t.selesai + '/24</b>' }), el('div', { kelas: 'kartu stat fx-eksp', html: '<div class="eyebrow" style="margin:0">Cocokkan masalah (rata-rata)</div><b>' + fmt(t.cocok) + ' / 5</b>' }), el('div', { kelas: 'kartu stat fx-poli', html: '<div class="eyebrow" style="margin:0">Tiket keluar (rata-rata)</div><b>' + fmt(t.tiket) + ' / 3</b>' })));
+      const k = el('div', { kelas: 'kartu gulir', gaya: 'flex:1;min-height:0' }); k.append(el('h3', null, 'Pemahaman per jenis grafik'), el('p', { kelas: 'muted kecil' }, 'Dari tanda “Paham” dan “Masih bingung” saat siswa saling menjelaskan, ditambah pilihan refleksi akhir. Jenis dengan banyak “bingung” layak dibahas ulang.'));
+      const maks = Math.max(1, ...Object.values(t.agr).map((x) => x.paham + x.bingung));
+      UI.URUT.forEach((f) => { const x = t.agr[f], tot = x.paham + x.bingung; k.append(el('div', { kelas: 'baris fx-' + f, gaya: 'margin:.5rem 0' }, el('div', { html: UI.ubin(f) }).firstChild, el('b', { gaya: 'width:11rem;color:var(--td)' }, UI.NAMA[f]), el('div', { kelas: 'bar-pemahaman' }, el('i', { kelas: 'p', gaya: 'width:' + (x.paham / maks * 100) + '%' }), el('i', { kelas: 'b', gaya: 'width:' + (x.bingung / maks * 100) + '%' })), el('span', { kelas: 'chip ok' }, 'paham ' + x.paham), el('span', { kelas: 'chip warn' }, 'bingung ' + x.bingung), el('span', { kelas: 'chip abu', title: 'Dipilih siswa pada refleksi' }, 'refleksi: mudah ' + x.mudah + ' · bingung ' + x.ref))); });
+      w.append(k);
+    };
+    async function muat() { const r = await ga('g-status'); if (r.ok) { data = r; net = 'online'; } else net = 'offline'; render(); }
+    await muat(); poll = setInterval(muat, 4000);
+  }
+
   /* ---------------- kode hasil ---------------- */
   function tKode() {
     const w = el('div', { kelas: 'kode-wrap' }); pg.append(w);
@@ -88,10 +105,11 @@
   }
 
   async function mintaPin(salah) {
-    const v = await UI.papanKetik({ judul: 'PIN guru', ikon: ik('kunci', 'besar'), panjang: 4, alfabet: '0123456789', kolom: 5, sembunyi: true, otomatis: true, catatan: salah ? 'PIN salah. Coba lagi.' : 'Masukkan PIN guru (4 angka).' });
-    if (v == null) return mintaPin(false); pin = v; const r = await ga('g-status'); if (r._s === 401) return mintaPin(true); if (r.ok) { net = 'online'; data = r; } else net = 'offline'; gambarAtas(); ke(tab);
+    const v = await UI.papanKetik({ judul: 'PIN guru', ikon: ik('kunci', 'besar'), panjang: 5, alfabet: '0123456789', kolom: 5, sembunyi: true, otomatis: true, catatan: salah ? 'PIN salah. Coba lagi.' : 'Masukkan PIN guru (5 angka).' });
+    if (v == null) { location.href = 'index.html'; return; } pin = v; const r = await ga('g-status'); if (r._s === 401) return mintaPin(true); if (r.ok) { net = 'online'; data = r; } else { net = 'offline'; if (pin !== B.PIN_GURU) return mintaPin(true); } try { sessionStorage.setItem('gfg_pin', pin); } catch (e) { /* abaikan */ } gambarAtas(); ke(tab);
   }
   UI.pasangPutar(); gambarAtas(); bawah.style.display = 'none';
-  (async () => { const c = await fetch('/api/app', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ a: 'cek' }) }).then((r) => r.json()).catch(() => ({})); if (c.ok && c.penyimpanan) { net = 'online'; await mintaPin(false); } else { net = 'offline'; gambarAtas(); ke('penjelasan'); } })();
+  (async () => { const c = await fetch('/api/app', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ a: 'cek' }) }).then((r) => r.json()).catch(() => ({})); let ss = ''; try { ss = sessionStorage.getItem('gfg_pin') || ''; } catch (e) { /* abaikan */ }
+    if (c.ok && c.penyimpanan) { net = 'online'; if (ss) { pin = ss; const r = await ga('g-status'); if (r.ok) { data = r; gambarAtas(); return ke('penjelasan'); } } await mintaPin(false); } else { net = 'offline'; if (ss === B.PIN_GURU) { pin = ss; gambarAtas(); ke('penjelasan'); } else await mintaPin(false); } })();
   window.gfGuru = { ke, ga: () => ga };
 })();

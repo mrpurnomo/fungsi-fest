@@ -1,0 +1,22 @@
+/* Tahap lanjutan: pakar berpasangan */
+.t2-hub { position: absolute; inset: 0; display: grid; grid-template-columns: 22rem 1fr; gap: 1rem; }
+.t2-kiri { display: flex; flex-direction: column; gap: .3rem; } .fam-chips { display: flex; flex-wrap: wrap; gap: .4rem; }
+.t2-langkah { display: grid; grid-template-columns: 1fr 1fr; grid-template-rows: 1fr 1fr; gap: 1rem; min-height: 0; }
+.t2-kartu { display: flex; flex-direction: column; margin: 0; } .t2-kartu.selesai { border-color: var(--mint); background: linear-gradient(#F2FCF8, #fff 60%); } .t2-kartu.terkunci { opacity: .7; }
+.no-bulat { width: 2.4rem; height: 2.4rem; border-radius: 50%; background: var(--markisa); color: #fff; display: grid; place-items: center; font-family: var(--tampil); font-weight: 700; font-size: 1.2rem; flex: none; } .t2-kartu.selesai .no-bulat { background: var(--mint); color: #04382A; }
+.kartu-wrap, .jelas-wrap, .cocok-wrap, .ref-wrap { position: absolute; inset: 0; display: flex; flex-direction: column; }
+.kartu-wrap .galeri { grid-template-columns: 14rem 1fr; } .kartu-wrap .daftar { display: flex; flex-direction: column; gap: .35rem; }
+.jelas-isi { flex: 1; min-height: 0; display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; } .jelas-kol { min-height: 0; margin: 0; }
+.fam-baris { background: var(--tt); border-radius: 1.1rem; padding: .6rem .8rem; margin-top: .5rem; }
+.cek-chip { display: inline-flex; align-items: center; gap: .3rem; border: .12rem solid var(--garis-2); background: #fff; border-radius: 99px; padding: .3rem .9rem; font-weight: 700; font-size: .95rem; cursor: pointer; color: var(--tinta-2); min-height: 2.4rem; } .cek-chip.on { background: var(--mint-100); border-color: var(--mint); color: var(--mint-800); }
+.pil-paham { display: inline-flex; align-items: center; gap: .3rem; border: .12rem solid var(--garis-2); background: #fff; border-radius: 99px; padding: .3rem .9rem; font-weight: 700; font-size: .92rem; cursor: pointer; min-height: 2.4rem; color: var(--tinta-2); }
+.pil-paham.ya.on { background: var(--mint); border-color: var(--mint); color: #04382A; } .pil-paham.bingung.on { background: var(--jingga-100); border-color: var(--jingga); color: var(--jingga-800); }
+.cocok-isi { flex: 1; min-height: 0; display: grid; grid-template-columns: 1fr 1.5fr; gap: 1rem; }
+.cocok-sit { margin: 0; overflow: auto; } .cocok-pilihan { display: grid; grid-template-columns: repeat(3, 1fr); gap: .8rem; align-content: center; }
+.opsi-grafik { position: relative; background: #fff; border: .16rem solid var(--garis); border-radius: 1.3rem; padding: .5rem; cursor: pointer; display: flex; flex-direction: column; align-items: center; gap: .3rem; box-shadow: 0 .2rem 0 var(--garis-2); } .opsi-grafik:active { transform: scale(.98); }
+.opsi-grafik svg { width: 100%; height: auto; max-height: 14rem; } .opsi-grafik .hrf { position: absolute; left: .6rem; top: .6rem; width: 2rem; height: 2rem; border-radius: .6rem; background: var(--markisa); color: #fff; display: grid; place-items: center; font-weight: 700; font-family: var(--tampil); }
+.opsi-grafik.benar { border-color: var(--mint); background: var(--mint-100); } .opsi-grafik.salah { border-color: var(--koral); background: var(--koral-100); } .opsi-grafik.dipilih { border-color: var(--markisa); background: var(--markisa-muda); box-shadow: 0 0 0 .25rem var(--markisa-100); }
+.opsi-grafik .nm-fam { font-weight: 700; font-size: 1rem; }
+.ref-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: .5rem; } .ref-pil { display: flex; align-items: center; gap: .5rem; padding: .35rem .6rem .35rem .4rem; border: .14rem solid var(--garis); border-radius: 1rem; background: #fff; font-weight: 700; font-size: .92rem; cursor: pointer; text-align: left; } .ref-pil .ubin { width: 2rem; height: 2rem; padding: .35rem; border-radius: .6rem; flex: none; } .ref-pil.on { border-color: var(--t); background: var(--tt); color: var(--td); }
+.tabel-mini { border-collapse: collapse; width: 100%; font-size: 1.05rem; margin: .6rem 0; } .tabel-mini th { background: var(--markisa-muda); color: var(--markisa-tua); font-size: .9rem; padding: .35rem .7rem; text-align: left; } .tabel-mini td { padding: .35rem .7rem; border-bottom: 1px solid #F0EEF9; font-variant-numeric: tabular-nums; }
+.cocok-pilihan { gap: 1rem; } .opsi-grafik svg { max-height: 17rem; }

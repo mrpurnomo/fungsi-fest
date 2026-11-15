@@ -12,3 +12,8 @@
 
 .stat-guru .btn { align-self: center; }
 .kode-wrap .grid-pantau { flex: none; grid-auto-rows: 7.2rem; align-content: start; }
+
+.bar-pemahaman { flex: 1; display: flex; height: 1.2rem; background: #EEEBFA; border-radius: 99px; overflow: hidden; } .bar-pemahaman i { display: block; height: 100%; } .bar-pemahaman .p { background: var(--mint); } .bar-pemahaman .b { background: var(--jingga); }
+
+.tabs-guru button { white-space: nowrap; padding: 0 .9rem; }
+#atas { flex-wrap: nowrap; } #atas .btn, #atas .chip { flex: none; }

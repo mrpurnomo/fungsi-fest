@@ -5,16 +5,16 @@ Pembelajaran fungsi untuk **XI-F Soshum** (tablet, landscape saja).
 | Halaman | Alamat | Untuk |
 |---|---|---|
 | Siswa | `/` | pengantar animasi → tes awal 5 soal → kelompok |
-| Guru | `/guru` | penjelasan (pengantar yang sama), pantau, kelompok, kode hasil |
+| Guru | `/guru` (atau tombol **Guru** di layar sambutan) | penjelasan (pengantar yang sama), pantau, kelompok, tahap lanjutan, kode hasil |
 
 ## Memasang di Vercel (±5 menit)
 
 1. Vercel → **Add New → Project** → impor repositori ini → **Deploy** (tanpa pengaturan build).
 2. Buka proyek → **Storage** → **Create Database** → pilih **Upstash (Redis)** → hubungkan ke proyek.
    Variabel `KV_REST_API_URL` dan `KV_REST_API_TOKEN` (atau `UPSTASH_REDIS_REST_URL/TOKEN`) terisi otomatis.
-3. **Settings → Environment Variables** → tambah `GURU_PIN` (4 angka, bawaan `1611` bila tidak diisi).
+3. PIN guru bawaan **30594** (5 angka). Tidak perlu mengisi apa pun. Jika ingin mengganti, tambahkan `GURU_PIN` di **Settings → Environment Variables**; jika variabel itu ada, nilainya yang dipakai.
 4. **Deployments → Redeploy** supaya variabel terbaca.
-5. Buka `/guru`, masukkan PIN. Chip **Server aktif** berarti semuanya tersambung.
+5. Buka `/`, pilih **Guru**, masukkan PIN. Chip **Server aktif** berarti semuanya tersambung.
 
 Tanpa langkah 2–4 aplikasi tetap berjalan dalam **mode mandiri**: nama tidak dikunci, hasil diserahkan lewat **kode 5 karakter**
 yang dimasukkan guru di tab *Kode hasil*, dan kelompok disusun di halaman guru.
@@ -31,3 +31,7 @@ yang dimasukkan guru di tab *Kode hasil*, dan kelompok disusun di halaman guru.
 
 - Kunci jawaban tes awal ikut dalam berkas halaman (diagnostik, bukan ujian). Siswa yang membuka kode sumber bisa melihatnya.
 - Mengatur ulang nama siswa: halaman guru → **Pantau** → ketuk nama → *Atur ulang*.
+
+## Akun uji coba
+
+Di halaman pilih nama ada tombol **Akun uji coba (guru)** (butuh PIN guru). Akun ini tidak masuk statistik dan kelompok siswa asli, selalu mulai dari awal, dan punya tombol **Lompat ke…** untuk mencoba tiap tahap. Atur ulang dari halaman guru → Pantau.

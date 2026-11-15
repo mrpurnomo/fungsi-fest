@@ -18,7 +18,9 @@
   function gambarAtas() {
     atas.innerHTML = '';
     atas.append(el('span', { kelas: 'logo' }, 'Grafik ', el('b', null, 'Fungsi')), el('span', { kelas: 'ruang' }));
-    if (idx !== null) atas.append(el('span', { kelas: 'chip', html: ik('siswa', 'kecil') + esc(B.nama(idx).split(' ')[0]) }));
+    if (idx !== null) atas.append(el('span', { kelas: 'chip' + (idx === B.DUMMY ? ' sorot' : ''), html: ik('siswa', 'kecil') + (idx === B.DUMMY ? 'UJI COBA' : esc(B.nama(idx).split(' ')[0])) }));
+    if (idx === B.DUMMY) atas.append(el('button', { kelas: 'btn sekunder kecil', type: 'button', html: ik('nyala', 'kecil') + 'Lompat ke…', onclick: lompatUji }));
+    if (idx === B.DUMMY) atas.append(el('button', { kelas: 'btn sekunder kecil', type: 'button', html: ik('kembali', 'kecil') + 'Keluar uji coba', onclick: async () => { if (await UI.konfirmasi('Keluar dari uji coba?', '<p class="tengah">Progres uji coba tidak disimpan dan tidak memengaruhi siswa lain.</p>', 'Keluar', 'Batal')) { clearInterval(ping); lsSet('p' + B.DUMMY, null); idx = null; P = null; sWelcome(); } } }));
     atas.append(el('span', { kelas: 'chip ' + (net === 'online' ? 'ok' : (net === 'cek' ? 'abu' : 'warn')), html: ik(net === 'online' ? 'wifi' : 'putus', 'kecil') + (net === 'online' ? 'Terhubung ke guru' : (net === 'cek' ? 'Memeriksa…' : 'Mode mandiri')), title: net === 'offline' ? 'Tidak terhubung ke guru. Hasil diserahkan lewat kode.' : '' }));
   }
   const kosongkanBawah = () => { bawah.innerHTML = ''; bawah.style.display = 'none'; };
@@ -34,9 +36,23 @@
     w.innerHTML = '<div class="bg-kurva" aria-hidden="true"></div><div class="isi-welcome"><div class="eyebrow" style="justify-content:center">Matematika Tingkat Lanjut · SMA YPVDP Bontang</div><h1 class="judul-besar">Grafik <span class="hl">Fungsi</span></h1><p class="sub">Belajar menghitung, menggambar, dan mengenal bermacam-macam grafik fungsi.</p></div>';
     const bg = w.querySelector('.bg-kurva'); bg.innerHTML = '<svg viewBox="0 0 800 400" preserveAspectRatio="xMidYMid slice"><g fill="none" stroke-linecap="round" stroke-width="5"><path d="M20 340C140 340 150 60 270 60S400 340 520 340 640 60 780 60" stroke="#2EA7F2" opacity=".35"/><path d="M0 300L180 120 340 300 500 120 660 300 800 150" stroke="#F5B700" opacity=".35"/><path d="M0 380C200 370 380 330 540 190S740 20 800 10" stroke="#FF8A1F" opacity=".35"/><path d="M60 40V380M60 210H800" stroke="#9B5DE5" opacity=".18" stroke-dasharray="6 10"/></g></svg>';
     const gl = el('div', { kelas: 'garland-welcome' }); w.prepend(gl); setTimeout(() => UI.untaian(gl), 30);
-    w.querySelector('.isi-welcome').append(el('button', { kelas: 'btn besar denyut', type: 'button', html: 'Masuk' + ik('panah'), onclick: async () => { UI.layarPenuh(); sKelas(); } }), el('div', { kelas: 'muted kecil', gaya: 'margin-top:1.2rem' }, 'Pastikan tabletmu dalam posisi mendatar (landscape).'));
+    w.querySelector('.isi-welcome').append(el('div', { kelas: 'eyebrow', gaya: 'margin-top:.4rem' }, 'Masuk sebagai'), el('div', { kelas: 'baris', gaya: 'gap:1.2rem' }, el('button', { kelas: 'btn besar denyut', type: 'button', html: ik('siswa') + 'Siswa', onclick: () => { UI.layarPenuh(); sKelas(); } }), el('button', { kelas: 'btn besar sekunder', type: 'button', html: ik('kunci') + 'Guru', onclick: () => loginGuru(false) })), el('div', { kelas: 'muted kecil', gaya: 'margin-top:1.2rem' }, 'Pastikan tabletmu dalam posisi mendatar (landscape).'));
     layar(w, 'tengah-layar');
   }
+
+  /* ---------------------------------------------------------------- lompat (hanya akun uji coba) */
+  async function lompatUji() {
+    const pilih = await UI.dialog({ judul: 'Lompat ke tahap …', ikon: ik('nyala', 'besar'), isi: '<p class="muted">Hanya untuk akun uji coba. Jawaban tes diisi otomatis.</p>', tombol: [['intro', 'Pengantar'], ['tes', 'Tes awal'], ['hasil', 'Hasil tes'], ['kelompok', 'Kelompok'], ['lanjut', 'Tahap lanjutan']].map(([v, t]) => ({ t, nilai: v, kelas: 'sekunder' })).concat([{ t: 'Batal', nilai: null, kelas: 'bahaya' }]), tutupLuar: true }); if (!pilih) return;
+    clearInterval(tmr); const so = B.soalSiswa(idx); P.tes = { jawab: so.map((q, i) => (i < 3 ? q.kunci : (q.kunci + 1) % 5)), mulai: Date.now(), selesai: pilih !== 'tes' && pilih !== 'intro', detik: 240 };
+    if (pilih === 'intro') { P.tahap = 'intro'; P.intro = 1; P.tes = baruP().tes; } else if (pilih === 'tes') { P.tahap = 'tes'; P.tes = baruP().tes; } else { await api('hasil', { idx, jawab: P.tes.jawab, detik: 240 }); P.terkirim = true; P.tahap = pilih; }
+    simpan(); lanjutDari();
+  }
+
+  /* ---------------------------------------------------------------- PIN guru */
+  async function cekPinGuru(pin) { const r = await api('g-status', { pin }); if (r._s === 401) return false; if (r.ok) return true; return pin === B.PIN_GURU; }
+  async function mintaPin(judul, salah) { const v = await UI.papanKetik({ judul, ikon: ik('kunci', 'besar'), panjang: 5, alfabet: '0123456789', kolom: 5, sembunyi: true, otomatis: true, catatan: salah ? 'PIN salah. Coba lagi.' : 'Masukkan PIN guru (5 angka).' }); if (v == null) return null; if (await cekPinGuru(v)) return v; return mintaPin(judul, true); }
+  async function loginGuru() { const v = await mintaPin('Masuk sebagai guru', false); if (v == null) return; try { sessionStorage.setItem('gfg_pin', v); } catch (e) { /* abaikan */ } location.href = 'guru.html'; }
+  async function masukUji() { const v = await mintaPin('Akun uji coba (guru)', false); if (v == null) return; idx = B.DUMMY; lsSet('p' + idx, null); P = baruP(); const r = await api('klaim', { idx }); net = r.ok ? 'online' : 'offline'; gambarAtas(); mulaiPing(); lanjutDari(); }
 
   /* ---------------------------------------------------------------- 2. pilih kelas */
   function sKelas() {
@@ -50,7 +66,7 @@
   async function sNama() {
     kosongkanBawah(); gambarAtas();
     const w = el('div', { kelas: 'nama-wrap' }); w.append(el('div', { kelas: 'baris', gaya: 'justify-content:space-between;margin-bottom:.4rem' }, el('div', null, el('div', { kelas: 'eyebrow' }, 'Langkah 2 dari 2'), el('h2', { gaya: 'margin:0' }, 'Pilih namamu')), el('button', { kelas: 'btn sekunder kecil', type: 'button', html: ik('kembali', 'kecil') + 'Kembali', onclick: sKelas })));
-    const grid = el('div', { kelas: 'grid-nama' }); w.append(grid); layar(w);
+    const grid = el('div', { kelas: 'grid-nama' }); w.append(grid, el('div', { kelas: 'baris', gaya: 'justify-content:flex-end;padding:.2rem 0' }, el('button', { kelas: 'btn sekunder kecil', type: 'button', html: ik('pensil', 'kecil') + 'Akun uji coba (guru)', onclick: masukUji }))); layar(w);
     let st = { diklaim: [], selesai: [] }; const r = await (net === 'cek' ? cekJaringan().then(() => api('status')) : api('status')); if (r && r.ok) st = r; else if (net !== 'offline') { net = 'offline'; gambarAtas(); }
     B.DAFTAR.forEach((_, i) => {
       const nm = B.nama(i), sudah = st.diklaim.includes(i), tamat = st.selesai.includes(i);
@@ -162,7 +178,8 @@
 
   /* ---------------------------------------------------------------- 8. tahap berikutnya */
   function sLanjut() {
-    kosongkanBawah(); gambarAtas(); const w = el('div', { kelas: 'tengah-isi' }); w.innerHTML = '<span class="ubin fx-trig" style="width:5.5rem;height:5.5rem">' + UI.glif('trig') + '</span><h2>Tahap berikutnya</h2><p class="muted" style="max-width:38rem;font-size:1.2rem">Tunggu arahan gurumu. Kegiatan berikutnya dilakukan bersama kelompok.</p>';
+    gambarAtas(); Tahap2.mulai({ idx: () => idx, P: () => P, simpan, api, layar, net: () => net, gambarAtas, bawahKosong: kosongkanBawah, konfeti }); return;
+    kosongkanBawah(); const w = el('div', { kelas: 'tengah-isi' }); w.innerHTML = '<span class="ubin fx-trig" style="width:5.5rem;height:5.5rem">' + UI.glif('trig') + '</span><h2>Tahap berikutnya</h2><p class="muted" style="max-width:38rem;font-size:1.2rem">Tunggu arahan gurumu. Kegiatan berikutnya dilakukan bersama kelompok.</p>';
     w.append(el('button', { kelas: 'btn sekunder', type: 'button', html: ik('kelompok') + 'Lihat kelompok lagi', onclick: () => { P.tahap = 'kelompok'; simpan(); sKelompok(); } })); layar(w, 'tengah-layar');
   }
 
