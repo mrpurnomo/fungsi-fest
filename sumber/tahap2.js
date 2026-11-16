@@ -90,7 +90,10 @@
   }
 
   /* ============================================================ pusat */
-  const pamSelesai = (t) => Object.keys((t.pam && t.pam.jawab) || {}).length >= 9;
+  /* pameran jigsaw (XI-G): penjaga meja boleh centang/soal/lewati; pengembara wajib soal benar untuk semua jenis lain */
+  const pamLain = (t) => [1, 2, 3, 4, 5, 6, 7, 8, 9].filter((g) => g !== t.grup);
+  const pamDone = (t) => { const p = t.pam || {}, j = p.jawab || {}; if (!p.peran) return 0; const ok = p.peran === 'kelana' ? ['benar'] : ['benar', 'paham', 'lewati']; return pamLain(t).filter((g) => ok.indexOf(j[g]) >= 0).length; };
+  const pamSelesai = (t) => !!(t.pam && t.pam.peran) && pamDone(t) >= pamLain(t).length;
   const status = () => { const t = T(); if (XG()) return [t.fam.every((f) => t.kartu[f]), pamSelesai(t), !!t.dis.selesai, !!t.cocok.selesai, !!(t.fung && t.fung.selesai), !!t.tamat]; return [t.fam.every((f) => t.kartu[f]), !!t.dis.selesai, !!t.cocok.selesai, !!t.tamat]; };
   function terbuka(k, sel) { if (E.idx() === B.DUMMY) return true; if (E.net() === 'online') return (T().aktif || [1]).indexOf(k) >= 0; return k === 1 || sel[k - 2]; }
   async function hub() {
@@ -127,10 +130,10 @@
     kanan.append(grid); w.append(sisi, kanan); E.layar(w);
   }
   function langkahXG(t, fam) {
-    const pamN = Object.keys((t.pam && t.pam.jawab) || {}).length, fungN = ((t.fung && t.fung.hasil) || []).filter(Boolean).length, rd = (t.dis.rnd || []).filter((r) => r && r.selesai).length, cj = t.cocok.jawab.filter((v) => v != null).length, tj = (t.tiket.jawab || []).filter((v) => v != null).length;
+    const pamN = pamDone(t), fungN = ((t.fung && t.fung.hasil) || []).filter(Boolean).length, rd = (t.dis.rnd || []).filter((r) => r && r.selesai).length, cj = t.cocok.jawab.filter((v) => v != null).length, tj = (t.tiket.jawab || []).filter((v) => v != null).length;
     return [
       [1, 'Kartu pakar', 'buku', 'Kuasai satu jenis grafik kelompokmu: rumus, bentuk, ciri, lalu soal cerita.', fam.filter((f) => t.kartu[f]).length + ' dari ' + fam.length + ' kartu', kartuPakar, 'poli', fam.length, fam.filter((f) => t.kartu[f]).length],
-      [2, 'Pameran pakar', 'kelompok', 'Sembilan kelompok bergantian menjelaskan. Simak dan coba soal tiap jenis.', pamN + ' dari 9 kelompok', pameran, 'log', 9, pamN],
+      [2, 'Pameran pakar', 'kelompok', 'Pilih peran: jaga meja atau berkelana. Kuasai jenis grafik kelompok lain.', pamN + ' dari ' + pamLain(t).length + ' jenis', pameran, 'log', pamLain(t).length, pamN],
       [3, 'Tebak fungsinya', 'kelompok', 'Diskusi: kejadian sehari-hari ini grafiknya jenis apa?', rd + ' dari 6 tebakan', diskusi, 'trig', 6, rd],
       [4, 'Cocokkan grafik', 'mata', 'Lihat data lima masalah nyata, lalu tentukan nama fungsinya.', cj + ' dari 5 masalah', cocok, 'eksp', 5, cj],
       [5, 'Dari grafik ke fungsi', 'pensil', 'Lihat tabel angka dan temukan aturan fungsinya sendiri.', fungN + ' dari 3 tugas', fungsi, 'rasional', 3, fungN],
@@ -315,30 +318,56 @@
     [300, 1100, 2000].forEach((ms) => setTimeout(() => { if (w.isConnected) E.konfeti(innerWidth * (0.25 + Math.random() * .5), innerHeight * .25, 70); }, ms));
   }
 
-  /* ============================================================ XI-G · langkah 2: pameran pakar (dikendalikan guru) */
-  let pamLihat = null, pamOto = true, pamHook = null;
+  /* ============================================================ XI-G · langkah 2: pameran pakar (jigsaw, bebas urutan) */
+  let pamHook = null;
   function pameran() {
-    E.bawahKosong(); const t = T(); t.pam = t.pam || { jawab: {} }; t.pam.jawab = t.pam.jawab || {}; const urut = B.SET.flat(), w = el('div', { kelas: 't2-bingkai t2-pameran' }); E.layar(w); pamOto = true; pamLihat = t.pameran || 0;
-    pamHook = () => { if (!document.querySelector('.t2-pameran')) { pamHook = null; return; } if (pamOto) pamLihat = t.pameran || 0; gambar(); };
-    const benarN = () => Object.keys(t.pam.jawab).filter((k) => t.pam.jawab[k] === 'benar').length;
+    E.bawahKosong(); const t = T(); t.pam = t.pam || { jawab: {} }; t.pam.jawab = t.pam.jawab || {}; const urut = B.SET.flat(), j = t.pam.jawab, own = t.grup, w = el('div', { kelas: 't2-bingkai t2-pameran' }); E.layar(w);
+    let tampil = 'daftar'; const coba = {}, benarN = () => Object.keys(j).filter((k) => j[k] === 'benar').length;
+    if (own && !j[own]) j[own] = 'sendiri';
+    const sync = () => { t.pam.benar = benarN(); sinkron({ pam: { benar: t.pam.benar, peran: t.pam.peran || null } }); };
+    pamHook = () => { if (!document.querySelector('.t2-pameran')) { pamHook = null; return; } gambar(); };
+    function pilihPeran(k) {
+      const ownF = own ? NAMA[urut[own - 1]] : 'jenis kelompokmu';
+      const kartu = (id, ikon, judul, teks, label) => el('button', { kelas: 'peran-kartu', type: 'button', onclick: () => { t.pam.peran = id; sync(); gambar(); }, html: '<span class="ubin fx-' + (id === 'jaga' ? 'log' : 'eksp') + '">' + ik(ikon) + '</span><h2>' + judul + '</h2><p>' + teks + '</p><span class="btn ' + (id === 'jaga' ? '' : 'hijau') + '">' + label + '</span>' });
+      k.isi.append(el('div', { kelas: 'peran-wrap' }, el('div', { kelas: 'muted', gaya: 'text-align:center;font-size:1.15rem' }, 'Setiap anggota memilih sendiri. Kamu boleh berganti peran kapan saja.'), el('div', { kelas: 'peran-dua' },
+        kartu('jaga', 'kelompok', 'Penjaga meja', 'Tetap di mejamu dan menjelaskan <b>' + ownF + '</b> kepada teman yang datang. Kamu boleh mencentang atau melewati jenis lain yang sudah dipelajari rekan satu kelompok.', 'Saya jaga meja'),
+        kartu('kelana', 'mata', 'Pengembara', 'Berkeliling ke meja kelompok lain untuk belajar. Kamu <b>wajib menguasai</b> semua jenis lain: kerjakan soalnya sampai benar.', 'Saya berkelana'))));
+    }
+    async function gantiPeran() { const ya = await UI.konfirmasi('Ganti peran?', '<p class="tengah">Penjaga hanya wajib soal benar bila berganti menjadi pengembara. Kemajuanmu tidak hilang.</p>', 'Ya, ganti', 'Batal'); if (!ya) return; t.pam.peran = t.pam.peran === 'jaga' ? 'kelana' : 'jaga'; tampil = 'daftar'; sync(); gambar(); }
+    function lihatKartu(f) { UI.dialog({ lebar: true, judul: NAMA[f], ikon: UI.ubin(f), tutupX: true, tutupLuar: true, isi: el('div', { kelas: 'galeri', gaya: 'grid-template-columns:1fr;height:30rem' }, isiKartu(f).kolom), tombol: [{ t: 'Tutup', nilai: true }] }); }
+    function set(g, v) { if (j[g] === v) delete j[g]; else j[g] = v; sync(); gambar(); }
+    function kartuJenis(g) {
+      const f = urut[g - 1], st = j[g], jaga = t.pam.peran === 'jaga', c = el('div', { kelas: 'pj fx-' + f + (st === 'benar' || st === 'paham' || st === 'lewati' || st === 'sendiri' ? ' ok' : '') + (t.pameran === g ? ' sorot' : '') });
+      const ket = { benar: 'soal benar', paham: 'dicentang paham', lewati: 'dilewati', gagal: 'soal belum benar', sendiri: 'jenis kelompokmu' }[st] || 'belum dipelajari';
+      c.append(el('div', { kelas: 'baris' }, el('div', { html: UI.ubin(f) }).firstChild, el('div', { gaya: 'flex:1;min-width:0' }, el('b', { gaya: 'font-size:1.1rem;color:var(--td)' }, NAMA[f]), el('div', { kelas: 'muted kecil' }, 'Kelompok ' + g)), el('span', { kelas: 'chip ' + (st && st !== 'gagal' ? 'ok' : (st === 'gagal' ? 'warn' : 'abu')) }, ket)));
+      if (g === own) { c.append(el('div', { kelas: 'muted kecil', gaya: 'margin-top:.4rem' }, 'Ini jenis kelompokmu, sudah dihitung selesai.')); return c; }
+      const baris = el('div', { kelas: 'baris', gaya: 'margin-top:.5rem;flex-wrap:wrap;gap:.4rem' }, el('button', { kelas: 'btn sekunder kecil', type: 'button', html: ik('mata', 'kecil') + 'Lihat kartu', onclick: () => lihatKartu(f) }), el('button', { kelas: 'btn hijau kecil' + (st ? '' : ' denyut-h'), type: 'button', html: ik('ujian', 'kecil') + (st === 'benar' ? 'Soal ✓ ulangi' : 'Kerjakan soal'), onclick: () => ujiPam(f, g, true) }));
+      if (jaga) baris.append(el('button', { kelas: 'btn sekunder kecil' + (st === 'paham' ? ' aktifx' : ''), type: 'button', disabled: st === 'benar', html: ik('centang', 'kecil') + (st === 'paham' ? 'Batal centang' : 'Sudah paham'), onclick: () => set(g, 'paham') }), el('button', { kelas: 'btn sekunder kecil' + (st === 'lewati' ? ' aktifx' : ''), type: 'button', disabled: st === 'benar' || st === 'paham', html: st === 'lewati' ? 'Batal lewati' : 'Lewati', onclick: () => set(g, 'lewati') }));
+      c.append(baris); return c;
+    }
     function gambar() {
-      w.innerHTML = ''; const cur = t.pameran || 0, r = pamLihat;
-      if (r && r === t.grup && !t.pam.jawab[r]) { t.pam.jawab[r] = 'sendiri'; t.pam.benar = benarN(); sinkron({ pam: { benar: t.pam.benar } }); }
-      const k = kerangka('Langkah ' + NO().pam + ' · ' + (cur ? 'putaran ' + cur + ' dari 9' : 'menunggu aba-aba guru'), 'Pameran pakar', { titik: Array.from({ length: 9 }, (_, i) => (i + 1 === r ? 'now' : (t.pam.jawab[i + 1] ? 'isi' : ''))), ke: (i) => { if (i + 1 <= cur) { pamLihat = i + 1; pamOto = (i + 1 === cur); gambar(); } } });
-      if (!r) { k.isi.append(el('div', { kelas: 'kartu tengah-isi', gaya: 'margin:auto;padding:2.2rem 3rem;max-width:40rem' }, el('span', { kelas: 'ubin fx-log', gaya: 'width:5rem;height:5rem;margin:0 auto', html: ik('jam') }), el('h2', null, 'Pameran belum dimulai'), el('p', { kelas: 'muted', gaya: 'font-size:1.15rem' }, 'Gurumu akan memanggil kelompok satu per satu. Layar ini berganti sendiri saat gilirannya tiba.'), el('button', { kelas: 'btn sekunder', type: 'button', html: ik('ulang') + 'Segarkan', onclick: () => cekGuru(true) }))); w.append(k.w); return; }
-      const f = urut[r - 1], own = r === t.grup, st = t.pam.jawab[r], { kolom } = isiKartu(f);
-      k.isi.append(el('div', { kelas: 'umpan ' + (own ? 'ok' : 'hint'), gaya: 'margin-bottom:.5rem', html: ik(own ? 'bintang' : 'info') + '<span>' + (own ? '<b>Giliran kelompokmu!</b> Jelaskan ' + NAMA[f] + ' kepada seluruh kelas: rumus, bentuk grafik, dan satu contoh kehidupan.' : '<b>Kelompok ' + r + '</b> sedang menjelaskan <b>' + NAMA[f] + '</b>. Simak, lalu coba soal ceritanya.') + '</span>' }), el('div', { kelas: 'galeri', gaya: 'grid-template-columns:1fr;flex:1;min-height:0' }, kolom));
-      const tombolSoal = own ? el('span', { kelas: 'chip ok', html: ik('centang', 'kecil') + 'Kelompokmu yang menjelaskan' }) : el('button', { kelas: 'btn hijau ' + (st ? '' : 'denyut-h'), type: 'button', html: ik('ujian') + (st === 'benar' ? 'Soal selesai · coba lagi' : (st === 'gagal' ? 'Coba soal baru' : 'Coba soal ceritanya')), onclick: () => ujiPam(f, r, true) });
-      k.nav.append(tombol('Putaran sebelumnya', 'kembali', { kelas: 'sekunder', kiri: true, p: { disabled: r <= 1, onclick: () => { pamLihat = r - 1; pamOto = false; gambar(); } } }), tombolSoal, tombol('Putaran berikutnya', 'panah', { p: { disabled: r >= cur, onclick: () => { pamLihat = r + 1; pamOto = (r + 1 === cur); gambar(); } } }));
+      w.innerHTML = ''; const peran = t.pam.peran;
+      const k = kerangka('Langkah ' + NO().pam + ' · ' + (peran ? (peran === 'jaga' ? 'penjaga meja' : 'pengembara') : 'pilih perannya'), 'Pameran pakar', {});
+      if (!peran) { pilihPeran(k); w.append(k.w); return; }
+      const lain = pamLain(t), n = pamDone(t), selesai = n >= lain.length, ownF = own ? urut[own - 1] : null;
+      const atas = el('div', { kelas: 'pam-atas' }, el('span', { kelas: 'chip sorot', html: ik(peran === 'jaga' ? 'kelompok' : 'mata', 'kecil') + (peran === 'jaga' ? 'Penjaga meja' : 'Pengembara') }), el('div', { kelas: 'pam-bar' }, el('div', { kelas: 'lg-bar' }, el('i', { gaya: 'width:' + Math.round(n / lain.length * 100) + '%' })), el('span', { kelas: 'muted kecil' }, n + ' dari ' + lain.length + ' jenis lain ' + (peran === 'kelana' ? 'dikuasai (soal benar)' : 'selesai'))), peran === 'jaga' && ownF ? el('div', { kelas: 'seg-varian' }, el('button', { type: 'button', kelas: tampil === 'ajar' ? 'aktif' : '', onclick: () => { tampil = 'ajar'; gambar(); } }, 'Mode mengajar'), el('button', { type: 'button', kelas: tampil === 'daftar' ? 'aktif' : '', onclick: () => { tampil = 'daftar'; gambar(); } }, 'Jelajahi jenis lain')) : null, el('button', { kelas: 'btn sekunder kecil', type: 'button', html: ik('ulang', 'kecil') + 'Ganti peran', onclick: gantiPeran }));
+      k.isi.append(atas);
+      if (t.pameran) k.isi.append(el('div', { kelas: 'umpan hint', gaya: 'margin:.2rem 0', html: ik('info') + '<span><b>Pengumuman guru:</b> giliran meja Kelompok ' + t.pameran + ' (' + NAMA[urut[t.pameran - 1]] + '). Pengembara boleh pindah ke meja itu.</span>' }));
+      if (peran === 'jaga' && ownF && tampil === 'ajar') {
+        const cek = t.pam.ajarCek = t.pam.ajarCek || [false, false, false, false];
+        k.isi.append(el('div', { kelas: 'ajar-bar' }, el('span', { kelas: 'muted' }, 'Siapkan penjelasanmu:'), ['Rumus dan nama lain', 'Bentuk grafik', 'Bentuk umum', 'Contoh kehidupan'].map((x, i) => el('button', { kelas: 'cek-chip' + (cek[i] ? ' on' : ''), type: 'button', html: (cek[i] ? ik('centang', 'kecil') : '') + x, onclick: () => { cek[i] = !cek[i]; E.simpan(); gambar(); } })), el('span', { kelas: 'ruang' }), el('span', { kelas: 'muted' }, 'Teman yang sudah kamu ajar:'), el('button', { kelas: 'btn sekunder kecil', type: 'button', onclick: () => { t.pam.ajar = Math.max(0, (t.pam.ajar || 0) - 1); E.simpan(); gambar(); } }, '−'), el('b', { gaya: 'font-size:1.3rem;min-width:1.5rem;text-align:center' }, String(t.pam.ajar || 0)), el('button', { kelas: 'btn kecil', type: 'button', onclick: () => { t.pam.ajar = (t.pam.ajar || 0) + 1; E.simpan(); gambar(); } }, '+')));
+        k.isi.append(el('div', { kelas: 'galeri', gaya: 'grid-template-columns:1fr;flex:1;min-height:0' }, isiKartu(ownF).kolom));
+      } else { const grid = el('div', { kelas: 'pj-grid gulir' }); pamUrut().forEach((g) => grid.append(kartuJenis(g))); k.isi.append(grid); }
+      k.nav.append(el('span', { kelas: 'muted' }, peran === 'kelana' ? 'Pengembara: semua jenis lain harus soal benar.' : 'Penjaga: centang, kerjakan soal, atau lewati.'), el('span'), selesai ? tombol('Pameran selesai', 'centang', { kelas: 'hijau denyut-h', kiri: true, p: { onclick: hub } }) : el('span', { kelas: 'chip abu' }, (lain.length - n) + ' jenis lagi'));
       w.append(k.w);
     }
-    const coba = {};
-    async function ujiPam(f, r, baru) {
-      if (baru) coba[r] = 0; const q = B.tantanganAcak(f, Math.floor(Math.random() * 2e9)), v = await UI.keypadAngka({ judul: 'Soal cerita · ' + NAMA[f], tanya: q.tanya, ikon: ik('ujian', 'besar') }); if (v == null) return;
-      coba[r] = (coba[r] || 0) + 1;
-      if (v === q.kunci) { t.pam.jawab[r] = 'benar'; t.pam.benar = benarN(); sinkron({ pam: { benar: t.pam.benar } }); E.konfeti(innerWidth / 2, innerHeight / 3, 28); gambar(); await UI.info('Tepat!', '<div class="tengah"><p style="font-size:1.2rem">' + esc(q.jelas) + '</p></div>', 'Lanjut', { ikon: ik('centang', 'besar') }); }
-      else if (coba[r] >= 2) { if (t.pam.jawab[r] !== 'benar') t.pam.jawab[r] = 'gagal'; t.pam.benar = benarN(); sinkron({ pam: { benar: t.pam.benar } }); gambar(); await UI.info('Ini jawabannya', '<div class="tengah"><p style="font-size:1.2rem">' + esc(q.jelas) + '</p></div>', 'Mengerti', { ikon: ik('info', 'besar') }); }
-      else { const lagi = await UI.dialog({ judul: 'Belum tepat', ikon: ik('info', 'besar'), isi: '<div class="tengah"><p style="font-size:1.25rem">Jawabanmu <b>' + F(v) + '</b> belum tepat.</p><p class="muted">Petunjuk: ganti peubah dengan angka yang diminta, lalu hitung pelan-pelan.</p></div>', tombol: [{ t: 'Tutup', nilai: false, kelas: 'sekunder' }, { t: 'Coba lagi', nilai: true }] }); if (lagi) ujiPam(f, r); }
+    const pamUrut = () => [1, 2, 3, 4, 5, 6, 7, 8, 9];
+    async function ujiPam(f, g, baru) {
+      if (baru) coba[g] = 0; const q = B.tantanganAcak(f, Math.floor(Math.random() * 2e9)), v = await UI.keypadAngka({ judul: 'Soal cerita · ' + NAMA[f], tanya: q.tanya, ikon: ik('ujian', 'besar') }); if (v == null) return;
+      coba[g] = (coba[g] || 0) + 1; const sebelum = pamSelesai(t);
+      if (v === q.kunci) { j[g] = 'benar'; sync(); E.konfeti(innerWidth / 2, innerHeight / 3, 28); gambar(); await UI.info('Tepat!', '<div class="tengah"><p style="font-size:1.2rem">' + esc(q.jelas) + '</p></div>', 'Lanjut', { ikon: ik('centang', 'besar') }); if (!sebelum && pamSelesai(t)) { E.konfeti(innerWidth / 2, innerHeight / 3, 70); await UI.info('Pameran selesai!', '<div class="tengah"><p style="font-size:1.25rem">Kamu sudah menyelesaikan pameran pakar. Tunggu aba-aba guru untuk langkah berikutnya.</p></div>', 'Kembali ke pusat', { ikon: ik('bintang', 'besar') }); hub(); } }
+      else if (coba[g] >= 2) { if (j[g] !== 'benar') j[g] = 'gagal'; sync(); gambar(); await UI.info('Ini jawabannya', '<div class="tengah"><p style="font-size:1.2rem">' + esc(q.jelas) + '</p><p class="muted">Coba lagi dengan soal baru sampai benar.</p></div>', 'Mengerti', { ikon: ik('info', 'besar') }); }
+      else { const lagi = await UI.dialog({ judul: 'Belum tepat', ikon: ik('info', 'besar'), isi: '<div class="tengah"><p style="font-size:1.25rem">Jawabanmu <b>' + F(v) + '</b> belum tepat.</p><p class="muted">Petunjuk: ganti peubah dengan angka yang diminta, lalu hitung pelan-pelan.</p></div>', tombol: [{ t: 'Tutup', nilai: false, kelas: 'sekunder' }, { t: 'Coba lagi', nilai: true }] }); if (lagi) ujiPam(f, g); }
     }
     gambar();
   }

@@ -76,7 +76,7 @@ const handler = async (req, res) => {
         if (Array.isArray(t.bingung)) u.bingung = [...new Set(t.bingung.filter(ok))].filter((f) => !(u.kuasai || []).includes(f));
         if (t.diskusi && n(t.diskusi.benar, 6) !== undefined) u.diskusi = { benar: t.diskusi.benar, total: Math.min(6, Number(t.diskusi.total) || 6) };
         if (t.fung && n(t.fung.skor, 3) !== undefined) u.fung = { skor: t.fung.skor };
-        if (t.pam && n(t.pam.benar, 9) !== undefined) u.pam = { benar: t.pam.benar };
+        if (t.pam && n(t.pam.benar, 9) !== undefined) u.pam = { benar: t.pam.benar, peran: ['jaga', 'kelana'].includes(t.pam.peran) ? t.pam.peran : ((u.pam && u.pam.peran) || null) };
         if (n(t.poin, 400) !== undefined) u.poin = t.poin;
         if (Array.isArray(t.lencana)) u.lencana = t.lencana.map((x) => String(x).slice(0, 24)).slice(0, 8);
         if (Array.isArray(t.sel) && t.sel.length === NLANGKAH()) u.sel = t.sel.map((v) => v === true);
@@ -105,12 +105,12 @@ const handler = async (req, res) => {
       if (b.a === 'g-status') {
         const s = await semuaSiswa(), kel = await ambilKel(), gerbang = (await redis('GET', ctx().K.G)) || 'tutup';
         const uji = s['s' + B.DUMMY] ? { klaim: true, tahap: s['s' + B.DUMMY].tahap, skor: s['s' + B.DUMMY].hasil ? s['s' + B.DUMMY].hasil.skor : null } : { klaim: false };
-        const FAM = Object.keys(B.NAMA_FAM), agr = {}; FAM.forEach((f) => { agr[f] = { kuasai: 0, bingung: 0 }; }); let cs = 0, cn = 0, ts = 0, tn = 0, ds = 0, dn = 0, sel2 = 0, fsum = 0, fn = 0; const poinSiswa = [];
-        Object.keys(s).filter(nyata).forEach((k) => { const t = s[k].t2; if (!t) return; (t.kuasai || []).forEach((f) => { if (agr[f]) agr[f].kuasai++; }); (t.bingung || []).forEach((f) => { if (agr[f]) agr[f].bingung++; }); if (t.cocok) { cs += t.cocok.benar; cn++; } if (t.tiket) { ts += t.tiket.skor; tn++; } if (t.diskusi) { ds += t.diskusi.benar; dn++; } if (t.selesai) sel2++; if (t.fung) { fsum += t.fung.skor; fn++; } if (t.poin != null) poinSiswa.push({ idx: +k.slice(1), nama: nm(+k.slice(1)), poin: t.poin, lencana: t.lencana || [] }); });
+        const FAM = Object.keys(B.NAMA_FAM), agr = {}; FAM.forEach((f) => { agr[f] = { kuasai: 0, bingung: 0 }; }); let cs = 0, cn = 0, ts = 0, tn = 0, ds = 0, dn = 0, sel2 = 0, fsum = 0, fn = 0, pjaga = 0, pkelana = 0; const poinSiswa = [];
+        Object.keys(s).filter(nyata).forEach((k) => { const t = s[k].t2; if (!t) return; (t.kuasai || []).forEach((f) => { if (agr[f]) agr[f].kuasai++; }); (t.bingung || []).forEach((f) => { if (agr[f]) agr[f].bingung++; }); if (t.cocok) { cs += t.cocok.benar; cn++; } if (t.tiket) { ts += t.tiket.skor; tn++; } if (t.diskusi) { ds += t.diskusi.benar; dn++; } if (t.selesai) sel2++; if (t.fung) { fsum += t.fung.skor; fn++; } if (t.pam && t.pam.peran === 'jaga') pjaga++; if (t.pam && t.pam.peran === 'kelana') pkelana++; if (t.poin != null) poinSiswa.push({ idx: +k.slice(1), nama: nm(+k.slice(1)), poin: t.poin, lencana: t.lencana || [] }); });
         poinSiswa.sort((x, y) => y.poin - x.poin); const grupPoin = (kel ? kel.kel : []).map((g, gi) => { const p = g.map((m) => (poinSiswa.find((q) => q.idx === m.idx) || {}).poin).filter((v) => v != null); return { kel: gi + 1, n: p.length, total: p.reduce((x, y) => x + y, 0), rata: p.length ? p.reduce((x, y) => x + y, 0) / p.length : 0 }; });
         poinSiswa.forEach((p) => { p.kel = kel ? sudahMasuk(kel.kel, p.idx) + 1 : 0; });
         const aktifL = await bacaLangkah(), langkah = aktifL.length ? Math.max.apply(null, aktifL) : 0, selStep = Array.from({ length: NLANGKAH() }, () => 0); Object.keys(s).filter(nyata).forEach((k) => { const sl = s[k].t2 && s[k].t2.sel; if (sl) sl.forEach((v, i) => { if (v) selStep[i]++; }); });
-        const tahap2 = { agr, cocok: cn ? cs / cn : null, cocokN: cn, tiket: tn ? ts / tn : null, tiketN: tn, diskusi: dn ? ds / dn : null, fung: fn ? fsum / fn : null, selesai: sel2, langkah, aktif: aktifL, selStep, peringkat: poinSiswa.slice(0, 10), grup: grupPoin };
+        const tahap2 = { agr, cocok: cn ? cs / cn : null, cocokN: cn, tiket: tn ? ts / tn : null, tiketN: tn, diskusi: dn ? ds / dn : null, peranJaga: pjaga, peranKelana: pkelana, fung: fn ? fsum / fn : null, selesai: sel2, langkah, aktif: aktifL, selStep, peringkat: poinSiswa.slice(0, 10), grup: grupPoin };
         const daftar = CFG().daftar.map((_, i) => { const d = s['s' + i]; return { idx: i, nama: nm(i), klaim: !!d, aktif: d ? d.aktif : 0, tahap: d ? d.tahap : null, skor: d && d.hasil ? d.hasil.skor : null, detik: d && d.hasil ? d.hasil.detik : null, kel: kel ? sudahMasuk(kel.kel, i) : -1 }; });
         return kirim(200, { ok: true, sekarang: Date.now(), kelas: ctx().kl, manual: CFG().manual, kelasBuka: !CFG().manual || (await redis('GET', ctx().K.KB)) === '1', pameran: Number(await redis('GET', ctx().K.P)) || 0, nLangkah: NLANGKAH(), daftar, uji, tahap2, kelompok: kel ? tampilKel(kel.kel) : null, gerbang });
       }
