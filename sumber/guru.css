@@ -37,3 +37,18 @@
 .lg-bar { height: .6rem; background: #fff; border-radius: 99px; overflow: hidden; border: 1px solid var(--garis); } .lg-bar i { display: block; height: 100%; background: var(--mint); }
 .lg .btn { min-height: 2.6rem; font-size: .95rem; } .lg-samping { display: flex; flex-direction: column; gap: .4rem; justify-content: center; }
 .arsip-baris { display: flex; align-items: center; gap: .6rem; padding: .6rem .8rem; margin: .4rem 0; background: var(--markisa-muda); border-radius: 1rem; }
+
+.pilih-kelas { display: inline-flex; background: #fff; border: 1px solid var(--garis-2); border-radius: 99px; padding: .2rem; flex: none; } .pilih-kelas button { border: 0; background: transparent; border-radius: 99px; min-height: 2rem; padding: 0 .8rem; font-weight: 700; color: var(--tinta-2); cursor: pointer; } .pilih-kelas button.aktif { background: var(--mentari); color: var(--tinta); box-shadow: 0 .12rem 0 #C79300; }
+.langkah-guru { grid-template-columns: repeat(auto-fit, minmax(10rem, 1fr)); }
+.kb { position: absolute; inset: 0; display: flex; flex-direction: column; }
+.kb-kep { display: flex; align-items: flex-end; justify-content: space-between; gap: 1rem; margin-bottom: .5rem; flex-wrap: wrap; } .kb-aksi { display: flex; align-items: center; gap: .4rem; flex-wrap: wrap; }
+.kb .gerbang { margin-bottom: .4rem; padding: .6rem 1rem; }
+.kb-papan { flex: 1; min-height: 0; display: grid; grid-template-columns: 17rem 1fr; gap: .8rem; }
+.kb-pool { margin: 0; padding: .7rem; display: flex; flex-direction: column; min-height: 0; } .kb-pool-kep { display: flex; align-items: center; justify-content: space-between; margin-bottom: .4rem; } .kb-pool-isi { flex: 1; min-height: 0; overflow: auto; display: flex; flex-direction: column; gap: .3rem; scrollbar-width: thin; }
+.kb-grid { min-height: 0; display: grid; grid-template-columns: repeat(3, 1fr); grid-template-rows: repeat(3, 1fr); gap: .5rem; }
+.kb-grup { background: #fff; border: .14rem solid var(--garis-2); border-radius: 1rem; padding: .4rem .5rem; display: flex; flex-direction: column; min-height: 0; overflow: hidden; } .kb-grup.siap { border-color: var(--markisa); box-shadow: 0 0 0 .18rem var(--markisa-100); cursor: copy; }
+.kb-grup-kep { display: flex; align-items: center; gap: .4rem; margin-bottom: .2rem; } .kb-grup-kep b { font-family: var(--tampil); flex: 1; } .kb-n { width: 1.6rem; height: 1.6rem; border-radius: 50%; background: var(--t); color: #fff; display: grid; place-items: center; font-weight: 700; font-size: .85rem; }
+.kb-grup-isi { flex: 1; min-height: 0; display: flex; flex-direction: column; gap: .25rem; overflow: auto; scrollbar-width: thin; }
+.kb-chip { display: flex; align-items: center; gap: .4rem; text-align: left; border: .12rem solid var(--garis-2); background: #fff; border-radius: 99px; padding: .15rem .6rem .15rem .2rem; font-weight: 700; font-size: .88rem; cursor: grab; touch-action: none; user-select: none; color: var(--tinta); } .kb-chip .av2 { width: 1.7rem; height: 1.7rem; font-size: .65rem; flex: none; } .kb-chip.pilih { background: var(--mentari-100); border-color: var(--mentari); box-shadow: 0 0 0 .15rem rgba(255,194,51,.5); } .kb-chip.selesai { border-color: var(--mint); }
+.pam-guru { display: flex; align-items: center; gap: 1rem; margin: 0 0 .7rem; padding: .6rem 1.1rem; }
+.kb-grup.aktif { border-color: var(--mentari); background: #FFFBEA; box-shadow: 0 0 0 .22rem rgba(255,194,51,.55); }

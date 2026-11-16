@@ -283,6 +283,8 @@ sup { font-size: .68em; line-height: 0; vertical-align: baseline; position: rela
 .kel-nama { display: flex; align-items: center; gap: .5rem; font-size: .9rem; font-weight: 600; padding: .2rem .3rem; border-radius: .7rem; } .kel-nama.aku { background: var(--mentari-100); }
 .av2 { width: 1.7rem; height: 1.7rem; border-radius: 50%; background: var(--t); color: #fff; display: grid; place-items: center; font-size: .65rem; font-weight: 700; flex: none; }
 
+.grid-kel.g9 { grid-template-columns: repeat(3, 1fr); grid-auto-rows: min-content; gap: .5rem; overflow: auto; } .grid-kel.g9 .kel-kartu { padding: .35rem .6rem; } .grid-kel.g9 .kel-nama { font-size: .85rem; margin: .1rem 0; }
+
 .tabs-guru { display: flex; gap: .4rem; background: #fff; border: 1px solid var(--garis); border-radius: 99px; padding: .25rem; box-shadow: var(--bayang); }
 .tabs-guru button { display: inline-flex; gap: .45rem; align-items: center; min-height: 2.5rem; padding: 0 1.1rem; border: 0; border-radius: 99px; background: transparent; font-weight: 700; color: var(--tinta-2); cursor: pointer; }
 .tabs-guru button.aktif { background: var(--markisa); color: #fff; box-shadow: 0 .15rem 0 var(--markisa-tua); }
@@ -322,6 +324,21 @@ sup { font-size: .68em; line-height: 0; vertical-align: baseline; position: rela
 .lg-bar { height: .6rem; background: #fff; border-radius: 99px; overflow: hidden; border: 1px solid var(--garis); } .lg-bar i { display: block; height: 100%; background: var(--mint); }
 .lg .btn { min-height: 2.6rem; font-size: .95rem; } .lg-samping { display: flex; flex-direction: column; gap: .4rem; justify-content: center; }
 .arsip-baris { display: flex; align-items: center; gap: .6rem; padding: .6rem .8rem; margin: .4rem 0; background: var(--markisa-muda); border-radius: 1rem; }
+
+.pilih-kelas { display: inline-flex; background: #fff; border: 1px solid var(--garis-2); border-radius: 99px; padding: .2rem; flex: none; } .pilih-kelas button { border: 0; background: transparent; border-radius: 99px; min-height: 2rem; padding: 0 .8rem; font-weight: 700; color: var(--tinta-2); cursor: pointer; } .pilih-kelas button.aktif { background: var(--mentari); color: var(--tinta); box-shadow: 0 .12rem 0 #C79300; }
+.langkah-guru { grid-template-columns: repeat(auto-fit, minmax(10rem, 1fr)); }
+.kb { position: absolute; inset: 0; display: flex; flex-direction: column; }
+.kb-kep { display: flex; align-items: flex-end; justify-content: space-between; gap: 1rem; margin-bottom: .5rem; flex-wrap: wrap; } .kb-aksi { display: flex; align-items: center; gap: .4rem; flex-wrap: wrap; }
+.kb .gerbang { margin-bottom: .4rem; padding: .6rem 1rem; }
+.kb-papan { flex: 1; min-height: 0; display: grid; grid-template-columns: 17rem 1fr; gap: .8rem; }
+.kb-pool { margin: 0; padding: .7rem; display: flex; flex-direction: column; min-height: 0; } .kb-pool-kep { display: flex; align-items: center; justify-content: space-between; margin-bottom: .4rem; } .kb-pool-isi { flex: 1; min-height: 0; overflow: auto; display: flex; flex-direction: column; gap: .3rem; scrollbar-width: thin; }
+.kb-grid { min-height: 0; display: grid; grid-template-columns: repeat(3, 1fr); grid-template-rows: repeat(3, 1fr); gap: .5rem; }
+.kb-grup { background: #fff; border: .14rem solid var(--garis-2); border-radius: 1rem; padding: .4rem .5rem; display: flex; flex-direction: column; min-height: 0; overflow: hidden; } .kb-grup.siap { border-color: var(--markisa); box-shadow: 0 0 0 .18rem var(--markisa-100); cursor: copy; }
+.kb-grup-kep { display: flex; align-items: center; gap: .4rem; margin-bottom: .2rem; } .kb-grup-kep b { font-family: var(--tampil); flex: 1; } .kb-n { width: 1.6rem; height: 1.6rem; border-radius: 50%; background: var(--t); color: #fff; display: grid; place-items: center; font-weight: 700; font-size: .85rem; }
+.kb-grup-isi { flex: 1; min-height: 0; display: flex; flex-direction: column; gap: .25rem; overflow: auto; scrollbar-width: thin; }
+.kb-chip { display: flex; align-items: center; gap: .4rem; text-align: left; border: .12rem solid var(--garis-2); background: #fff; border-radius: 99px; padding: .15rem .6rem .15rem .2rem; font-weight: 700; font-size: .88rem; cursor: grab; touch-action: none; user-select: none; color: var(--tinta); } .kb-chip .av2 { width: 1.7rem; height: 1.7rem; font-size: .65rem; flex: none; } .kb-chip.pilih { background: var(--mentari-100); border-color: var(--mentari); box-shadow: 0 0 0 .15rem rgba(255,194,51,.5); } .kb-chip.selesai { border-color: var(--mint); }
+.pam-guru { display: flex; align-items: center; gap: 1rem; margin: 0 0 .7rem; padding: .6rem 1.1rem; }
+.kb-grup.aktif { border-color: var(--mentari); background: #FFFBEA; box-shadow: 0 0 0 .22rem rgba(255,194,51,.55); }
 
 /* Tahap lanjutan: pakar berpasangan */
 .t2-hub { position: absolute; inset: 0; display: grid; grid-template-columns: 21rem 1fr; gap: 1.1rem; }
@@ -400,6 +417,12 @@ sup { font-size: .68em; line-height: 0; vertical-align: baseline; position: rela
 .t2-catatan { width: 100%; }
 
 .t2-sambung { display: flex; flex-direction: column; align-items: flex-end; gap: .3rem; }
+
+.t2-langkah.n6 { grid-template-columns: repeat(3, 1fr); } .t2-langkah.n6 .t2-kartu p { font-size: .95rem; } .t2-langkah.n6 .t2-kartu h3 { font-size: 1.1rem; }
+.fung-isi .cocok-isi { grid-template-columns: 1.25fr 1fr; } .fung-aturan { display: flex; flex-direction: column; gap: .8rem; margin: 0; }
+.fung-rumus { font-size: 2.4rem; line-height: 1.6; display: flex; align-items: center; flex-wrap: wrap; gap: .3rem; font-style: normal; white-space: pre; }
+.slot-f { min-width: 3.6rem; height: 3.4rem; border: .16rem dashed var(--markisa); background: var(--markisa-muda); color: var(--markisa-tua); border-radius: 1rem; font-family: var(--tampil); font-size: 1.8rem; font-weight: 700; cursor: pointer; padding: 0 .6rem; margin: 0 .15rem; } .slot-f.terisi { border-style: solid; background: #fff; } .slot-f.isi { border-style: solid; border-color: var(--mint); background: var(--mint-100); color: var(--mint-800); cursor: default; }
+.t2-pameran .isi { min-height: 0; }
 </style>
 </head>
 <body>
@@ -637,8 +660,18 @@ sup { font-size: .68em; line-height: 0; vertical-align: baseline; position: rela
   const judulKata = (s) => s.toLowerCase().replace(/(^|[\s-])([a-z])/g, (m, a, b) => a + b.toUpperCase());
   const DUMMY = 24;                    // akun uji coba guru (tidak masuk kelompok dan statistik)
 const PIN_GURU = '30594';
-const nama = (i) => (i === DUMMY ? 'Siswa Uji Coba (Guru)' : judulKata(DAFTAR[i]));
-  const DURASI = 600;      // detik
+const DAFTAR_G = ['AFRA ATIQAH BALQIS', 'AMINAH', 'ANDI ALMAHYRA ZOYA TENRI AJENG', 'AURELFA SAFWA ANNORA NAAZHEEN', 'CHESTA ADABI DESAINI', 'DHINI RAHMADHANI ISMAIL PUTRI', 'DHIYA NABILAH RAHMAN', 'GABY MARCELLINA BAKARA', 'KANIA ALMIRA RUSDI', 'MAHERA GHANIYA HISYAM', 'MUHAMMAD NAUFAL ATHAYA RAMADHAN', 'MUHAMMAD TAUFIQURRAHMAN', 'MUHAMMAD YANISKO APRIALDI', 'NAYLA RAFA NABILA', 'NAYMA FAKHIRA ARDIFA', 'NAYSYILA PUTRI RABANI', 'RAIHAN FARELLIO', 'RAISSYA DAMAYANTI ATHA TSANIAH', 'SILAH MAHARANI PUTRI', 'SOFIE SASIKIRANA', 'SULMI IKHWAN KHAIRI', 'TSALTSA ANIN NURHUMAIRA', 'ZAHIRAH ALYA MUKHBITA YUCHA', 'ZUFAIRA QONITA MAZAYA'];
+  /* pengaturan per kelas: XI-F (kelompok otomatis dari tes) dan XI-G (kelompok disusun guru, 9 kelompok, pakar satu jenis per kelompok) */
+  const KELAS_CFG = {
+    xif: { kode: 'xif', nama: 'XI-F Soshum', daftar: DAFTAR, durasi: 600, manual: false, langkah: 4, jmlKelompok: 4 },
+    xig: { kode: 'xig', nama: 'XI-G', daftar: DAFTAR_G, durasi: 300, manual: true, langkah: 6, jmlKelompok: 9 }
+  };
+  let AKTIF = 'xif';
+  const cfg = (k) => KELAS_CFG[k || AKTIF] || KELAS_CFG.xif;
+  const setKelas = (k) => { if (KELAS_CFG[k]) AKTIF = k; return cfg(); };
+  const nama = (i, k) => (i === DUMMY ? 'Siswa Uji Coba (Guru)' : judulKata(cfg(k).daftar[i]));
+  const durasi = (k) => cfg(k).durasi;
+  const DURASI = 600;      // detik (XI-F)
   const JUMLAH_SOAL = 5, KELOMPOK = 4, MAKS_ANGGOTA = 6;
 
   /* ---------- acak berbenih ---------- */
@@ -780,10 +813,29 @@ const nama = (i) => (i === DUMMY ? 'Siswa Uji Coba (Guru)' : judulKata(DAFTAR[i]
   ];
   const PROMPT = ['Siapa yang bisa membaca konteksnya dengan kata-kata sendiri?', 'Apa yang terjadi pada y saat x makin besar: naik, turun, berulang, atau melompat?', 'Mirip dengan contoh grafik yang mana? Beri satu alasan.'];
   function diskusiSiswa(seed) { const r = mulberry(1300 + seed * 733); return acak(r, DISKUSI.map((_, i) => i)).slice(0, 6).map((i, n) => Object.assign({ no: n + 1, ref: i }, DISKUSI[i])); }
+  /* dari tabel ke aturan fungsi (tambahan XI-G): tiga tugas per murid, angkanya diacak tetapi bentuknya tetap */
+  function tugasFungsi(idx) {
+    const r = mulberry(8800 + idx * 271), fn = (n) => String(n).replace('-', '−'), T = [];
+    { const a = pil(r, [2, 3, 4, 5, -2, -3]), b = pil(r, [-5, -3, -2, 1, 2, 3, 4, 6]), xs = [0, 1, 2, 3];
+      T.push({ jenis: 'linear', fam: 'poli', judul: 'Aturan garis lurus', rumus: '<i>f</i>(<i>x</i>) = [a]<i>x</i> + [b]', label: ['a', 'b'], jawab: [a, b], baris: xs.map((x) => [x, a * x + b]),
+        petunjuk: ['Lihat baris x = 0. Nilai y pada baris itu adalah b.', 'Setiap x naik 1, y bertambah berapa? Tambahan itu adalah a.'],
+        jelas: 'Saat x = 0, y = ' + fn(b) + ', jadi b = ' + fn(b) + '. Setiap x naik 1, y bertambah ' + fn(a) + ', jadi a = ' + fn(a) + '. Aturannya: f(x) = ' + fn(a) + 'x ' + (b < 0 ? '− ' + (-b) : '+ ' + b) + '. Pola “bertambah tetap” adalah ciri garis lurus.' }); }
+    { const a = pil(r, [1, 2, 3]), c = pil(r, [-6, -5, -4, -3, -2, -1, 1, 2, 3, 4, 5, 6]), xs = [-2, -1, 0, 1, 2];
+      T.push({ jenis: 'kuadrat', fam: 'poli', judul: 'Aturan lengkung (parabola)', rumus: '<i>f</i>(<i>x</i>) = [a]<i>x</i><sup>2</sup> + [c]', label: ['a', 'c'], jawab: [a, c], baris: xs.map((x) => [x, a * x * x + c]),
+        petunjuk: ['Lihat baris x = 0. Karena 0² = 0, nilai y di sana adalah c.', 'Lihat baris x = 1: y = a + c. Kurangi c untuk mendapatkan a.'],
+        jelas: 'Saat x = 0, y = ' + fn(c) + ', jadi c = ' + fn(c) + '. Saat x = 1, y = ' + fn(a + c) + ', jadi a = ' + fn(a + c) + ' − (' + fn(c) + ') = ' + a + '. Aturannya: f(x) = ' + (a === 1 ? '' : a) + 'x² ' + (c < 0 ? '− ' + (-c) : '+ ' + c) + '. Nilai y sama untuk x dan −x: grafik simetris.' }); }
+    { const b = pil(r, [2, 3]), a = pil(r, [1, 2, 3, 4]), xs = [0, 1, 2, 3];
+      T.push({ jenis: 'eksponen', fam: 'eksp', judul: 'Aturan yang berlipat', rumus: '<i>f</i>(<i>x</i>) = [a] · [b]<sup><i>x</i></sup>', label: ['a', 'b'], jawab: [a, b], baris: xs.map((x) => [x, a * Math.pow(b, x)]),
+        petunjuk: ['Lihat baris x = 0. Karena b⁰ = 1, nilai y di sana adalah a.', 'Bagi y baris berikutnya dengan y baris sebelumnya. Hasilnya adalah b.'],
+        jelas: 'Saat x = 0, y = ' + a + ', jadi a = ' + a + '. Tiap x naik 1, y dikali ' + b + ', jadi b = ' + b + '. Aturannya: f(x) = ' + (a === 1 ? '' : a + ' · ') + b + 'ˣ. Perubahan “dikali tetap” adalah ciri eksponensial.' }); }
+    return T;
+  }
   /* poin dan lencana tahap lanjutan */
   function hitungPoin(t) {
-    const kartu = Object.keys(t.kartu || {}).reduce((a, f) => a + (t.kartu[f] === 1 ? 10 : 5), 0), dis = ((t.diskusi && t.diskusi.benar) || 0) * 10, coc = ((t.cocok && t.cocok.benar) || 0) * 10, tik = ((t.tiket && t.tiket.skor) || 0) * 20, bonus = t.tamat ? 10 : 0;
-    const poin = Math.min(400, kartu + dis + coc + tik + bonus), L = [];
+    const pamP = ((t.pam && t.pam.benar) || 0) * 5, fungP = ((t.fung && t.fung.skor) || 0) * 15, kartu = Object.keys(t.kartu || {}).reduce((a, f) => a + (t.kartu[f] === 1 ? 10 : 5), 0), dis = ((t.diskusi && t.diskusi.benar) || 0) * 10, coc = ((t.cocok && t.cocok.benar) || 0) * 10, tik = ((t.tiket && t.tiket.skor) || 0) * 20, bonus = t.tamat ? 10 : 0;
+    const poin = Math.min(400, kartu + dis + coc + tik + bonus + pamP + fungP), L = [];
+    if (t.pam && t.pam.benar >= 7) L.push('Murid Pameran');
+    if (t.fung && t.fung.skor === 3) L.push('Penemu Rumus');
     if ((t.fam || []).length && (t.fam || []).every((f) => t.kartu && t.kartu[f])) L.push('Pakar Kartu');
     if (t.diskusi && t.diskusi.benar >= 5) L.push('Penebak Jitu');
     if (t.cocok && t.cocok.benar >= 4) L.push('Pemburu Masalah');
@@ -807,7 +859,7 @@ const nama = (i) => (i === DUMMY ? 'Siswa Uji Coba (Guru)' : judulKata(DAFTAR[i]
     ];
   }
 
-  const api = { tantanganAcak, KELAS, SET, NAMA_FAM, DISKUSI, PROMPT, diskusiSiswa, hitungPoin, bagianPasangan, TANTANGAN, SITUASI, PENGECOH, cocokSiswa, tiketSiswa, DAFTAR, DUMMY, PIN_GURU, nama, judulKata, DURASI, JUMLAH_SOAL, KELOMPOK, MAKS_ANGGOTA, soalSiswa, nilai, buatKode, bacaKode, bentukKelompok, tambahKelompok, ALFA };
+  const api = { tugasFungsi, KELAS_CFG, cfg, setKelas, durasi, kelasAktif: () => AKTIF, tantanganAcak, KELAS, SET, NAMA_FAM, DISKUSI, PROMPT, diskusiSiswa, hitungPoin, bagianPasangan, TANTANGAN, SITUASI, PENGECOH, cocokSiswa, tiketSiswa, DAFTAR, DUMMY, PIN_GURU, nama, judulKata, DURASI, JUMLAH_SOAL, KELOMPOK, MAKS_ANGGOTA, soalSiswa, nilai, buatKode, bacaKode, bentukKelompok, tambahKelompok, ALFA };
   if (typeof module !== 'undefined' && module.exports) module.exports = api; else root.BS = api;
 })(typeof window !== 'undefined' ? window : globalThis);
 
@@ -1021,6 +1073,8 @@ const nama = (i) => (i === DUMMY ? 'Siswa Uji Coba (Guru)' : judulKata(DAFTAR[i]
   const { el, ik, esc, anim } = UI, B = BS, K = GF.K, NAMA = UI.NAMA;
   let E, tmrCek = null;
   const T = () => E.P().t2;
+  const XG = () => B.cfg(B.kelasAktif()).manual;
+  const NO = () => (XG() ? { kartu: 1, pam: 2, dis: 3, cocok: 4, fung: 5, tiket: 6 } : { kartu: 1, dis: 2, cocok: 3, tiket: 4 });
   const kirim = (d) => { if (E.net() === 'online') E.api('t2', { idx: E.idx(), t2: d, tahap: 'tahap2' }); };
   const HURUF = ['A', 'B', 'C'], VAR = { poli: 2, trig: 0 }, warnaFam = (f) => 'var(--f-' + f + ')';
   const WARNA9 = ['poli', 'eksp', 'log', 'trig', 'rasional', 'akar', 'mutlak', 'tangga', 'sepotong'];
@@ -1030,7 +1084,7 @@ const nama = (i) => (i === DUMMY ? 'Siswa Uji Coba (Guru)' : judulKata(DAFTAR[i]
   const adaFam = (f, arr) => (arr || []).indexOf(f) >= 0;
 
   /* ---------- poin & sinkron ke guru ---------- */
-  function hitung() { const t = T(); return B.hitungPoin({ kartu: t.kartu, fam: t.fam, diskusi: t.dis, cocok: t.cocok, tiket: t.tiket, tamat: t.tamat }); }
+  function hitung() { const t = T(); return B.hitungPoin({ kartu: t.kartu, fam: t.fam, diskusi: t.dis, cocok: t.cocok, tiket: t.tiket, pam: t.pam, fung: t.fung, tamat: t.tamat }); }
   function sinkron(extra) { const t = T(), p = hitung(); t.poin = p.poin; t.lencana = p.lencana; E.simpan(); kirim(Object.assign({ poin: p.poin, lencana: p.lencana, sel: status() }, extra || {})); return p; }
 
   /* ---------- grafik bantu ---------- */
@@ -1079,6 +1133,7 @@ const nama = (i) => (i === DUMMY ? 'Siswa Uji Coba (Guru)' : judulKata(DAFTAR[i]
   async function tentukan() {
     const t = T(); if (t.pas != null && t.fam && t.fam.length) return;
     const r = await E.api('kelompok', { idx: E.idx() });
+    if (XG()) { if (r.ok && r.kelompok && r.kelompok[r.saya]) { const g = r.kelompok[r.saya]; t.grup = r.saya + 1; t.pas = 0; t.fam = [B.SET.flat()[r.saya % 9]]; t.pos = Math.max(0, g.findIndex((x) => x.idx === E.idx())); t.mitra = g.filter((x) => x.idx !== E.idx()).map((x) => x.nama); } else { t.pas = 0; t.fam = [B.SET.flat()[0]]; t.mitra = []; t.grup = null; t.pos = 0; } E.simpan(); kirim({ pasangan: 0 }); return; }
     if (r.ok && r.kelompok && r.kelompok[r.saya]) {
       const g = r.kelompok[r.saya], pos = Math.max(0, g.findIndex((s) => s.idx === E.idx())), bp = B.bagianPasangan(pos, g.length);
       t.pas = bp.pasangan; t.fam = bp.keluarga.length ? bp.keluarga : B.SET[bp.pasangan % 3].slice(); t.pos = pos; t.grup = r.saya + 1;
@@ -1094,16 +1149,17 @@ const nama = (i) => (i === DUMMY ? 'Siswa Uji Coba (Guru)' : judulKata(DAFTAR[i]
   async function sapaPasangan() {
     const t = T(), aku = B.nama(E.idx()), av = (n, tag) => '<div class="av-kol"><span class="av-besar fx-' + WARNA9[(n.length + (tag ? 1 : 3)) % 9] + '">' + esc(inisial(n)) + '</span><b>' + esc(n.split(/\s+/).slice(0, 2).join(' ')) + '</b>' + (tag ? '<span class="muted kecil">kamu</span>' : '') + '</div>';
     const teman = t.mitra && t.mitra.length;
-    const isi = '<div class="tengah"><p style="font-size:1.35rem;margin:.1rem 0 .4rem">' + (teman ? 'Pasangan belajarmu adalah <b>' + t.mitra.map(esc).join(' dan ') + '</b>.' : 'Kamu belajar sendiri untuk bagian ini. Kamu boleh bertanya kepada teman sekelompokmu.') + '</p>'
+    const isi = '<div class="tengah"><p style="font-size:1.35rem;margin:.1rem 0 .4rem">' + (teman ? (XG() ? 'Teman sekelompokmu adalah <b>' : 'Pasangan belajarmu adalah <b>') + t.mitra.map(esc).join(' dan ') + '</b>.' : 'Kamu belajar sendiri untuk bagian ini. Kamu boleh bertanya kepada teman sekelompokmu.') + '</p>'
       + '<div class="baris" style="justify-content:center;gap:1.4rem;margin:.6rem 0">' + av(aku, true) + (teman ? '<span class="plus-p">+</span>' + t.mitra.map((m) => av(m, false)).join('') : '') + '</div>'
       + '<div class="eyebrow" style="justify-content:center;margin-top:.8rem">Tugas ' + (teman ? 'kalian' : 'kamu') + ': jadi pakar untuk</div><div class="baris" style="justify-content:center;flex-wrap:wrap;gap:.5rem;margin-top:.3rem">' + t.fam.map((f) => '<span class="chip fx-' + f + '" style="background:var(--tt);color:var(--td);font-size:1.05rem">' + UI.ubin(f) + NAMA[f] + '</span>').join('') + '</div>'
-      + '<p class="muted" style="margin:.8rem 0 0">Pasangan ini tidak diubah, supaya semua kelompok punya pakar untuk sembilan jenis grafik.</p></div>';
+      + (XG() ? '<p class="muted" style="margin:.8rem 0 0">Kelompok ' + t.grup + ' akan menjelaskan jenis grafik ini kepada seluruh kelas pada <b>Pameran Pakar</b>. Siapkan dulu bersama temanmu.</p></div>' : '<p class="muted" style="margin:.8rem 0 0">Pasangan ini tidak diubah, supaya semua kelompok punya pakar untuk sembilan jenis grafik.</p></div>');
     await UI.dialog({ judul: 'Selamat!', ikon: ik('bintang', 'besar'), isi, lebar: true, tombol: [{ t: 'Mulai belajar', nilai: true, ikon: 'panah' }] });
     E.konfeti(innerWidth / 2, innerHeight / 3, 50);
   }
 
   /* ============================================================ pusat */
-  const status = () => { const t = T(); return [t.fam.every((f) => t.kartu[f]), !!t.dis.selesai, !!t.cocok.selesai, !!t.tamat]; };
+  const pamSelesai = (t) => Object.keys((t.pam && t.pam.jawab) || {}).length >= 9;
+  const status = () => { const t = T(); if (XG()) return [t.fam.every((f) => t.kartu[f]), pamSelesai(t), !!t.dis.selesai, !!t.cocok.selesai, !!(t.fung && t.fung.selesai), !!t.tamat]; return [t.fam.every((f) => t.kartu[f]), !!t.dis.selesai, !!t.cocok.selesai, !!t.tamat]; };
   function terbuka(k, sel) { if (E.idx() === B.DUMMY) return true; if (E.net() === 'online') return (T().aktif || [1]).indexOf(k) >= 0; return k === 1 || sel[k - 2]; }
   async function hub() {
     E.bawahKosong(); E.gambarAtas(); await tentukan(); const t = T(); if (!t.sapa) { await sapaPasangan(); t.sapa = true; E.simpan(); }
@@ -1116,19 +1172,19 @@ const nama = (i) => (i === DUMMY ? 'Siswa Uji Coba (Guru)' : judulKata(DAFTAR[i]
     sisi.append(el('div', { kelas: 'eyebrow' }, 'Pakar Grafik' + (t.grup ? ' · Kelompok ' + t.grup : '')));
     sisi.append(el('div', { kelas: 't2-tim', html: tim.map((n, i) => '<div class="av-kol kecil"><span class="av-besar kecil fx-' + WARNA9[(n.length + i * 4) % 9] + '">' + esc(inisial(n)) + '</span><span>' + esc(n.split(/\s+/)[0]) + (i === 0 ? ' <span class="muted kecil">(kamu)</span>' : '') + '</span></div>').join('') }));
     const R = 34, C = 2 * Math.PI * R;
-    sisi.append(el('div', { kelas: 't2-kemajuan', html: '<svg viewBox="0 0 80 80" class="cincin"><circle cx="40" cy="40" r="' + R + '" fill="none" stroke="#E4D9FC" stroke-width="8"/><circle cx="40" cy="40" r="' + R + '" fill="none" stroke="#6D35E8" stroke-width="8" stroke-linecap="round" stroke-dasharray="' + (C * selesai / 4).toFixed(1) + ' ' + C.toFixed(1) + '" transform="rotate(-90 40 40)"/><text x="40" y="47" text-anchor="middle" font-size="22" font-weight="700" font-family="Bricolage,sans-serif" fill="#1E1B4B">' + selesai + '/4</text></svg><div><b style="font-size:1.1rem">Kemajuanmu</b><div class="muted kecil">' + selesai + ' dari 4 langkah selesai</div><span class="chip sorot" style="margin-top:.3rem">' + ik('bintang', 'kecil') + p.poin + ' poin</span></div>' }));
+    sisi.append(el('div', { kelas: 't2-kemajuan', html: '<svg viewBox="0 0 80 80" class="cincin"><circle cx="40" cy="40" r="' + R + '" fill="none" stroke="#E4D9FC" stroke-width="8"/><circle cx="40" cy="40" r="' + R + '" fill="none" stroke="#6D35E8" stroke-width="8" stroke-linecap="round" stroke-dasharray="' + (C * selesai / sel.length).toFixed(1) + ' ' + C.toFixed(1) + '" transform="rotate(-90 40 40)"/><text x="40" y="47" text-anchor="middle" font-size="22" font-weight="700" font-family="Bricolage,sans-serif" fill="#1E1B4B">' + selesai + '/' + sel.length + '</text></svg><div><b style="font-size:1.1rem">Kemajuanmu</b><div class="muted kecil">' + selesai + ' dari ' + sel.length + ' langkah selesai</div><span class="chip sorot" style="margin-top:.3rem">' + ik('bintang', 'kecil') + p.poin + ' poin</span></div>' }));
     sisi.append(el('div', { kelas: 'eyebrow', gaya: 'margin-top:.2rem' }, 'Pakar untuk'), el('div', { kelas: 't2-fam', html: fam.map((f) => '<div class="t2-fam-baris fx-' + f + '">' + UI.ubin(f) + '<b>' + NAMA[f] + '</b>' + (t.kartu[f] ? '<span class="ok-bulat">' + ik('centang', 'kecil') + '</span>' : '') + '</div>').join('') }));
     if (t.tiket.selesai) sisi.append(el('button', { kelas: 'btn hijau denyut-h t2-catatan', type: 'button', html: ik('buku', 'kecil') + 'Catatan belajar (PDF)', onclick: bukaCatatan }));
     sisi.append(el('button', { kelas: 'btn ' + (t.tamat ? 'hijau' : 'sekunder') + ' t2-ringkas', type: 'button', disabled: !t.tamat, html: ik(t.tamat ? 'bintang' : 'gembok', 'kecil') + 'Lihat ringkasan akhir', onclick: tamat }));
     /* sisi kanan */
     const kanan = el('section', { kelas: 't2-utama' }); kanan.append(el('div', { kelas: 't2-judul' }, el('div', null, el('div', { kelas: 'eyebrow' }, 'Tahap lanjutan'), el('h2', { gaya: 'margin:0' }, 'Perjalanan belajarmu')), el('div', { kelas: 't2-sambung' }, el('div', { kelas: 'muted' }, 'Langkah dibuka oleh guru saat sudah waktunya.'), el('div', { kelas: 'baris', gaya: 'justify-content:flex-end;gap:.5rem' }, statusSambung(), el('button', { kelas: 'btn sekunder kecil', type: 'button', html: ik('ulang', 'kecil') + 'Segarkan', onclick: async (e) => { const b = e.currentTarget; b.disabled = true; await cekGuru(true); if (document.querySelector('.t2-hub')) render(); } })))));
-    const L = [
+    const L = XG() ? langkahXG(t, fam) : [
       [1, 'Kartu pakar', 'buku', 'Pelajari rumus, bentuk grafik, dan contoh nyata. Lalu uji dengan soal cerita.', fam.filter((f) => t.kartu[f]).length + ' dari ' + fam.length + ' kartu', kartuPakar, 'poli', fam.length, fam.filter((f) => t.kartu[f]).length],
       [2, 'Tebak fungsinya', 'kelompok', 'Diskusi bersama kelompok: kejadian sehari-hari ini grafiknya jenis apa?', ((t.dis.rnd || []).filter((r) => r && r.selesai).length) + ' dari 6 tebakan', diskusi, 'trig', 6, (t.dis.rnd || []).filter((r) => r && r.selesai).length],
       [3, 'Cocokkan grafik', 'mata', 'Lihat data lima masalah nyata, lalu tentukan nama fungsinya.', t.cocok.jawab.filter((v) => v != null).length + ' dari 5 masalah', cocok, 'eksp', 5, t.cocok.jawab.filter((v) => v != null).length],
       [4, 'Tiket keluar', 'pensil', 'Tiga soal singkat, lalu refleksi. Kerjakan sendiri.', (t.tiket.jawab || []).filter((v) => v != null).length + ' dari 3 soal', tiket, 'sepotong', 3, (t.tiket.jawab || []).filter((v) => v != null).length]
     ];
-    const grid = el('div', { kelas: 't2-langkah' });
+    const grid = el('div', { kelas: 't2-langkah' + (XG() ? ' n6' : '') });
     L.forEach(([no, j, ikon, d, meta, fn, warna, tot, isi]) => {
       const ok = sel[no - 1], buka = terbuka(no, sel), kelas = ok ? 'selesai' : (buka ? 'siap' : 'terkunci');
       const kartu = el('div', { kelas: 'kartu t2-kartu fx-' + warna + ' ' + kelas });
@@ -1137,6 +1193,17 @@ const nama = (i) => (i === DUMMY ? 'Siswa Uji Coba (Guru)' : judulKata(DAFTAR[i]
       kartu.append(el('button', { kelas: 'btn t2-tbl' + (ok ? ' sekunder' : (buka ? ' denyut' : '')), type: 'button', disabled: !buka, html: !buka ? ik('gembok', 'kecil') + 'Menunggu aba-aba guru' : (ok ? 'Buka lagi' : (meta.charAt(0) === '0' ? 'Mulai' : 'Lanjutkan')) + ik('panah', 'kecil'), onclick: () => fn() })); grid.append(kartu);
     });
     kanan.append(grid); w.append(sisi, kanan); E.layar(w);
+  }
+  function langkahXG(t, fam) {
+    const pamN = Object.keys((t.pam && t.pam.jawab) || {}).length, fungN = ((t.fung && t.fung.hasil) || []).filter(Boolean).length, rd = (t.dis.rnd || []).filter((r) => r && r.selesai).length, cj = t.cocok.jawab.filter((v) => v != null).length, tj = (t.tiket.jawab || []).filter((v) => v != null).length;
+    return [
+      [1, 'Kartu pakar', 'buku', 'Kuasai satu jenis grafik kelompokmu: rumus, bentuk, ciri, lalu soal cerita.', fam.filter((f) => t.kartu[f]).length + ' dari ' + fam.length + ' kartu', kartuPakar, 'poli', fam.length, fam.filter((f) => t.kartu[f]).length],
+      [2, 'Pameran pakar', 'kelompok', 'Sembilan kelompok bergantian menjelaskan. Simak dan coba soal tiap jenis.', pamN + ' dari 9 kelompok', pameran, 'log', 9, pamN],
+      [3, 'Tebak fungsinya', 'kelompok', 'Diskusi: kejadian sehari-hari ini grafiknya jenis apa?', rd + ' dari 6 tebakan', diskusi, 'trig', 6, rd],
+      [4, 'Cocokkan grafik', 'mata', 'Lihat data lima masalah nyata, lalu tentukan nama fungsinya.', cj + ' dari 5 masalah', cocok, 'eksp', 5, cj],
+      [5, 'Dari grafik ke fungsi', 'pensil', 'Lihat tabel angka dan temukan aturan fungsinya sendiri.', fungN + ' dari 3 tugas', fungsi, 'rasional', 3, fungN],
+      [6, 'Tiket keluar', 'ujian', 'Tiga soal singkat, lalu refleksi. Kerjakan sendiri.', tj + ' dari 3 soal', tiket, 'sepotong', 3, tj]
+    ];
   }
   function bukaCatatan() { if (window.Catatan) Catatan.buka({ idx: E.idx(), P: E.P() }); }
   /* sambungan ke guru: memeriksa langkah yang dibuka. Gagal diperiksa = ditampilkan jelas, bukan diam-diam. */
@@ -1158,7 +1225,8 @@ const nama = (i) => (i === DUMMY ? 'Siswa Uji Coba (Guru)' : judulKata(DAFTAR[i]
     const r = await E.api('t2s', { idx: E.idx() });
     if (!(r && r.ok)) { sambung.gagal++; if (manual) UI.toast('Belum tersambung ke guru. Coba lagi sebentar lagi.', 'awas'); return; }
     sambung.ok = Date.now(); sambung.gagal = 0;
-    const t = T(), baru = Array.isArray(r.aktif) ? r.aktif : [1, 2, 3, 4].filter((n) => n <= (r.buka || 1)), lama = t.aktif || [1];
+    const t = T(); if ((r.pameran || 0) !== (t.pameran || 0)) { t.pameran = r.pameran || 0; E.simpan(); if (pamHook) pamHook(); if (t.pameran) UI.toast('Pameran pakar: giliran Kelompok ' + t.pameran, 'bintang'); }
+    const baru = Array.isArray(r.aktif) ? r.aktif : Array.from({ length: r.n || 4 }, (_, i) => i + 1).filter((n) => n <= (r.buka || 1)), lama = t.aktif || [1];
     if (JSON.stringify(baru) === JSON.stringify(lama)) { if (manual) UI.toast('Sudah yang terbaru', 'centang'); return; }
     t.aktif = baru; E.simpan(); const nb = baru.filter((n) => lama.indexOf(n) < 0), tutup = lama.filter((n) => baru.indexOf(n) < 0);
     if (nb.length) UI.toast('Guru membuka langkah ' + nb.join(', '), 'bintang'); else if (tutup.length) UI.toast('Guru menutup langkah ' + tutup.join(', '), 'info');
@@ -1188,6 +1256,7 @@ const nama = (i) => (i === DUMMY ? 'Siswa Uji Coba (Guru)' : judulKata(DAFTAR[i]
       const daftar = el('div', { kelas: 'daftar gulir' }), isi = el('div', { gaya: 'min-height:0;display:flex;flex-direction:column;gap:.5rem' });
       fam.forEach((x, i) => daftar.append(el('button', { kelas: 'tab fx-' + x + (i === aktif ? ' aktif' : '') + (t.kartu[x] ? ' lihat' : ''), type: 'button', html: UI.ubin(x) + '<span>' + NAMA[x] + '</span>' + ik('centang', 'kecil').replace('class="ik kecil"', 'class="ik kecil centang"'), onclick: () => { aktif = i; gambar(); } })));
       const { kolom, kanan } = isiKartu(f);
+      if (XG()) kanan.append(el('div', { kelas: 'umpan ok', gaya: 'align-items:flex-start', html: ik('info') + '<span><b>Siapkan penjelasanmu.</b> Kelompokmu akan menjelaskan jenis ini kepada seluruh kelas: rumus dan nama lain, bentuk grafik, satu contoh kehidupan. Latihan dulu bersama temanmu.</span>' }));
       kanan.append(el('div', { kelas: 'uji-kotak' }, el('div', null, el('b', null, t.kartu[f] ? 'Kartu ini sudah kamu kuasai' : 'Siap menguji dirimu?'), el('div', { kelas: 'muted kecil' }, 'Satu soal cerita sehari-hari tentang ' + NAMA[f] + '.')), el('button', { kelas: 'btn hijau ' + (t.kartu[f] ? '' : 'denyut-h'), type: 'button', html: ik('ujian') + (t.kartu[f] ? 'Coba lagi' : 'Uji sekarang'), onclick: () => uji(f, true) })));
       isi.append(kolom); w.append(kep, el('div', { kelas: 'galeri t2-galeri' }, daftar, isi));
     }
@@ -1208,7 +1277,7 @@ const nama = (i) => (i === DUMMY ? 'Siswa Uji Coba (Guru)' : judulKata(DAFTAR[i]
     const w = el('div', { kelas: 't2-bingkai' }); E.layar(w);
     function gambar() {
       w.innerHTML = ''; const s = soal[no], r = t.dis.rnd[no] = t.dis.rnd[no] || { coba: 0, selesai: false, ok: false }, peran = PERAN[(no + (t.pos || 0)) % 4];
-      const k = kerangka('Langkah 2 · putaran ' + (no + 1) + ' dari 6', 'Tebak fungsinya', { titik: soal.map((_, i) => (i === no ? 'now' : ((t.dis.rnd[i] && t.dis.rnd[i].selesai) ? 'isi' : ''))), ke: (i) => { if (i <= t.dis.rnd.filter((x) => x && x.selesai).length) { no = i; gambar(); } } });
+      const k = kerangka('Langkah ' + NO().dis + ' · putaran ' + (no + 1) + ' dari 6', 'Tebak fungsinya', { titik: soal.map((_, i) => (i === no ? 'now' : ((t.dis.rnd[i] && t.dis.rnd[i].selesai) ? 'isi' : ''))), ke: (i) => { if (i <= t.dis.rnd.filter((x) => x && x.selesai).length) { no = i; gambar(); } } });
       const kiri = el('div', { kelas: 'kartu t2-konteks' }); kiri.innerHTML = '<div class="eyebrow">Kejadian sehari-hari</div><h3>' + esc(s.judul) + '</h3><p style="font-size:1.15rem;margin:.2rem 0 .4rem">' + esc(s.konteks) + '</p><div class="tabel-besar">' + tabelData(s) + '</div><p class="muted kecil" style="margin:.5rem 0 0">Baca tabelnya: apa yang terjadi pada y saat x bertambah?</p>';
       const kanan = el('div', { kelas: 't2-diskusi' }); kanan.append(el('div', { kelas: 'peran' }, el('span', { kelas: 'chip sorot', html: ik('siswa', 'kecil') + 'Perananmu: ' + peran[0] }), el('span', { kelas: 'muted kecil' }, peran[1])), el('div', { kelas: 'umpan ok', gaya: 'align-items:flex-start;flex-direction:column;gap:.15rem' , html: '<b>Bicarakan dulu bersama kelompok</b>' + B.PROMPT.map((x, i) => '<span>' + (i + 1) + '. ' + esc(x) + '</span>').join('') }));
       const gridF = el('div', { kelas: 'fam-pilih' }); semua.forEach((f) => gridF.append(el('button', { kelas: 'fam-tbl fx-' + f + (r.selesai ? (f === s.fam ? ' benar' : '') : '') + (r.salah === f && !r.selesai ? ' salah' : ''), type: 'button', html: UI.ubin(f) + '<span>' + NAMA[f] + '</span>', onclick: () => (r.selesai ? lihat() : pilih(f)) }))); kanan.append(el('div', { kelas: 'eyebrow', gaya: 'margin-top:.2rem' }, r.selesai ? 'Jawaban kelompok' : 'Menurut kelompokmu, ini fungsi apa?'), r.selesai ? el('button', { kelas: 'btn hijau', type: 'button', html: ik('mata') + 'Lihat penjelasan dan grafiknya', onclick: lihat }) : null, gridF);
@@ -1252,14 +1321,14 @@ const nama = (i) => (i === DUMMY ? 'Siswa Uji Coba (Guru)' : judulKata(DAFTAR[i]
     function gambar() {
       if (t.cocok.selesai && t.cocok.tampilHasil !== false && no > 4) return hasil();
       w.innerHTML = ''; const item = soal[no], jwb = t.cocok.jawab[no], terjawab = jwb != null;
-      const k = kerangka('Langkah 3 · masalah ' + (no + 1) + ' dari 5', 'Cocokkan grafik', { titik: soal.map((_, i) => (i === no ? 'now' : (t.cocok.jawab[i] != null ? 'isi' : ''))), ke: (i) => { no = i; gambar(); } });
+      const k = kerangka('Langkah ' + NO().cocok + ' · masalah ' + (no + 1) + ' dari 5', 'Cocokkan grafik', { titik: soal.map((_, i) => (i === no ? 'now' : (t.cocok.jawab[i] != null ? 'isi' : ''))), ke: (i) => { no = i; gambar(); } });
       k.isi.append(kartuSoal(item, { jawab: jwb, reveal: terjawab, pilih: async (p) => { t.cocok.jawab[no] = p; t.cocok.benar = soal.filter((s, i) => t.cocok.jawab[i] === s.kunci).length; if (t.cocok.jawab.filter((v) => v != null).length >= 5) t.cocok.selesai = true; sinkron({ cocok: { benar: t.cocok.benar } }); const ok = p === item.kunci; gambar(); if (ok) E.konfeti(innerWidth / 2, innerHeight / 3, 26); await penjelasan({ ok, judul: ok ? 'Tepat!' : 'Belum tepat', s: B.SITUASI[item.situasi], fam: item.fam, pilihF: item.opsi[p], lanjut: t.cocok.selesai && no === 4 ? 'Lihat hasil' : 'Lanjut' }); if (t.cocok.selesai && no === 4) { t.cocok.tampilHasil = true; no = 5; return hasil(); } if (no < 4) { no++; gambar(); } } }));
       k.nav.append(tombol('Sebelumnya', 'kembali', { kelas: 'sekunder', kiri: true, p: { disabled: no === 0, onclick: () => { no--; gambar(); } } }), terjawab ? el('button', { kelas: 'btn hijau kecil', type: 'button', html: ik('mata', 'kecil') + 'Lihat penjelasan dan grafik', onclick: () => penjelasan({ ok: jwb === item.kunci, judul: 'Penjelasan masalah ' + (no + 1), s: B.SITUASI[item.situasi], fam: item.fam, pilihF: item.opsi[jwb], lanjut: 'Tutup' }) }) : el('span', { kelas: 'muted' }, 'Pilih satu jawaban'), no < 4 ? tombol('Berikutnya', 'panah', { p: { disabled: !terjawab, onclick: () => { no++; gambar(); } } }) : tombol('Lihat hasil', 'centang', { kelas: 'hijau', kiri: true, p: { disabled: !t.cocok.selesai, onclick: () => { no = 5; hasil(); } } }));
       w.append(k.w);
     }
     function hasil() {
       w.innerHTML = ''; const b = soal.filter((s, i) => t.cocok.jawab[i] === s.kunci).length;
-      const k = el('div', { kelas: 'tengah-isi kartu', gaya: 'padding:2rem 3rem;margin:auto' }); k.innerHTML = '<div class="eyebrow" style="justify-content:center">Langkah 3 selesai</div><h2>' + b + ' dari 5 masalah tepat</h2><div class="baris" style="justify-content:center;flex-wrap:wrap">' + soal.map((s, i) => '<span class="chip ' + (t.cocok.jawab[i] === s.kunci ? 'ok' : 'warn') + '">' + (i + 1) + '. ' + esc(B.SITUASI[s.situasi].judul) + ' · ' + NAMA[s.fam] + '</span>').join('') + '</div><p class="muted">Yang belum tepat tidak apa-apa. Bahas bersama kelompokmu.</p>';
+      const k = el('div', { kelas: 'tengah-isi kartu', gaya: 'padding:2rem 3rem;margin:auto' }); k.innerHTML = '<div class="eyebrow" style="justify-content:center">Langkah ' + NO().cocok + ' selesai</div><h2>' + b + ' dari 5 masalah tepat</h2><div class="baris" style="justify-content:center;flex-wrap:wrap">' + soal.map((s, i) => '<span class="chip ' + (t.cocok.jawab[i] === s.kunci ? 'ok' : 'warn') + '">' + (i + 1) + '. ' + esc(B.SITUASI[s.situasi].judul) + ' · ' + NAMA[s.fam] + '</span>').join('') + '</div><p class="muted">Yang belum tepat tidak apa-apa. Bahas bersama kelompokmu.</p>';
       k.append(el('div', { kelas: 'baris', gaya: 'justify-content:center' }, el('button', { kelas: 'btn sekunder', type: 'button', html: ik('ulang') + 'Lihat lagi', onclick: () => { no = 0; gambar(); } }), el('button', { kelas: 'btn', type: 'button', html: 'Ke pusat' + ik('panah'), onclick: hub }))); w.append(k); E.konfeti(innerWidth / 2, innerHeight * .3, 40);
     }
     gambar();
@@ -1314,8 +1383,69 @@ const nama = (i) => (i === DUMMY ? 'Siswa Uji Coba (Guru)' : judulKata(DAFTAR[i]
     [300, 1100, 2000].forEach((ms) => setTimeout(() => { if (w.isConnected) E.konfeti(innerWidth * (0.25 + Math.random() * .5), innerHeight * .25, 70); }, ms));
   }
 
+  /* ============================================================ XI-G · langkah 2: pameran pakar (dikendalikan guru) */
+  let pamLihat = null, pamOto = true, pamHook = null;
+  function pameran() {
+    E.bawahKosong(); const t = T(); t.pam = t.pam || { jawab: {} }; t.pam.jawab = t.pam.jawab || {}; const urut = B.SET.flat(), w = el('div', { kelas: 't2-bingkai t2-pameran' }); E.layar(w); pamOto = true; pamLihat = t.pameran || 0;
+    pamHook = () => { if (!document.querySelector('.t2-pameran')) { pamHook = null; return; } if (pamOto) pamLihat = t.pameran || 0; gambar(); };
+    const benarN = () => Object.keys(t.pam.jawab).filter((k) => t.pam.jawab[k] === 'benar').length;
+    function gambar() {
+      w.innerHTML = ''; const cur = t.pameran || 0, r = pamLihat;
+      if (r && r === t.grup && !t.pam.jawab[r]) { t.pam.jawab[r] = 'sendiri'; t.pam.benar = benarN(); sinkron({ pam: { benar: t.pam.benar } }); }
+      const k = kerangka('Langkah ' + NO().pam + ' · ' + (cur ? 'putaran ' + cur + ' dari 9' : 'menunggu aba-aba guru'), 'Pameran pakar', { titik: Array.from({ length: 9 }, (_, i) => (i + 1 === r ? 'now' : (t.pam.jawab[i + 1] ? 'isi' : ''))), ke: (i) => { if (i + 1 <= cur) { pamLihat = i + 1; pamOto = (i + 1 === cur); gambar(); } } });
+      if (!r) { k.isi.append(el('div', { kelas: 'kartu tengah-isi', gaya: 'margin:auto;padding:2.2rem 3rem;max-width:40rem' }, el('span', { kelas: 'ubin fx-log', gaya: 'width:5rem;height:5rem;margin:0 auto', html: ik('jam') }), el('h2', null, 'Pameran belum dimulai'), el('p', { kelas: 'muted', gaya: 'font-size:1.15rem' }, 'Gurumu akan memanggil kelompok satu per satu. Layar ini berganti sendiri saat gilirannya tiba.'), el('button', { kelas: 'btn sekunder', type: 'button', html: ik('ulang') + 'Segarkan', onclick: () => cekGuru(true) }))); w.append(k.w); return; }
+      const f = urut[r - 1], own = r === t.grup, st = t.pam.jawab[r], { kolom } = isiKartu(f);
+      k.isi.append(el('div', { kelas: 'umpan ' + (own ? 'ok' : 'hint'), gaya: 'margin-bottom:.5rem', html: ik(own ? 'bintang' : 'info') + '<span>' + (own ? '<b>Giliran kelompokmu!</b> Jelaskan ' + NAMA[f] + ' kepada seluruh kelas: rumus, bentuk grafik, dan satu contoh kehidupan.' : '<b>Kelompok ' + r + '</b> sedang menjelaskan <b>' + NAMA[f] + '</b>. Simak, lalu coba soal ceritanya.') + '</span>' }), el('div', { kelas: 'galeri', gaya: 'grid-template-columns:1fr;flex:1;min-height:0' }, kolom));
+      const tombolSoal = own ? el('span', { kelas: 'chip ok', html: ik('centang', 'kecil') + 'Kelompokmu yang menjelaskan' }) : el('button', { kelas: 'btn hijau ' + (st ? '' : 'denyut-h'), type: 'button', html: ik('ujian') + (st === 'benar' ? 'Soal selesai · coba lagi' : (st === 'gagal' ? 'Coba soal baru' : 'Coba soal ceritanya')), onclick: () => ujiPam(f, r, true) });
+      k.nav.append(tombol('Putaran sebelumnya', 'kembali', { kelas: 'sekunder', kiri: true, p: { disabled: r <= 1, onclick: () => { pamLihat = r - 1; pamOto = false; gambar(); } } }), tombolSoal, tombol('Putaran berikutnya', 'panah', { p: { disabled: r >= cur, onclick: () => { pamLihat = r + 1; pamOto = (r + 1 === cur); gambar(); } } }));
+      w.append(k.w);
+    }
+    const coba = {};
+    async function ujiPam(f, r, baru) {
+      if (baru) coba[r] = 0; const q = B.tantanganAcak(f, Math.floor(Math.random() * 2e9)), v = await UI.keypadAngka({ judul: 'Soal cerita · ' + NAMA[f], tanya: q.tanya, ikon: ik('ujian', 'besar') }); if (v == null) return;
+      coba[r] = (coba[r] || 0) + 1;
+      if (v === q.kunci) { t.pam.jawab[r] = 'benar'; t.pam.benar = benarN(); sinkron({ pam: { benar: t.pam.benar } }); E.konfeti(innerWidth / 2, innerHeight / 3, 28); gambar(); await UI.info('Tepat!', '<div class="tengah"><p style="font-size:1.2rem">' + esc(q.jelas) + '</p></div>', 'Lanjut', { ikon: ik('centang', 'besar') }); }
+      else if (coba[r] >= 2) { if (t.pam.jawab[r] !== 'benar') t.pam.jawab[r] = 'gagal'; t.pam.benar = benarN(); sinkron({ pam: { benar: t.pam.benar } }); gambar(); await UI.info('Ini jawabannya', '<div class="tengah"><p style="font-size:1.2rem">' + esc(q.jelas) + '</p></div>', 'Mengerti', { ikon: ik('info', 'besar') }); }
+      else { const lagi = await UI.dialog({ judul: 'Belum tepat', ikon: ik('info', 'besar'), isi: '<div class="tengah"><p style="font-size:1.25rem">Jawabanmu <b>' + F(v) + '</b> belum tepat.</p><p class="muted">Petunjuk: ganti peubah dengan angka yang diminta, lalu hitung pelan-pelan.</p></div>', tombol: [{ t: 'Tutup', nilai: false, kelas: 'sekunder' }, { t: 'Coba lagi', nilai: true }] }); if (lagi) ujiPam(f, r); }
+    }
+    gambar();
+  }
+
+  /* ============================================================ XI-G · langkah 5: dari tabel ke aturan fungsi */
+  function fungsi() {
+    E.bawahKosong(); const t = T(), tugas = B.tugasFungsi(E.idx()); t.fung = t.fung || { hasil: [] }; t.fung.hasil = t.fung.hasil || []; let no = Math.min(2, t.fung.hasil.filter(Boolean).length);
+    const w = el('div', { kelas: 't2-bingkai' }); E.layar(w); const nilai = tugas.map((tg) => tg.label.map(() => null)), salah = tugas.map(() => 0), buka = tugas.map(() => 0);
+    const skor = () => t.fung.hasil.filter((h) => h && h.ok).length;
+    function gambar() {
+      w.innerHTML = ''; const tg = tugas[no], h = t.fung.hasil[no], sel = skor();
+      const k = kerangka('Langkah ' + NO().fung + ' · tugas ' + (no + 1) + ' dari 3', 'Dari grafik ke fungsi', { titik: tugas.map((_, i) => (i === no ? 'now' : (t.fung.hasil[i] ? 'isi' : ''))), ke: (i) => { no = i; gambar(); } });
+      const kiri = el('div', { kelas: 'kartu cocok-sit gulir' }), s = { judul: tg.judul, x: 'x', y: 'y', baris: tg.baris };
+      kiri.innerHTML = '<div class="eyebrow">Mesin misterius</div><h3>' + esc(tg.judul) + '</h3><p style="font-size:1.1rem;margin:.1rem 0 .3rem">Tabel ini dibuat oleh sebuah fungsi. Temukan aturan yang menghasilkannya.</p><div class="data-baris"><div>' + tabelData(s) + '</div><div class="plot-kecil"></div></div>'; kiri.querySelector('.plot-kecil').append(plotData(s, tg.fam));
+      const kanan = el('div', { kelas: 'kartu fung-aturan' }), formula = el('div', { kelas: 'fung-rumus mat' }); formula.innerHTML = tg.rumus.replace(/\[(\w)\]/g, (m, l) => '<button type="button" class="slot-f" data-l="' + l + '"></button>');
+      kanan.append(el('div', { kelas: 'eyebrow' }, 'Tulis aturannya'), formula);
+      formula.querySelectorAll('.slot-f').forEach((b) => { const i = tg.label.indexOf(b.dataset.l), selesai = !!h; b.textContent = selesai ? F(tg.jawab[i]) : (nilai[no][i] == null ? '?' : F(nilai[no][i])); b.disabled = selesai; if (selesai) b.classList.add('isi'); else if (nilai[no][i] != null) b.classList.add('terisi'); b.onclick = async () => { const v = await UI.keypadAngka({ judul: 'Nilai ' + b.dataset.l, tanya: 'Berapa nilai <b>' + b.dataset.l + '</b> pada aturan fungsi ini?', ikon: ik('pensil', 'besar') }); if (v != null) { nilai[no][i] = v; gambar(); } }; });
+      const ph = el('div', { kelas: 'fung-petunjuk' }); for (let i = 0; i < buka[no]; i++) ph.append(el('div', { kelas: 'umpan hint', html: ik('info') + '<span><b>Petunjuk ' + (i + 1) + ':</b> ' + esc(tg.petunjuk[i]) + '</span>' }));
+      kanan.append(ph);
+      if (h) kanan.append(el('div', { kelas: 'umpan ' + (h.ok ? 'ok' : 'hint'), html: ik(h.ok ? 'centang' : 'info') + '<span><b>' + (h.ok ? 'Tepat!' : 'Ini aturannya.') + '</b> ' + esc(tg.jelas) + '</span>' }));
+      else kanan.append(el('div', { kelas: 'baris', gaya: 'margin-top:auto;flex-wrap:wrap' }, el('button', { kelas: 'btn sekunder', type: 'button', disabled: buka[no] >= 2, html: ik('info', 'kecil') + (buka[no] ? 'Petunjuk berikutnya' : 'Minta petunjuk'), onclick: () => { buka[no]++; gambar(); } }), el('button', { kelas: 'btn hijau', type: 'button', disabled: nilai[no].some((v) => v == null), html: ik('centang') + 'Periksa', onclick: periksa })));
+      k.isi.append(el('div', { kelas: 'cocok-isi' }, kiri, kanan)); k.isi.classList.add('fung-isi');
+      k.nav.append(tombol('Sebelumnya', 'kembali', { kelas: 'sekunder', kiri: true, p: { disabled: no === 0, onclick: () => { no--; gambar(); } } }), el('span', { kelas: 'muted' }, sel + ' dari 3 tugas ditemukan aturannya'), no < 2 ? tombol('Berikutnya', 'panah', { p: { onclick: () => { no++; gambar(); } } }) : tombol('Selesai', 'centang', { kelas: 'hijau', kiri: true, p: { disabled: t.fung.hasil.filter(Boolean).length < 3, onclick: hub } }));
+      w.append(k.w);
+    }
+    async function periksa() {
+      const tg = tugas[no], ok = tg.jawab.every((v, i) => v === nilai[no][i]);
+      if (ok) { t.fung.hasil[no] = { ok: true, petunjuk: buka[no] }; E.konfeti(innerWidth / 2, innerHeight / 3, 30); }
+      else { salah[no]++; if (salah[no] >= 3) t.fung.hasil[no] = { ok: false }; }
+      t.fung.skor = skor(); t.fung.selesai = t.fung.hasil.filter(Boolean).length >= 3; sinkron({ fung: { skor: t.fung.skor } }); gambar();
+      if (ok) await UI.info('Tepat!', '<div class="tengah"><p style="font-size:1.2rem">' + esc(tg.jelas) + '</p></div>', 'Lanjut', { ikon: ik('centang', 'besar') });
+      else if (salah[no] >= 3) await UI.info('Ini aturannya', '<div class="tengah"><p style="font-size:1.2rem">' + esc(tg.jelas) + '</p><p class="muted">Tidak apa-apa. Coba pahami langkahnya.</p></div>', 'Mengerti', { ikon: ik('info', 'besar') });
+      else await UI.info('Belum tepat', '<div class="tengah"><p style="font-size:1.2rem">Coba periksa lagi nilai yang kamu tulis.</p><p class="muted">Tekan “Minta petunjuk” bila perlu.</p></div>', 'Coba lagi', { ikon: ik('info', 'besar') });
+    }
+    gambar();
+  }
+
   root.Tahap2 = { mulai: (env) => {
-    E = env; const P = E.P(); P.t2 = P.t2 || {}; const t = P.t2; t.kartu = t.kartu || {}; t.dis = t.dis || { rnd: [] }; t.cocok = t.cocok || { jawab: [] }; t.cocok.jawab = t.cocok.jawab || []; t.tiket = t.tiket || {}; t.aktif = t.aktif || [1];
+    E = env; const P = E.P(); P.t2 = P.t2 || {}; const t = P.t2; t.kartu = t.kartu || {}; t.dis = t.dis || { rnd: [] }; t.cocok = t.cocok || { jawab: [] }; t.cocok.jawab = t.cocok.jawab || []; t.tiket = t.tiket || {}; t.aktif = t.aktif || [1]; t.pam = t.pam || { jawab: {} }; t.fung = t.fung || { hasil: [] };
     if (t.ref && !Array.isArray(t.ref.kuasai)) t.ref = { kuasai: [], bingung: [] };
     hub();
   } };
@@ -1404,6 +1534,11 @@ const nama = (i) => (i === DUMMY ? 'Siswa Uji Coba (Guru)' : judulKata(DAFTAR[i]
       '<p class="lead">Lima masalah nyata. Dari data dan ceritanya, kita menentukan nama fungsi dan membayangkan bentuk grafiknya.</p>'
       + coc.map((it, i) => { const s = B.SITUASI[it.situasi], ok = cj[i] === it.kunci; return '<div class="cocok" style="--w:' + HEX[it.fam] + ';--t:' + MUDA[it.fam] + ';--d:' + TUA[it.fam] + '"><div class="c-g">' + grafikData(s, it.fam) + '</div><div class="c-t"><div class="c-kep"><b>' + (i + 1) + '. ' + esc(s.judul) + '</b><span class="' + (ok ? 'ok' : 'no') + '">' + (cj[i] == null ? 'belum dijawab' : (ok ? '✓ tepat' : '✗ dibahas')) + '</span></div><p class="kecil">' + esc(s.teks) + '</p><p class="c-f">Fungsi <b>' + NAMA[it.fam] + '</b></p><p class="kecil"><b>Mengapa?</b> ' + esc(s.alasan) + '</p></div></div>'; }).join('')));
 
+    /* tambahan XI-G: dari tabel ke aturan fungsi */
+    if (B.cfg(B.kelasAktif()).manual) {
+      const tf = B.tugasFungsi(idx), hf = (t.fung && t.fung.hasil) || [];
+      pg.push(hal('Dari grafik ke fungsi', 'F', '<p class="lead">Tabel angka dapat ditelusuri kembali ke aturan fungsinya: lihat nilai saat <i>x</i> = 0, lalu lihat pola perubahannya.</p>' + tf.map((tg, i) => { const h = hf[i]; return '<div class="soal ' + (h && h.ok ? 'ok' : 'salah') + '"><div class="s-kep"><span class="s-no">' + (i + 1) + '</span><div class="s-tanya">' + esc(tg.judul) + ': ' + tg.rumus.replace(/\[(\w)\]/g, (m, l) => '<b>' + F(tg.jawab[tg.label.indexOf(l)]) + '</b>') + '</div><span class="s-st">' + (h ? (h.ok ? '✓ ditemukan' : 'dibahas') : 'belum dikerjakan') + '</span></div><div class="s-opsi">' + tg.baris.map((b) => '<span>x = ' + F(b[0]) + ' → y = ' + F(b[1]) + '</span>').join('') + '</div><div class="s-jelas"><b>Cara menemukan:</b> ' + esc(tg.jelas) + '</div></div>'; }).join('')));
+    }
     /* 10. tiket + refleksi */
     const tk = B.tiketSiswa(idx), tkj = (t.tiket && t.tiket.jawab) || [], kuasai = (t.ref && t.ref.kuasai) || [], bingung = (t.ref && t.ref.bingung) || [], poin = B.hitungPoin({ kartu: t.kartu, fam: t.fam, diskusi: t.dis, cocok: t.cocok, tiket: t.tiket, tamat: t.tamat });
     pg.push(hal('Tiket keluar dan refleksi', 8,
@@ -1439,7 +1574,7 @@ const nama = (i) => (i === DUMMY ? 'Siswa Uji Coba (Guru)' : judulKata(DAFTAR[i]
 .kecil-judul{font-size:7.8pt;letter-spacing:.08em;text-transform:uppercase;font-weight:700;color:#6D35E8;margin-bottom:1mm}.rumus-b{font-family:'Lora Math',Cambria,Georgia,serif;font-size:21pt;font-weight:700;margin:1mm 0;color:#1E1B4B}
 .ct{width:100%;border-collapse:collapse;font-size:9.5pt}.ct th{background:#6D35E8;color:#fff;text-align:left;padding:1.4mm 2.4mm;font-size:8.5pt}.ct td{padding:1.2mm 2.4mm;border-bottom:.3mm solid #ECE9F8}.ct tr:nth-child(even) td{background:#FAF9FF}.kecil-t td{font-size:8.6pt;padding:.8mm 2mm}
 .grafik{border:.3mm solid #E6E4F4;border-radius:3mm;padding:2mm;background:#fff}.grafik.tinggi{height:92mm}.langkah{margin:0;padding-left:5mm}.langkah li{margin:1.5mm 0}
-.jenis{display:grid;grid-template-columns:62mm 1fr;gap:4mm;border:.4mm solid var(--w);background:var(--t);border-radius:4mm;padding:3mm;flex:1;min-height:0;overflow:hidden}.j-grafik{background:#fff;border-radius:3mm;padding:1.5mm;height:55mm;align-self:center;border:.3mm solid #fff}.j-nama{font-family:Bricolage,sans-serif;font-size:15pt;color:var(--d);line-height:1.1}.j-alias{font-size:8.5pt;color:#4A4775;margin-bottom:1mm}.j-rumus{background:#fff;border-radius:2.5mm;padding:1mm 2.5mm;font-family:'Lora Math',Cambria,Georgia,serif;font-style:italic;font-size:13pt;font-weight:700;margin:1mm 0;color:var(--d)}.j-rumus span{display:block;font-family:Instrument,sans-serif;font-style:normal;font-size:7pt;letter-spacing:.08em;text-transform:uppercase;color:#6B6894}.j-umum{font-size:8.4pt;color:var(--d);font-weight:700}.jenis .kecil-judul{color:var(--d);margin-top:1.2mm}.jenis ul{margin:0;padding-left:4.2mm;font-size:8.8pt}.jenis li{margin:.4mm 0}.j-rumus .cabang{font-size:9pt}.j-rumus .isi-cabang{gap:0}.jenis ul{font-size:8.4pt}.j-rumus .kurawal{font-size:2.4em}
+.jenis{display:grid;grid-template-columns:62mm 1fr;gap:4mm;border:.4mm solid var(--w);background:var(--t);border-radius:4mm;padding:3mm;flex:1;min-height:0;overflow:hidden}.j-grafik{background:#fff;border-radius:3mm;padding:1.5mm;height:55mm;align-self:center;border:.3mm solid #fff}.j-nama{font-family:Bricolage,sans-serif;font-size:15pt;color:var(--d);line-height:1.1}.j-alias{font-size:8.5pt;color:#4A4775;margin-bottom:1mm}.j-rumus{background:#fff;border-radius:2.5mm;padding:1mm 2.5mm;font-family:'Lora Math',Cambria,Georgia,serif;font-style:italic;font-size:13pt;font-weight:700;margin:1mm 0;color:var(--d)}.j-rumus span{display:block;font-family:Instrument,sans-serif;font-style:normal;font-size:7pt;letter-spacing:.08em;text-transform:uppercase;color:#6B6894}.j-umum{font-size:8.4pt;color:var(--d);font-weight:700}.jenis .kecil-judul{color:var(--d);margin-top:1.2mm}.jenis ul{margin:0;padding-left:4.2mm;font-size:8.8pt}.jenis li{margin:.4mm 0}.j-rumus .cabang{font-size:9pt}.j-rumus .isi-cabang{gap:0}.jenis ul{font-size:8.1pt}.jenis{padding:2.4mm 3mm}.jenis .kecil-judul{margin-top:.6mm}.j-rumus{margin:.6mm 0}.j-rumus .kurawal{font-size:2.4em}
 .skor{display:flex;align-items:center;gap:4mm;background:#F3EEFE;border-radius:4mm;padding:3mm 4mm}.skor-b{font-family:Bricolage,sans-serif;font-size:26pt;color:#6D35E8;line-height:1}.skor-b small{font-size:13pt;color:#6B6894}
 .soal{border:.4mm solid #E6E4F4;border-left-width:1.6mm;border-radius:3mm;padding:2.4mm 3.2mm}.soal.ok{border-left-color:#12B886;background:#F6FDF9}.soal.salah{border-left-color:#F2495C;background:#FFF8F9}.s-kep{display:flex;gap:2.5mm;align-items:flex-start}.s-no{width:6mm;height:6mm;border-radius:50%;background:#6D35E8;color:#fff;display:grid;place-items:center;font-weight:700;font-size:9pt;flex:none}.s-tanya{flex:1;font-weight:700;font-size:10pt}.s-st{font-size:8pt;font-weight:700;white-space:nowrap;color:#0A6B50}.soal.salah .s-st{color:#B5192D}.s-opsi{display:flex;flex-wrap:wrap;gap:1mm 4mm;margin:1.2mm 0 0 8.5mm;font-size:9pt}.s-opsi .k{color:#0A6B50;font-weight:700}.s-opsi .p{color:#B5192D;text-decoration:line-through}.s-jelas{margin:1.4mm 0 0 8.5mm;font-size:8.8pt;color:#4A4775}
 .pakar{border:.4mm solid var(--w);border-radius:4mm;overflow:hidden}.p-kep{display:flex;justify-content:space-between;background:var(--w);color:#fff;padding:1.4mm 3.5mm;font-family:Bricolage,sans-serif;font-size:11pt}.p-kep span{font-family:Instrument,sans-serif;font-size:8pt;opacity:.95;align-self:center}.p-isi{display:grid;grid-template-columns:1.25fr 1fr;gap:3mm;padding:2.4mm 3.5mm;background:var(--t)}.p-isi .kecil-judul{color:var(--d)}.p-isi p{font-size:9pt}.p-j b{font-size:15pt;color:var(--d)}
@@ -1476,6 +1611,9 @@ const nama = (i) => (i === DUMMY ? 'Siswa Uji Coba (Guru)' : judulKata(DAFTAR[i]
   const app = document.getElementById('app'), pg = document.getElementById('panggung'), atas = document.getElementById('atas'), bawah = document.getElementById('bawah');
   const LK = 'gf_', lsGet = (k, d) => { try { const v = localStorage.getItem(LK + k); return v == null ? d : JSON.parse(v); } catch (e) { return d; } }, lsSet = (k, v) => { try { localStorage.setItem(LK + k, JSON.stringify(v)); } catch (e) { /* abaikan */ } };
   let token = lsGet('token', null); if (!token) { token = Math.random().toString(36).slice(2) + Date.now().toString(36); lsSet('token', token); }
+  let kelas = lsGet('kelas', 'xif'); if (!['xif', 'xig'].includes(kelas)) kelas = 'xif'; B.setKelas(kelas);
+  const setKelas = (k) => { kelas = k; B.setKelas(k); lsSet('kelas', k); };
+  const kunciP = (i) => 'p' + (kelas === 'xif' ? '' : kelas + '_') + i, kunciAk = () => (kelas === 'xif' ? 'aktif' : 'aktif_' + kelas);
   let net = 'cek', idx = null, P = null, intro = null, tmr = null, ping = null;
   const warnaNama = ['poli', 'eksp', 'log', 'trig', 'rasional', 'akar', 'mutlak', 'tangga', 'sepotong'];
   const inisial = (n) => { const k = n.split(/\s+/).filter((x) => /^[A-Za-z]/.test(x)); if (!k.length) return '?'; return (k[0][0] + (k.length > 1 ? k[k.length - 1][0] : '')).toUpperCase(); };
@@ -1483,7 +1621,7 @@ const nama = (i) => (i === DUMMY ? 'Siswa Uji Coba (Guru)' : judulKata(DAFTAR[i]
   /* ---------------------------------------------------------------- jaringan */
   async function api(a, data) {
     const ctl = new AbortController(), to = setTimeout(() => ctl.abort(), 6500);
-    try { const r = await fetch('/api/app', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(Object.assign({ a, token }, data || {})), signal: ctl.signal }); const j = await r.json().catch(() => ({})); j._s = r.status; return j; } catch (e) { return { gagal: true, _s: 0 }; } finally { clearTimeout(to); }
+    try { const r = await fetch('/api/app', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(Object.assign({ a, token, kelas }, data || {})), signal: ctl.signal }); const j = await r.json().catch(() => ({})); j._s = r.status; return j; } catch (e) { return { gagal: true, _s: 0 }; } finally { clearTimeout(to); }
   }
   async function cekJaringan() { const r = await api('cek'); net = r.ok && r.penyimpanan ? 'online' : 'offline'; gambarAtas(); return net; }
   function gambarAtas() {
@@ -1491,7 +1629,7 @@ const nama = (i) => (i === DUMMY ? 'Siswa Uji Coba (Guru)' : judulKata(DAFTAR[i]
     atas.append(el('span', { kelas: 'logo' }, 'Grafik ', el('b', null, 'Fungsi')), el('span', { kelas: 'ruang' }));
     if (idx !== null) atas.append(el('span', { kelas: 'chip' + (idx === B.DUMMY ? ' sorot' : ''), html: ik('siswa', 'kecil') + (idx === B.DUMMY ? 'UJI COBA' : esc(B.nama(idx).split(' ')[0])) }));
     if (idx === B.DUMMY) atas.append(el('button', { kelas: 'btn sekunder kecil', type: 'button', html: ik('nyala', 'kecil') + 'Lompat ke…', onclick: lompatUji }));
-    if (idx === B.DUMMY) atas.append(el('button', { kelas: 'btn sekunder kecil', type: 'button', html: ik('kembali', 'kecil') + 'Keluar uji coba', onclick: async () => { if (await UI.konfirmasi('Keluar dari uji coba?', '<p class="tengah">Progres uji coba tidak disimpan dan tidak memengaruhi siswa lain.</p>', 'Keluar', 'Batal')) { clearInterval(ping); lsSet('p' + B.DUMMY, null); idx = null; P = null; sWelcome(); } } }));
+    if (idx === B.DUMMY) atas.append(el('button', { kelas: 'btn sekunder kecil', type: 'button', html: ik('kembali', 'kecil') + 'Keluar uji coba', onclick: async () => { if (await UI.konfirmasi('Keluar dari uji coba?', '<p class="tengah">Progres uji coba tidak disimpan dan tidak memengaruhi siswa lain.</p>', 'Keluar', 'Batal')) { clearInterval(ping); lsSet(kunciP(B.DUMMY), null); idx = null; P = null; sWelcome(); } } }));
     if (idx !== null) atas.append(el('button', { kelas: 'btn sekunder kecil', type: 'button', html: ik('ulang', 'kecil') + 'Segarkan', onclick: segarkan }));
     atas.append(el('span', { kelas: 'chip ' + (net === 'online' ? 'ok' : (net === 'cek' ? 'abu' : 'warn')), html: ik(net === 'online' ? 'wifi' : 'putus', 'kecil') + (net === 'online' ? 'Terhubung ke guru' : (net === 'cek' ? 'Memeriksa…' : 'Mode mandiri')), title: net === 'offline' ? 'Tidak terhubung ke guru. Hasil diserahkan lewat kode.' : '' }));
   }
@@ -1502,7 +1640,7 @@ const nama = (i) => (i === DUMMY ? 'Siswa Uji Coba (Guru)' : judulKata(DAFTAR[i]
   }
   const kosongkanBawah = () => { bawah.innerHTML = ''; bawah.style.display = 'none'; };
   function layar(isi, kelas) { clearInterval(tmr); if (intro) { intro.stop(); intro = null; } pg.innerHTML = ''; const d = el('div', { kelas: 'layar ' + (kelas || '') }); d.append(isi); pg.append(d); return d; }
-  const simpan = () => { if (idx !== null) lsSet('p' + idx, P); };
+  const simpan = () => { if (idx !== null) lsSet(kunciP(idx), P); };
   const baruP = () => ({ tahap: 'intro', intro: 0, tes: { jawab: [null, null, null, null, null], mulai: 0, selesai: false, detik: 0 }, terkirim: false });
   function konfeti(x, y, n) { for (let i = 0; i < (n || 40); i++) { const c = el('div', { kelas: 'konfeti', gaya: 'left:' + x + 'px;top:' + y + 'px;background:' + ['#FFC233', '#6D35E8', '#12B886', '#F15BB5', '#2EA7F2', '#FF8A1F'][i % 6] }); document.body.append(c); const a = Math.random() * Math.PI * 2, d = 80 + Math.random() * 260; anim(c, [{ transform: 'translate(0,0) rotate(0)', opacity: 1 }, { transform: 'translate(' + Math.cos(a) * d + 'px,' + (Math.sin(a) * d + 160) + 'px) rotate(' + Math.random() * 720 + 'deg)', opacity: 0 }], { duration: 1200 + Math.random() * 900, easing: 'cubic-bezier(.2,.7,.3,1)' }).then(() => c.remove()); } }
 
@@ -1514,7 +1652,7 @@ const nama = (i) => (i === DUMMY ? 'Siswa Uji Coba (Guru)' : judulKata(DAFTAR[i]
     const bg = w.querySelector('.bg-kurva'); bg.innerHTML = '<svg viewBox="0 0 800 400" preserveAspectRatio="xMidYMid slice"><g fill="none" stroke-linecap="round" stroke-width="5"><path d="M20 340C140 340 150 60 270 60S400 340 520 340 640 60 780 60" stroke="#2EA7F2" opacity=".35"/><path d="M0 300L180 120 340 300 500 120 660 300 800 150" stroke="#F5B700" opacity=".35"/><path d="M0 380C200 370 380 330 540 190S740 20 800 10" stroke="#FF8A1F" opacity=".35"/><path d="M60 40V380M60 210H800" stroke="#9B5DE5" opacity=".18" stroke-dasharray="6 10"/></g></svg>';
     const gl = el('div', { kelas: 'garland-welcome' }); w.prepend(gl); setTimeout(() => UI.untaian(gl), 30);
     w.querySelector('.isi-welcome').append(el('div', { kelas: 'eyebrow', gaya: 'margin-top:.4rem' }, 'Masuk sebagai'), el('div', { kelas: 'baris', gaya: 'gap:1.2rem' }, el('button', { kelas: 'btn besar denyut', type: 'button', html: ik('siswa') + 'Siswa', onclick: () => { UI.layarPenuh(); sKelas(); } }), el('button', { kelas: 'btn besar sekunder', type: 'button', html: ik('kunci') + 'Guru', onclick: () => loginGuru(false) })), el('div', { kelas: 'muted kecil', gaya: 'margin-top:1.2rem' }, 'Pastikan tabletmu dalam posisi mendatar (landscape).'));
-    const ak = lsGet('aktif', null); if (Number.isInteger(ak) && ak >= 0 && ak < B.DAFTAR.length && lsGet('p' + ak, null)) w.querySelector('.isi-welcome').append(el('button', { kelas: 'btn besar hijau', type: 'button', gaya: 'margin-top:1rem', html: ik('siswa') + 'Lanjutkan sebagai ' + esc(B.nama(ak).split(' ')[0]), onclick: () => { UI.layarPenuh(); masukSebagai(ak); } }));
+    const ak = lsGet(kunciAk(), null); if (Number.isInteger(ak) && ak >= 0 && ak < B.cfg(kelas).daftar.length && lsGet(kunciP(ak), null)) w.querySelector('.isi-welcome').append(el('button', { kelas: 'btn besar hijau', type: 'button', gaya: 'margin-top:1rem', html: ik('siswa') + 'Lanjutkan sebagai ' + esc(B.nama(ak).split(' ')[0]), onclick: () => { UI.layarPenuh(); masukSebagai(ak); } }));
     layar(w, 'tengah-layar');
   }
 
@@ -1530,13 +1668,14 @@ const nama = (i) => (i === DUMMY ? 'Siswa Uji Coba (Guru)' : judulKata(DAFTAR[i]
   async function cekPinGuru(pin) { const r = await api('g-status', { pin }); if (r._s === 401) return false; if (r.ok) return true; return pin === B.PIN_GURU; }
   async function mintaPin(judul, salah) { const v = await UI.papanKetik({ judul, ikon: ik('kunci', 'besar'), panjang: 5, alfabet: '0123456789', kolom: 5, sembunyi: true, otomatis: true, keyboard: true, catatan: salah ? 'PIN salah. Coba lagi.' : 'Masukkan PIN guru (5 angka).' }); if (v == null) return null; if (await cekPinGuru(v)) return v; return mintaPin(judul, true); }
   async function loginGuru() { const v = await mintaPin('Masuk sebagai guru', false); if (v == null) return; try { sessionStorage.setItem('gfg_pin', v); } catch (e) { /* abaikan */ } location.href = 'guru.html'; }
-  async function masukUji() { const v = await mintaPin('Akun uji coba (guru)', false); if (v == null) return; idx = B.DUMMY; lsSet('p' + idx, null); P = baruP(); const r = await api('klaim', { idx }); net = r.ok ? 'online' : 'offline'; gambarAtas(); mulaiPing(); lanjutDari(); }
+  async function masukUji() { const v = await mintaPin('Akun uji coba (guru)', false); if (v == null) return; idx = B.DUMMY; lsSet(kunciP(idx), null); P = baruP(); const r = await api('klaim', { idx }); net = r.ok ? 'online' : 'offline'; gambarAtas(); mulaiPing(); lanjutDari(); }
 
   /* ---------------------------------------------------------------- 2. pilih kelas */
   function sKelas() {
     kosongkanBawah(); gambarAtas();
     const w = el('div', { kelas: 'tengah-isi' }); w.append(el('div', { kelas: 'eyebrow' }, 'Langkah 1 dari 2'), el('h2', null, 'Pilih kelasmu'));
-    const k = el('button', { kelas: 'kartu-kelas', type: 'button', onclick: sNama, html: '<span class="ubin fx-poli">' + UI.glif('trig') + '</span><div><div class="kelas-nama">XI-F Soshum</div><div class="muted">' + B.DAFTAR.length + ' murid · Matematika Tingkat Lanjut</div></div>' + ik('panah', 'besar') });
+    const kartuK = (k) => { const c = B.cfg(k); return el('button', { kelas: 'kartu-kelas', type: 'button', gaya: 'margin-bottom:.7rem', onclick: () => { setKelas(k); sNama(); }, html: '<span class="ubin fx-' + (k === 'xif' ? 'poli' : 'trig') + '">' + UI.glif('trig') + '</span><div><div class="kelas-nama">' + esc(c.nama) + '</div><div class="muted">' + c.daftar.length + ' murid · Matematika Tingkat Lanjut</div></div>' + ik('panah', 'besar') }); };
+    const k = el('div', null, kartuK('xif'), kartuK('xig'));
     w.append(k, el('button', { kelas: 'btn sekunder', type: 'button', gaya: 'margin-top:1.4rem', html: ik('kembali') + 'Kembali', onclick: sWelcome })); layar(w, 'tengah-layar');
   }
 
@@ -1546,7 +1685,8 @@ const nama = (i) => (i === DUMMY ? 'Siswa Uji Coba (Guru)' : judulKata(DAFTAR[i]
     const w = el('div', { kelas: 'nama-wrap' }); w.append(el('div', { kelas: 'baris', gaya: 'justify-content:space-between;margin-bottom:.4rem' }, el('div', null, el('div', { kelas: 'eyebrow' }, 'Langkah 2 dari 2'), el('h2', { gaya: 'margin:0' }, 'Pilih namamu')), el('button', { kelas: 'btn sekunder kecil', type: 'button', html: ik('kembali', 'kecil') + 'Kembali', onclick: sKelas })));
     const grid = el('div', { kelas: 'grid-nama' }); w.append(grid, el('div', { kelas: 'baris', gaya: 'justify-content:flex-end;padding:.2rem 0' }, el('button', { kelas: 'btn sekunder kecil', type: 'button', html: ik('pensil', 'kecil') + 'Akun uji coba (guru)', onclick: masukUji }))); layar(w);
     let st = { diklaim: [], selesai: [] }; const r = await (net === 'cek' ? cekJaringan().then(() => api('status')) : api('status')); if (r && r.ok) st = r; else if (net !== 'offline') { net = 'offline'; gambarAtas(); }
-    B.DAFTAR.forEach((_, i) => {
+    if (r && r.ok && r.manual && !r.kelasBuka) { grid.remove(); w.querySelector('.baris').nextSibling && w.append(el('div', { kelas: 'tengah-isi' }, el('span', { kelas: 'ubin fx-eksp', gaya: 'width:5rem;height:5rem', html: ik('jam') }), el('h2', null, 'Guru sedang menyiapkan kelompok'), el('p', { kelas: 'muted', gaya: 'max-width:34rem;font-size:1.15rem' }, 'Daftar nama akan terbuka otomatis begitu kelompok siap. Tunggu sebentar.'))); clearInterval(tmr); tmr = setTimeout(() => { if (document.querySelector('.nama-wrap')) sNama(); }, 4000); return; }
+    B.cfg(kelas).daftar.forEach((_, i) => {
       const nm = B.nama(i), sudah = st.diklaim.includes(i), tamat = st.selesai.includes(i);
       const t = el('button', { kelas: 'tile-nama fx-' + warnaNama[i % 9] + (sudah ? ' dipakai' : ''), type: 'button', onclick: () => pilihNama(i), html: '<span class="av">' + inisial(nm) + '</span><span class="nm">' + esc(nm) + '</span>' + (sudah ? '<span class="lencana-n">' + (tamat ? ik('centang', 'kecil') + 'selesai' : ik('kunci', 'kecil') + 'dipakai') + '</span>' : '') }); grid.append(t); anim(t, [{ opacity: 0, transform: 'translateY(.8rem) scale(.9)' }, { opacity: 1, transform: 'none' }], { duration: 400, delay: i * 25 });
     });
@@ -1560,9 +1700,10 @@ const nama = (i) => (i === DUMMY ? 'Siswa Uji Coba (Guru)' : judulKata(DAFTAR[i]
   async function masukSebagai(i) {
     const nm = B.nama(i); await cekJaringan();
     const r = await api('klaim', { idx: i });
+    if (r._s === 423) { await UI.info('Kelas belum dibuka', '<div class="tengah"><p>Gurumu belum membuka kelas ini.</p><p class="muted">Tunggu sebentar, lalu pilih namamu lagi.</p></div>', 'Mengerti', { ikon: ik('jam', 'besar') }); return sNama(); }
     if (r._s === 409) { await UI.info('Nama ini sedang dipakai', '<div class="tengah"><p>Nama <b>' + esc(nm) + '</b> sudah dipakai di perangkat lain.</p><p class="muted">Kalau itu memang kamu (misalnya tablet berganti), minta <b>guru</b> untuk mengatur ulang nama ini.</p></div>', 'Mengerti', { ikon: ik('kunci', 'besar') }); return sNama(); }
     if (r.gagal || r._s >= 500 || r._s === 503) { net = 'offline'; } else if (r.ok) { net = 'online'; }
-    idx = i; lsSet('aktif', i); P = lsGet('p' + i, null) || baruP();
+    idx = i; lsSet(kunciAk(), i); P = lsGet(kunciP(i), null) || baruP();
     if (r.hasil && r.hasil.jawab) { P.tes.jawab = r.hasil.jawab; P.tes.selesai = true; P.tes.detik = r.hasil.detik || 0; P.terkirim = true; if (['intro', 'tes'].includes(P.tahap)) P.tahap = 'hasil'; }
     simpan(); gambarAtas(); mulaiPing(); lanjutDari();
   }
@@ -1599,11 +1740,11 @@ const nama = (i) => (i === DUMMY ? 'Siswa Uji Coba (Guru)' : judulKata(DAFTAR[i]
       const sisa = 5 - jml(); info.textContent = sisa ? sisa + ' soal belum dijawab' : 'Semua soal sudah dijawab'; btnKirim.disabled = sisa > 0; btnKirim.className = 'btn hijau besar' + (sisa ? ' mati' : ' denyut');
     }
     let selesaiOtomatis = false;
-    function ketik() { const sisa = Math.max(0, B.DURASI - Math.floor((Date.now() - P.tes.mulai) / 1000)); timer.innerHTML = ik('jam') + '<b>' + String(Math.floor(sisa / 60)).padStart(2, '0') + ':' + String(sisa % 60).padStart(2, '0') + '</b>'; timer.classList.toggle('merah', sisa <= 60); if (sisa <= 0 && !selesaiOtomatis) { selesaiOtomatis = true; clearInterval(tmr); kumpulkan(true); } }
+    function ketik() { const sisa = Math.max(0, B.durasi(kelas) - Math.floor((Date.now() - P.tes.mulai) / 1000)); timer.innerHTML = ik('jam') + '<b>' + String(Math.floor(sisa / 60)).padStart(2, '0') + ':' + String(sisa % 60).padStart(2, '0') + '</b>'; timer.classList.toggle('merah', sisa <= 60); if (sisa <= 0 && !selesaiOtomatis) { selesaiOtomatis = true; clearInterval(tmr); kumpulkan(true); } }
     async function kumpulkan(paksa) {
       if (!paksa) { const sisa = 5 - jml(); const ya = await UI.konfirmasi('Kumpulkan jawaban?', '<div class="tengah"><p style="font-size:1.25rem">Semua soal sudah terjawab.</p><p class="muted">Setelah dikumpulkan, jawaban <b>tidak bisa diubah</b>.</p></div>', 'Ya, kumpulkan', 'Periksa lagi'); if (!ya) return; }
       else await UI.info('Waktu habis', '<div class="tengah"><p style="font-size:1.25rem">Jawabanmu dikumpulkan otomatis.</p></div>', 'Lihat hasil', { ikon: ik('jam', 'besar') });
-      P.tes.selesai = true; P.tes.detik = Math.min(B.DURASI, Math.floor((Date.now() - P.tes.mulai) / 1000)); P.tahap = 'hasil'; simpan(); sHasil(true);
+      P.tes.selesai = true; P.tes.detik = Math.min(B.durasi(kelas), Math.floor((Date.now() - P.tes.mulai) / 1000)); P.tahap = 'hasil'; simpan(); sHasil(true);
     }
     gambar(); ketik(); tmr = setInterval(ketik, 1000);
   }
@@ -1646,12 +1787,13 @@ const nama = (i) => (i === DUMMY ? 'Siswa Uji Coba (Guru)' : judulKata(DAFTAR[i]
       const r = await api('kelompok', { idx });
       if (r.ok && r.menunggu) { w.innerHTML = '<div class="tengah-isi"><span class="ubin fx-eksp" style="width:5rem;height:5rem">' + ik('jam') + '</span><h2>Guru belum membuka kelompok</h2><p class="muted">Tunggu sebentar, halaman ini akan memeriksa sendiri.</p></div>'; clearInterval(tmr); tmr = setTimeout(muat, 4000); return; }
       if (r.ok) { tampil(r.kelompok, r.saya); return; }
+      if (r.error === 'tanpa-kelompok') { w.innerHTML = '<div class="tengah-isi"><h2>Namamu belum ada di kelompok</h2><p class="muted" style="max-width:34rem">Beri tahu gurumu agar namamu dimasukkan ke sebuah kelompok, lalu coba lagi.</p></div>'; w.querySelector('.tengah-isi').append(el('button', { kelas: 'btn', type: 'button', gaya: 'margin-top:1rem', html: ik('ulang') + 'Coba lagi', onclick: muat })); return; }
       if (r.error === 'belum-selesai') { w.innerHTML = '<div class="tengah-isi"><h2>Selesaikan tes dulu</h2></div>'; return; }
       w.innerHTML = '<div class="tengah-isi"><span class="ubin fx-tangga" style="width:5rem;height:5rem">' + ik('putus') + '</span><h2>Daftar kelompok ada di layar guru</h2><p class="muted" style="max-width:36rem">Tablet belum terhubung ke guru, jadi kelompok diumumkan lewat layar kelas. Lihat nama dan nomor kelompokmu di sana, lalu pindah ke mejanya.</p></div>'; const b = el('div', { kelas: 'baris', gaya: 'justify-content:center;margin-top:1rem' }, el('button', { kelas: 'btn sekunder', type: 'button', html: ik('ulang') + 'Coba terhubung lagi', onclick: muat }), el('button', { kelas: 'btn', type: 'button', html: 'Saya sudah tahu kelompokku' + ik('panah'), onclick: () => { P.tahap = 'lanjut'; simpan(); sLanjut(); } })); w.querySelector('.tengah-isi').append(b);
     };
     function tampil(kel, saya) {
       w.innerHTML = ''; const kepala = el('div', { kelas: 'baris', gaya: 'justify-content:space-between;margin-bottom:.6rem' }, el('div', null, el('div', { kelas: 'eyebrow' }, 'Kelompok belajar'), el('h2', { gaya: 'margin:0' }, 'Kamu di Kelompok ' + (saya + 1))), el('button', { kelas: 'btn', type: 'button', html: 'Saya sudah di meja kelompok' + ik('panah'), onclick: () => { P.tahap = 'lanjut'; simpan(); sLanjut(); } }));
-      const grid = el('div', { kelas: 'grid-kel' }); w.append(kepala, el('div', { kelas: 'umpan ok', html: ik('info') + '<span>Pindahlah ke meja kelompokmu. Kelompok dibuat seimbang berdasarkan hasil tes awal.</span>' }), grid);
+      const grid = el('div', { kelas: 'grid-kel' + (kel.length > 4 ? ' g9' : '') }); w.append(kepala, el('div', { kelas: 'umpan ok', html: ik('info') + '<span>' + (B.cfg(kelas).manual ? 'Pindahlah ke meja kelompokmu. Kelompok disusun oleh gurumu.' : 'Pindahlah ke meja kelompokmu. Kelompok dibuat seimbang berdasarkan hasil tes awal.') + '</span>' }), grid);
       kel.forEach((g, gi) => { const k = el('div', { kelas: 'kel-kartu' + (gi === saya ? ' saya' : ''), 'data-g': gi }); k.append(el('div', { kelas: 'kel-judul' }, 'Kelompok ' + (gi + 1), el('span', { kelas: 'chip abu' }, g.length + ' orang'))); g.forEach((s) => k.append(el('div', { kelas: 'kel-nama' + (s.idx === idx ? ' aku' : '') }, el('span', { kelas: 'av2 fx-' + warnaNama[s.idx % 9] }, inisial(s.nama)), el('span', null, s.nama + (s.idx === idx ? ' (kamu)' : ''))))); grid.append(k); anim(k, [{ opacity: 0, transform: 'translateY(1rem)' }, { opacity: 1, transform: 'none' }], { duration: 500, delay: gi * 120 }); });
       setTimeout(() => konfeti(innerWidth / 2, innerHeight * .25, 40), 600);
     }
@@ -1667,7 +1809,7 @@ const nama = (i) => (i === DUMMY ? 'Siswa Uji Coba (Guru)' : judulKata(DAFTAR[i]
 
   /* ---------------------------------------------------------------- mulai */
   UI.pasangPutar(); gambarAtas(); sWelcome(); cekJaringan();
-  window.gfDebug = { intro: () => intro, P: () => P, idx: () => idx, net: () => net, ke: { welcome: sWelcome, kelas: sKelas, nama: sNama, intro: sIntro, tes: sTes, hasil: sHasil, kelompok: sKelompok, lanjut: sLanjut }, pilih: (i) => { idx = i; P = lsGet('p' + i, null) || baruP(); return P; }, set: (i, p) => { idx = i; P = p; simpan(); } };
+  window.gfDebug = { intro: () => intro, P: () => P, idx: () => idx, net: () => net, ke: { welcome: sWelcome, kelas: sKelas, nama: sNama, intro: sIntro, tes: sTes, hasil: sHasil, kelompok: sKelompok, lanjut: sLanjut }, pilih: (i) => { idx = i; P = lsGet(kunciP(i), null) || baruP(); return P; }, set: (i, p) => { idx = i; P = p; simpan(); } };
 })();
 </script>
 </body>

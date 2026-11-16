@@ -5,6 +5,9 @@
   const app = document.getElementById('app'), pg = document.getElementById('panggung'), atas = document.getElementById('atas'), bawah = document.getElementById('bawah');
   const LK = 'gf_', lsGet = (k, d) => { try { const v = localStorage.getItem(LK + k); return v == null ? d : JSON.parse(v); } catch (e) { return d; } }, lsSet = (k, v) => { try { localStorage.setItem(LK + k, JSON.stringify(v)); } catch (e) { /* abaikan */ } };
   let token = lsGet('token', null); if (!token) { token = Math.random().toString(36).slice(2) + Date.now().toString(36); lsSet('token', token); }
+  let kelas = lsGet('kelas', 'xif'); if (!['xif', 'xig'].includes(kelas)) kelas = 'xif'; B.setKelas(kelas);
+  const setKelas = (k) => { kelas = k; B.setKelas(k); lsSet('kelas', k); };
+  const kunciP = (i) => 'p' + (kelas === 'xif' ? '' : kelas + '_') + i, kunciAk = () => (kelas === 'xif' ? 'aktif' : 'aktif_' + kelas);
   let net = 'cek', idx = null, P = null, intro = null, tmr = null, ping = null;
   const warnaNama = ['poli', 'eksp', 'log', 'trig', 'rasional', 'akar', 'mutlak', 'tangga', 'sepotong'];
   const inisial = (n) => { const k = n.split(/\s+/).filter((x) => /^[A-Za-z]/.test(x)); if (!k.length) return '?'; return (k[0][0] + (k.length > 1 ? k[k.length - 1][0] : '')).toUpperCase(); };
@@ -12,7 +15,7 @@
   /* ---------------------------------------------------------------- jaringan */
   async function api(a, data) {
     const ctl = new AbortController(), to = setTimeout(() => ctl.abort(), 6500);
-    try { const r = await fetch('/api/app', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(Object.assign({ a, token }, data || {})), signal: ctl.signal }); const j = await r.json().catch(() => ({})); j._s = r.status; return j; } catch (e) { return { gagal: true, _s: 0 }; } finally { clearTimeout(to); }
+    try { const r = await fetch('/api/app', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(Object.assign({ a, token, kelas }, data || {})), signal: ctl.signal }); const j = await r.json().catch(() => ({})); j._s = r.status; return j; } catch (e) { return { gagal: true, _s: 0 }; } finally { clearTimeout(to); }
   }
   async function cekJaringan() { const r = await api('cek'); net = r.ok && r.penyimpanan ? 'online' : 'offline'; gambarAtas(); return net; }
   function gambarAtas() {
@@ -20,7 +23,7 @@
     atas.append(el('span', { kelas: 'logo' }, 'Grafik ', el('b', null, 'Fungsi')), el('span', { kelas: 'ruang' }));
     if (idx !== null) atas.append(el('span', { kelas: 'chip' + (idx === B.DUMMY ? ' sorot' : ''), html: ik('siswa', 'kecil') + (idx === B.DUMMY ? 'UJI COBA' : esc(B.nama(idx).split(' ')[0])) }));
     if (idx === B.DUMMY) atas.append(el('button', { kelas: 'btn sekunder kecil', type: 'button', html: ik('nyala', 'kecil') + 'Lompat ke…', onclick: lompatUji }));
-    if (idx === B.DUMMY) atas.append(el('button', { kelas: 'btn sekunder kecil', type: 'button', html: ik('kembali', 'kecil') + 'Keluar uji coba', onclick: async () => { if (await UI.konfirmasi('Keluar dari uji coba?', '<p class="tengah">Progres uji coba tidak disimpan dan tidak memengaruhi siswa lain.</p>', 'Keluar', 'Batal')) { clearInterval(ping); lsSet('p' + B.DUMMY, null); idx = null; P = null; sWelcome(); } } }));
+    if (idx === B.DUMMY) atas.append(el('button', { kelas: 'btn sekunder kecil', type: 'button', html: ik('kembali', 'kecil') + 'Keluar uji coba', onclick: async () => { if (await UI.konfirmasi('Keluar dari uji coba?', '<p class="tengah">Progres uji coba tidak disimpan dan tidak memengaruhi siswa lain.</p>', 'Keluar', 'Batal')) { clearInterval(ping); lsSet(kunciP(B.DUMMY), null); idx = null; P = null; sWelcome(); } } }));
     if (idx !== null) atas.append(el('button', { kelas: 'btn sekunder kecil', type: 'button', html: ik('ulang', 'kecil') + 'Segarkan', onclick: segarkan }));
     atas.append(el('span', { kelas: 'chip ' + (net === 'online' ? 'ok' : (net === 'cek' ? 'abu' : 'warn')), html: ik(net === 'online' ? 'wifi' : 'putus', 'kecil') + (net === 'online' ? 'Terhubung ke guru' : (net === 'cek' ? 'Memeriksa…' : 'Mode mandiri')), title: net === 'offline' ? 'Tidak terhubung ke guru. Hasil diserahkan lewat kode.' : '' }));
   }
@@ -31,7 +34,7 @@
   }
   const kosongkanBawah = () => { bawah.innerHTML = ''; bawah.style.display = 'none'; };
   function layar(isi, kelas) { clearInterval(tmr); if (intro) { intro.stop(); intro = null; } pg.innerHTML = ''; const d = el('div', { kelas: 'layar ' + (kelas || '') }); d.append(isi); pg.append(d); return d; }
-  const simpan = () => { if (idx !== null) lsSet('p' + idx, P); };
+  const simpan = () => { if (idx !== null) lsSet(kunciP(idx), P); };
   const baruP = () => ({ tahap: 'intro', intro: 0, tes: { jawab: [null, null, null, null, null], mulai: 0, selesai: false, detik: 0 }, terkirim: false });
   function konfeti(x, y, n) { for (let i = 0; i < (n || 40); i++) { const c = el('div', { kelas: 'konfeti', gaya: 'left:' + x + 'px;top:' + y + 'px;background:' + ['#FFC233', '#6D35E8', '#12B886', '#F15BB5', '#2EA7F2', '#FF8A1F'][i % 6] }); document.body.append(c); const a = Math.random() * Math.PI * 2, d = 80 + Math.random() * 260; anim(c, [{ transform: 'translate(0,0) rotate(0)', opacity: 1 }, { transform: 'translate(' + Math.cos(a) * d + 'px,' + (Math.sin(a) * d + 160) + 'px) rotate(' + Math.random() * 720 + 'deg)', opacity: 0 }], { duration: 1200 + Math.random() * 900, easing: 'cubic-bezier(.2,.7,.3,1)' }).then(() => c.remove()); } }
 
@@ -43,7 +46,7 @@
     const bg = w.querySelector('.bg-kurva'); bg.innerHTML = '<svg viewBox="0 0 800 400" preserveAspectRatio="xMidYMid slice"><g fill="none" stroke-linecap="round" stroke-width="5"><path d="M20 340C140 340 150 60 270 60S400 340 520 340 640 60 780 60" stroke="#2EA7F2" opacity=".35"/><path d="M0 300L180 120 340 300 500 120 660 300 800 150" stroke="#F5B700" opacity=".35"/><path d="M0 380C200 370 380 330 540 190S740 20 800 10" stroke="#FF8A1F" opacity=".35"/><path d="M60 40V380M60 210H800" stroke="#9B5DE5" opacity=".18" stroke-dasharray="6 10"/></g></svg>';
     const gl = el('div', { kelas: 'garland-welcome' }); w.prepend(gl); setTimeout(() => UI.untaian(gl), 30);
     w.querySelector('.isi-welcome').append(el('div', { kelas: 'eyebrow', gaya: 'margin-top:.4rem' }, 'Masuk sebagai'), el('div', { kelas: 'baris', gaya: 'gap:1.2rem' }, el('button', { kelas: 'btn besar denyut', type: 'button', html: ik('siswa') + 'Siswa', onclick: () => { UI.layarPenuh(); sKelas(); } }), el('button', { kelas: 'btn besar sekunder', type: 'button', html: ik('kunci') + 'Guru', onclick: () => loginGuru(false) })), el('div', { kelas: 'muted kecil', gaya: 'margin-top:1.2rem' }, 'Pastikan tabletmu dalam posisi mendatar (landscape).'));
-    const ak = lsGet('aktif', null); if (Number.isInteger(ak) && ak >= 0 && ak < B.DAFTAR.length && lsGet('p' + ak, null)) w.querySelector('.isi-welcome').append(el('button', { kelas: 'btn besar hijau', type: 'button', gaya: 'margin-top:1rem', html: ik('siswa') + 'Lanjutkan sebagai ' + esc(B.nama(ak).split(' ')[0]), onclick: () => { UI.layarPenuh(); masukSebagai(ak); } }));
+    const ak = lsGet(kunciAk(), null); if (Number.isInteger(ak) && ak >= 0 && ak < B.cfg(kelas).daftar.length && lsGet(kunciP(ak), null)) w.querySelector('.isi-welcome').append(el('button', { kelas: 'btn besar hijau', type: 'button', gaya: 'margin-top:1rem', html: ik('siswa') + 'Lanjutkan sebagai ' + esc(B.nama(ak).split(' ')[0]), onclick: () => { UI.layarPenuh(); masukSebagai(ak); } }));
     layar(w, 'tengah-layar');
   }
 
@@ -59,13 +62,14 @@
   async function cekPinGuru(pin) { const r = await api('g-status', { pin }); if (r._s === 401) return false; if (r.ok) return true; return pin === B.PIN_GURU; }
   async function mintaPin(judul, salah) { const v = await UI.papanKetik({ judul, ikon: ik('kunci', 'besar'), panjang: 5, alfabet: '0123456789', kolom: 5, sembunyi: true, otomatis: true, keyboard: true, catatan: salah ? 'PIN salah. Coba lagi.' : 'Masukkan PIN guru (5 angka).' }); if (v == null) return null; if (await cekPinGuru(v)) return v; return mintaPin(judul, true); }
   async function loginGuru() { const v = await mintaPin('Masuk sebagai guru', false); if (v == null) return; try { sessionStorage.setItem('gfg_pin', v); } catch (e) { /* abaikan */ } location.href = 'guru.html'; }
-  async function masukUji() { const v = await mintaPin('Akun uji coba (guru)', false); if (v == null) return; idx = B.DUMMY; lsSet('p' + idx, null); P = baruP(); const r = await api('klaim', { idx }); net = r.ok ? 'online' : 'offline'; gambarAtas(); mulaiPing(); lanjutDari(); }
+  async function masukUji() { const v = await mintaPin('Akun uji coba (guru)', false); if (v == null) return; idx = B.DUMMY; lsSet(kunciP(idx), null); P = baruP(); const r = await api('klaim', { idx }); net = r.ok ? 'online' : 'offline'; gambarAtas(); mulaiPing(); lanjutDari(); }
 
   /* ---------------------------------------------------------------- 2. pilih kelas */
   function sKelas() {
     kosongkanBawah(); gambarAtas();
     const w = el('div', { kelas: 'tengah-isi' }); w.append(el('div', { kelas: 'eyebrow' }, 'Langkah 1 dari 2'), el('h2', null, 'Pilih kelasmu'));
-    const k = el('button', { kelas: 'kartu-kelas', type: 'button', onclick: sNama, html: '<span class="ubin fx-poli">' + UI.glif('trig') + '</span><div><div class="kelas-nama">XI-F Soshum</div><div class="muted">' + B.DAFTAR.length + ' murid · Matematika Tingkat Lanjut</div></div>' + ik('panah', 'besar') });
+    const kartuK = (k) => { const c = B.cfg(k); return el('button', { kelas: 'kartu-kelas', type: 'button', gaya: 'margin-bottom:.7rem', onclick: () => { setKelas(k); sNama(); }, html: '<span class="ubin fx-' + (k === 'xif' ? 'poli' : 'trig') + '">' + UI.glif('trig') + '</span><div><div class="kelas-nama">' + esc(c.nama) + '</div><div class="muted">' + c.daftar.length + ' murid · Matematika Tingkat Lanjut</div></div>' + ik('panah', 'besar') }); };
+    const k = el('div', null, kartuK('xif'), kartuK('xig'));
     w.append(k, el('button', { kelas: 'btn sekunder', type: 'button', gaya: 'margin-top:1.4rem', html: ik('kembali') + 'Kembali', onclick: sWelcome })); layar(w, 'tengah-layar');
   }
 
@@ -75,7 +79,8 @@
     const w = el('div', { kelas: 'nama-wrap' }); w.append(el('div', { kelas: 'baris', gaya: 'justify-content:space-between;margin-bottom:.4rem' }, el('div', null, el('div', { kelas: 'eyebrow' }, 'Langkah 2 dari 2'), el('h2', { gaya: 'margin:0' }, 'Pilih namamu')), el('button', { kelas: 'btn sekunder kecil', type: 'button', html: ik('kembali', 'kecil') + 'Kembali', onclick: sKelas })));
     const grid = el('div', { kelas: 'grid-nama' }); w.append(grid, el('div', { kelas: 'baris', gaya: 'justify-content:flex-end;padding:.2rem 0' }, el('button', { kelas: 'btn sekunder kecil', type: 'button', html: ik('pensil', 'kecil') + 'Akun uji coba (guru)', onclick: masukUji }))); layar(w);
     let st = { diklaim: [], selesai: [] }; const r = await (net === 'cek' ? cekJaringan().then(() => api('status')) : api('status')); if (r && r.ok) st = r; else if (net !== 'offline') { net = 'offline'; gambarAtas(); }
-    B.DAFTAR.forEach((_, i) => {
+    if (r && r.ok && r.manual && !r.kelasBuka) { grid.remove(); w.querySelector('.baris').nextSibling && w.append(el('div', { kelas: 'tengah-isi' }, el('span', { kelas: 'ubin fx-eksp', gaya: 'width:5rem;height:5rem', html: ik('jam') }), el('h2', null, 'Guru sedang menyiapkan kelompok'), el('p', { kelas: 'muted', gaya: 'max-width:34rem;font-size:1.15rem' }, 'Daftar nama akan terbuka otomatis begitu kelompok siap. Tunggu sebentar.'))); clearInterval(tmr); tmr = setTimeout(() => { if (document.querySelector('.nama-wrap')) sNama(); }, 4000); return; }
+    B.cfg(kelas).daftar.forEach((_, i) => {
       const nm = B.nama(i), sudah = st.diklaim.includes(i), tamat = st.selesai.includes(i);
       const t = el('button', { kelas: 'tile-nama fx-' + warnaNama[i % 9] + (sudah ? ' dipakai' : ''), type: 'button', onclick: () => pilihNama(i), html: '<span class="av">' + inisial(nm) + '</span><span class="nm">' + esc(nm) + '</span>' + (sudah ? '<span class="lencana-n">' + (tamat ? ik('centang', 'kecil') + 'selesai' : ik('kunci', 'kecil') + 'dipakai') + '</span>' : '') }); grid.append(t); anim(t, [{ opacity: 0, transform: 'translateY(.8rem) scale(.9)' }, { opacity: 1, transform: 'none' }], { duration: 400, delay: i * 25 });
     });
@@ -89,9 +94,10 @@
   async function masukSebagai(i) {
     const nm = B.nama(i); await cekJaringan();
     const r = await api('klaim', { idx: i });
+    if (r._s === 423) { await UI.info('Kelas belum dibuka', '<div class="tengah"><p>Gurumu belum membuka kelas ini.</p><p class="muted">Tunggu sebentar, lalu pilih namamu lagi.</p></div>', 'Mengerti', { ikon: ik('jam', 'besar') }); return sNama(); }
     if (r._s === 409) { await UI.info('Nama ini sedang dipakai', '<div class="tengah"><p>Nama <b>' + esc(nm) + '</b> sudah dipakai di perangkat lain.</p><p class="muted">Kalau itu memang kamu (misalnya tablet berganti), minta <b>guru</b> untuk mengatur ulang nama ini.</p></div>', 'Mengerti', { ikon: ik('kunci', 'besar') }); return sNama(); }
     if (r.gagal || r._s >= 500 || r._s === 503) { net = 'offline'; } else if (r.ok) { net = 'online'; }
-    idx = i; lsSet('aktif', i); P = lsGet('p' + i, null) || baruP();
+    idx = i; lsSet(kunciAk(), i); P = lsGet(kunciP(i), null) || baruP();
     if (r.hasil && r.hasil.jawab) { P.tes.jawab = r.hasil.jawab; P.tes.selesai = true; P.tes.detik = r.hasil.detik || 0; P.terkirim = true; if (['intro', 'tes'].includes(P.tahap)) P.tahap = 'hasil'; }
     simpan(); gambarAtas(); mulaiPing(); lanjutDari();
   }
@@ -128,11 +134,11 @@
       const sisa = 5 - jml(); info.textContent = sisa ? sisa + ' soal belum dijawab' : 'Semua soal sudah dijawab'; btnKirim.disabled = sisa > 0; btnKirim.className = 'btn hijau besar' + (sisa ? ' mati' : ' denyut');
     }
     let selesaiOtomatis = false;
-    function ketik() { const sisa = Math.max(0, B.DURASI - Math.floor((Date.now() - P.tes.mulai) / 1000)); timer.innerHTML = ik('jam') + '<b>' + String(Math.floor(sisa / 60)).padStart(2, '0') + ':' + String(sisa % 60).padStart(2, '0') + '</b>'; timer.classList.toggle('merah', sisa <= 60); if (sisa <= 0 && !selesaiOtomatis) { selesaiOtomatis = true; clearInterval(tmr); kumpulkan(true); } }
+    function ketik() { const sisa = Math.max(0, B.durasi(kelas) - Math.floor((Date.now() - P.tes.mulai) / 1000)); timer.innerHTML = ik('jam') + '<b>' + String(Math.floor(sisa / 60)).padStart(2, '0') + ':' + String(sisa % 60).padStart(2, '0') + '</b>'; timer.classList.toggle('merah', sisa <= 60); if (sisa <= 0 && !selesaiOtomatis) { selesaiOtomatis = true; clearInterval(tmr); kumpulkan(true); } }
     async function kumpulkan(paksa) {
       if (!paksa) { const sisa = 5 - jml(); const ya = await UI.konfirmasi('Kumpulkan jawaban?', '<div class="tengah"><p style="font-size:1.25rem">Semua soal sudah terjawab.</p><p class="muted">Setelah dikumpulkan, jawaban <b>tidak bisa diubah</b>.</p></div>', 'Ya, kumpulkan', 'Periksa lagi'); if (!ya) return; }
       else await UI.info('Waktu habis', '<div class="tengah"><p style="font-size:1.25rem">Jawabanmu dikumpulkan otomatis.</p></div>', 'Lihat hasil', { ikon: ik('jam', 'besar') });
-      P.tes.selesai = true; P.tes.detik = Math.min(B.DURASI, Math.floor((Date.now() - P.tes.mulai) / 1000)); P.tahap = 'hasil'; simpan(); sHasil(true);
+      P.tes.selesai = true; P.tes.detik = Math.min(B.durasi(kelas), Math.floor((Date.now() - P.tes.mulai) / 1000)); P.tahap = 'hasil'; simpan(); sHasil(true);
     }
     gambar(); ketik(); tmr = setInterval(ketik, 1000);
   }
@@ -175,12 +181,13 @@
       const r = await api('kelompok', { idx });
       if (r.ok && r.menunggu) { w.innerHTML = '<div class="tengah-isi"><span class="ubin fx-eksp" style="width:5rem;height:5rem">' + ik('jam') + '</span><h2>Guru belum membuka kelompok</h2><p class="muted">Tunggu sebentar, halaman ini akan memeriksa sendiri.</p></div>'; clearInterval(tmr); tmr = setTimeout(muat, 4000); return; }
       if (r.ok) { tampil(r.kelompok, r.saya); return; }
+      if (r.error === 'tanpa-kelompok') { w.innerHTML = '<div class="tengah-isi"><h2>Namamu belum ada di kelompok</h2><p class="muted" style="max-width:34rem">Beri tahu gurumu agar namamu dimasukkan ke sebuah kelompok, lalu coba lagi.</p></div>'; w.querySelector('.tengah-isi').append(el('button', { kelas: 'btn', type: 'button', gaya: 'margin-top:1rem', html: ik('ulang') + 'Coba lagi', onclick: muat })); return; }
       if (r.error === 'belum-selesai') { w.innerHTML = '<div class="tengah-isi"><h2>Selesaikan tes dulu</h2></div>'; return; }
       w.innerHTML = '<div class="tengah-isi"><span class="ubin fx-tangga" style="width:5rem;height:5rem">' + ik('putus') + '</span><h2>Daftar kelompok ada di layar guru</h2><p class="muted" style="max-width:36rem">Tablet belum terhubung ke guru, jadi kelompok diumumkan lewat layar kelas. Lihat nama dan nomor kelompokmu di sana, lalu pindah ke mejanya.</p></div>'; const b = el('div', { kelas: 'baris', gaya: 'justify-content:center;margin-top:1rem' }, el('button', { kelas: 'btn sekunder', type: 'button', html: ik('ulang') + 'Coba terhubung lagi', onclick: muat }), el('button', { kelas: 'btn', type: 'button', html: 'Saya sudah tahu kelompokku' + ik('panah'), onclick: () => { P.tahap = 'lanjut'; simpan(); sLanjut(); } })); w.querySelector('.tengah-isi').append(b);
     };
     function tampil(kel, saya) {
       w.innerHTML = ''; const kepala = el('div', { kelas: 'baris', gaya: 'justify-content:space-between;margin-bottom:.6rem' }, el('div', null, el('div', { kelas: 'eyebrow' }, 'Kelompok belajar'), el('h2', { gaya: 'margin:0' }, 'Kamu di Kelompok ' + (saya + 1))), el('button', { kelas: 'btn', type: 'button', html: 'Saya sudah di meja kelompok' + ik('panah'), onclick: () => { P.tahap = 'lanjut'; simpan(); sLanjut(); } }));
-      const grid = el('div', { kelas: 'grid-kel' }); w.append(kepala, el('div', { kelas: 'umpan ok', html: ik('info') + '<span>Pindahlah ke meja kelompokmu. Kelompok dibuat seimbang berdasarkan hasil tes awal.</span>' }), grid);
+      const grid = el('div', { kelas: 'grid-kel' + (kel.length > 4 ? ' g9' : '') }); w.append(kepala, el('div', { kelas: 'umpan ok', html: ik('info') + '<span>' + (B.cfg(kelas).manual ? 'Pindahlah ke meja kelompokmu. Kelompok disusun oleh gurumu.' : 'Pindahlah ke meja kelompokmu. Kelompok dibuat seimbang berdasarkan hasil tes awal.') + '</span>' }), grid);
       kel.forEach((g, gi) => { const k = el('div', { kelas: 'kel-kartu' + (gi === saya ? ' saya' : ''), 'data-g': gi }); k.append(el('div', { kelas: 'kel-judul' }, 'Kelompok ' + (gi + 1), el('span', { kelas: 'chip abu' }, g.length + ' orang'))); g.forEach((s) => k.append(el('div', { kelas: 'kel-nama' + (s.idx === idx ? ' aku' : '') }, el('span', { kelas: 'av2 fx-' + warnaNama[s.idx % 9] }, inisial(s.nama)), el('span', null, s.nama + (s.idx === idx ? ' (kamu)' : ''))))); grid.append(k); anim(k, [{ opacity: 0, transform: 'translateY(1rem)' }, { opacity: 1, transform: 'none' }], { duration: 500, delay: gi * 120 }); });
       setTimeout(() => konfeti(innerWidth / 2, innerHeight * .25, 40), 600);
     }
@@ -196,5 +203,5 @@
 
   /* ---------------------------------------------------------------- mulai */
   UI.pasangPutar(); gambarAtas(); sWelcome(); cekJaringan();
-  window.gfDebug = { intro: () => intro, P: () => P, idx: () => idx, net: () => net, ke: { welcome: sWelcome, kelas: sKelas, nama: sNama, intro: sIntro, tes: sTes, hasil: sHasil, kelompok: sKelompok, lanjut: sLanjut }, pilih: (i) => { idx = i; P = lsGet('p' + i, null) || baruP(); return P; }, set: (i, p) => { idx = i; P = p; simpan(); } };
+  window.gfDebug = { intro: () => intro, P: () => P, idx: () => idx, net: () => net, ke: { welcome: sWelcome, kelas: sKelas, nama: sNama, intro: sIntro, tes: sTes, hasil: sHasil, kelompok: sKelompok, lanjut: sLanjut }, pilih: (i) => { idx = i; P = lsGet(kunciP(i), null) || baruP(); return P; }, set: (i, p) => { idx = i; P = p; simpan(); } };
 })();
