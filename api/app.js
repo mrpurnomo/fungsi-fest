@@ -9,7 +9,7 @@ const URL_REDIS = process.env.UPSTASH_REDIS_REST_URL || process.env.KV_REST_API_
 const TOK_REDIS = process.env.UPSTASH_REDIS_REST_TOKEN || process.env.KV_REST_API_TOKEN || cariEnv('REST_API_TOKEN', 'READ_ONLY') || cariEnv('REDIS_REST_TOKEN');
 const PINS = [String(process.env.GURU_PIN || ''), B.PIN_GURU].filter(Boolean);   // PIN bawaan selalu berlaku, GURU_PIN (jika ada) juga berlaku
 const pinOk = (p) => PINS.includes(String(p));
-const K_SISWA = 'gf:xif:siswa', K_KEL = 'gf:xif:kelompok', K_GERBANG = 'gf:xif:gerbang', K_LANGKAH = 'gf:xif:langkah';
+const K_SISWA = 'gf:xif:siswa', K_KEL = 'gf:xif:kelompok', K_GERBANG = 'gf:xif:gerbang', K_LANGKAH = 'gf:xif:langkah', K_ARSIP = 'gf:xif:arsip';
 
 async function redis(...cmd) {
   const r = await fetch(URL_REDIS, { method: 'POST', headers: { Authorization: 'Bearer ' + TOK_REDIS, 'Content-Type': 'application/json' }, body: JSON.stringify(cmd) });
@@ -20,6 +20,15 @@ async function ambilSiswa(idx) { const v = await redis('HGET', K_SISWA, 's' + id
 async function simpanSiswa(idx, d) { await redis('HSET', K_SISWA, 's' + idx, JSON.stringify(d)); }
 async function ambilKel() { const v = await redis('GET', K_KEL); return v ? JSON.parse(v) : null; }
 async function simpanKel(k) { await redis('SET', K_KEL, JSON.stringify(k)); }
+/* langkah tahap lanjutan: daftar langkah yang dibuka guru (tiap langkah bisa dibuka/ditutup sendiri). Format lama (satu angka n) dibaca sebagai langkah 1..n. */
+async function bacaLangkah() { const v = await redis('GET', K_LANGKAH); if (v == null) return [1]; try { const x = JSON.parse(v); if (Array.isArray(x)) return [...new Set(x.filter((n) => [1, 2, 3, 4].includes(n)))].sort(); if (Number.isInteger(x) && x >= 1) return [1, 2, 3, 4].filter((n) => n <= x); } catch (e) { /* abaikan */ } return [1]; }
+async function tulisLangkah(arr) { await redis('SET', K_LANGKAH, JSON.stringify([...new Set(arr)].sort())); }
+/* arsip kelompok: bertahan walau semua data kelas diatur ulang */
+async function ambilArsip() { const v = await redis('GET', K_ARSIP); try { return v ? JSON.parse(v) : []; } catch (e) { return []; } }
+async function arsipkan(kel, label, ganti) {
+  const arr = await ambilArsip(), snap = { id: Date.now().toString(36) + Math.random().toString(36).slice(2, 5), t: Date.now(), label: label || 'otomatis', kel: kel.kel.map((g) => g.map((s) => ({ idx: s.idx, skor: s.skor }))) };
+  if (ganti && arr[0] && arr[0].label === 'otomatis') arr[0] = snap; else arr.unshift(snap); await redis('SET', K_ARSIP, JSON.stringify(arr.slice(0, 12))); return snap;
+}
 const bersihIdx = (v) => { const n = Number(v); return Number.isInteger(n) && n >= 0 && n <= B.DUMMY ? n : null; };
 const nyata = (k) => +k.slice(1) < B.DAFTAR.length;   // tanpa akun uji coba
 const selesaiNyata = (s) => Object.keys(s).filter((k) => nyata(k) && s[k].hasil).map((k) => ({ idx: +k.slice(1), skor: s[k].hasil.skor }));
@@ -36,7 +45,8 @@ module.exports = async (req, res) => {
   try {
     /* ---------------- aksi siswa ---------------- */
     if (b.a === 'status') { const s = await semuaSiswa(); return kirim(200, { ok: true, diklaim: Object.keys(s).filter(nyata).map((k) => +k.slice(1)), selesai: Object.keys(s).filter((k) => nyata(k) && s[k].hasil).map((k) => +k.slice(1)) }); }
-    if (['klaim', 'ping', 'hasil', 'kelompok', 't2', 't2s'].includes(b.a)) {
+    if (b.a === 't2s') { const ak = await bacaLangkah(); return kirim(200, { ok: true, buka: ak.length ? Math.max.apply(null, ak) : 0, aktif: ak }); }
+    if (['klaim', 'ping', 'hasil', 'kelompok', 't2'].includes(b.a)) {
       const idx = bersihIdx(b.idx); if (idx === null || !b.token) return kirim(400, { error: 'Data tidak lengkap' });
       let d = await ambilSiswa(idx);
       if (b.a === 'klaim' && idx === B.DUMMY) { d = { hasil: null, token: b.token, aktif: Date.now(), tahap: 'masuk' }; await simpanSiswa(idx, d); return kirim(200, { ok: true, hasil: null, uji: true }); }
@@ -61,17 +71,17 @@ module.exports = async (req, res) => {
         if (t.diskusi && n(t.diskusi.benar, 6) !== undefined) u.diskusi = { benar: t.diskusi.benar, total: Math.min(6, Number(t.diskusi.total) || 6) };
         if (n(t.poin, 400) !== undefined) u.poin = t.poin;
         if (Array.isArray(t.lencana)) u.lencana = t.lencana.map((x) => String(x).slice(0, 24)).slice(0, 8);
+        if (Array.isArray(t.sel) && t.sel.length === 4) u.sel = t.sel.map((v) => v === true);
         if (t.selesai === true) u.selesai = true; d.t2 = u; d.aktif = Date.now(); if (b.tahap) d.tahap = String(b.tahap).slice(0, 20); await simpanSiswa(idx, d); return kirim(200, { ok: true });
       }
-      if (b.a === 't2s') { const l = Number(await redis('GET', K_LANGKAH)) || 1; return kirim(200, { ok: true, buka: l }); }
       if (b.a === 'kelompok') {
-        if (!d.hasil) return kirim(409, { error: 'belum-selesai' });
+        if (!d.hasil) { const k0 = await ambilKel(); if (!(k0 && sudahMasuk(k0.kel, idx) >= 0)) return kirim(409, { error: 'belum-selesai' }); }
         if (idx === B.DUMMY) { /* akun uji coba: lihat kelompok sementara, tidak disimpan dan tidak mengubah kelompok asli */
           const s0 = await semuaSiswa(), sel0 = selesaiNyata(s0); let k0 = await ambilKel(); k0 = k0 ? { kel: JSON.parse(JSON.stringify(k0.kel)) } : { kel: B.bentukKelompok(sel0) }; const g0 = B.tambahKelompok(k0.kel, { idx, skor: d.hasil.skor }); return kirim(200, { ok: true, kelompok: tampilKel(k0.kel), saya: g0 < 0 ? 0 : g0, uji: true }); }
         const gerbang = (await redis('GET', K_GERBANG)) || 'tutup'; let kel = await ambilKel();
         if (gerbang === 'tutup') return kirim(200, { ok: true, menunggu: true });
-        if (!kel) { const s = await semuaSiswa(); kel = { kel: B.bentukKelompok(selesaiNyata(s)), dibuat: Date.now() }; await simpanKel(kel); }
-        let g = sudahMasuk(kel.kel, idx); if (g < 0) { g = B.tambahKelompok(kel.kel, { idx, skor: d.hasil.skor }); if (g < 0) return kirim(409, { error: 'penuh' }); await simpanKel(kel); }
+        if (!kel) { const s = await semuaSiswa(); kel = { kel: B.bentukKelompok(selesaiNyata(s)), dibuat: Date.now() }; await simpanKel(kel); await arsipkan(kel, 'otomatis', true); }
+        let g = sudahMasuk(kel.kel, idx); if (g < 0) { g = B.tambahKelompok(kel.kel, { idx, skor: d.hasil ? d.hasil.skor : 0 }); if (g < 0) return kirim(409, { error: 'penuh' }); await simpanKel(kel); }
         return kirim(200, { ok: true, kelompok: tampilKel(kel.kel), saya: g });
       }
     }
@@ -85,18 +95,27 @@ module.exports = async (req, res) => {
         Object.keys(s).filter(nyata).forEach((k) => { const t = s[k].t2; if (!t) return; (t.kuasai || []).forEach((f) => { if (agr[f]) agr[f].kuasai++; }); (t.bingung || []).forEach((f) => { if (agr[f]) agr[f].bingung++; }); if (t.cocok) { cs += t.cocok.benar; cn++; } if (t.tiket) { ts += t.tiket.skor; tn++; } if (t.diskusi) { ds += t.diskusi.benar; dn++; } if (t.selesai) sel2++; if (t.poin != null) poinSiswa.push({ idx: +k.slice(1), nama: B.nama(+k.slice(1)), poin: t.poin, lencana: t.lencana || [] }); });
         poinSiswa.sort((x, y) => y.poin - x.poin); const grupPoin = (kel ? kel.kel : []).map((g, gi) => { const p = g.map((m) => (poinSiswa.find((q) => q.idx === m.idx) || {}).poin).filter((v) => v != null); return { kel: gi + 1, n: p.length, total: p.reduce((x, y) => x + y, 0), rata: p.length ? p.reduce((x, y) => x + y, 0) / p.length : 0 }; });
         poinSiswa.forEach((p) => { p.kel = kel ? sudahMasuk(kel.kel, p.idx) + 1 : 0; });
-        const langkah = Number(await redis('GET', K_LANGKAH)) || 1;
-        const tahap2 = { agr, cocok: cn ? cs / cn : null, cocokN: cn, tiket: tn ? ts / tn : null, tiketN: tn, diskusi: dn ? ds / dn : null, selesai: sel2, langkah, peringkat: poinSiswa.slice(0, 10), grup: grupPoin };
+        const aktifL = await bacaLangkah(), langkah = aktifL.length ? Math.max.apply(null, aktifL) : 0, selStep = [0, 0, 0, 0]; Object.keys(s).filter(nyata).forEach((k) => { const sl = s[k].t2 && s[k].t2.sel; if (sl) sl.forEach((v, i) => { if (v) selStep[i]++; }); });
+        const tahap2 = { agr, cocok: cn ? cs / cn : null, cocokN: cn, tiket: tn ? ts / tn : null, tiketN: tn, diskusi: dn ? ds / dn : null, selesai: sel2, langkah, aktif: aktifL, selStep, peringkat: poinSiswa.slice(0, 10), grup: grupPoin };
         const daftar = B.DAFTAR.map((_, i) => { const d = s['s' + i]; return { idx: i, nama: B.nama(i), klaim: !!d, aktif: d ? d.aktif : 0, tahap: d ? d.tahap : null, skor: d && d.hasil ? d.hasil.skor : null, detik: d && d.hasil ? d.hasil.detik : null, kel: kel ? sudahMasuk(kel.kel, i) : -1 }; });
         return kirim(200, { ok: true, sekarang: Date.now(), daftar, uji, tahap2, kelompok: kel ? tampilKel(kel.kel) : null, gerbang });
       }
       if (b.a === 'g-reset') { const idx = bersihIdx(b.idx); if (idx === null) return kirim(400, { error: 'idx' }); await redis('HDEL', K_SISWA, 's' + idx); const kel = await ambilKel(); if (kel) { kel.kel = kel.kel.map((g) => g.filter((s) => s.idx !== idx)); await simpanKel(kel); } return kirim(200, { ok: true }); }
       if (b.a === 'g-reset-semua') { await redis('DEL', K_SISWA); await redis('DEL', K_KEL); await redis('DEL', K_LANGKAH); await redis('DEL', K_GERBANG); return kirim(200, { ok: true }); }
-      if (b.a === 'g-bentuk') { const s = await semuaSiswa(); const kel = { kel: B.bentukKelompok(selesaiNyata(s)), dibuat: Date.now() }; await simpanKel(kel); return kirim(200, { ok: true, kelompok: tampilKel(kel.kel) }); }
-      if (b.a === 'g-tambah') { const s = await semuaSiswa(); let kel = await ambilKel(); if (!kel) return kirim(200, { ok: true, ditambah: 0 }); let n = 0; Object.keys(s).filter((k) => nyata(k) && s[k].hasil).forEach((k) => { const idx = +k.slice(1); if (sudahMasuk(kel.kel, idx) < 0 && B.tambahKelompok(kel.kel, { idx, skor: s[k].hasil.skor }) >= 0) n++; }); await simpanKel(kel); return kirim(200, { ok: true, ditambah: n }); }
+      if (b.a === 'g-bentuk') { const s = await semuaSiswa(); const kel = { kel: B.bentukKelompok(selesaiNyata(s)), dibuat: Date.now() }; await simpanKel(kel); await arsipkan(kel, 'otomatis', true); return kirim(200, { ok: true, kelompok: tampilKel(kel.kel) }); }
+      if (b.a === 'g-tambah') { const s = await semuaSiswa(); let kel = await ambilKel(); if (!kel) return kirim(200, { ok: true, ditambah: 0 }); let n = 0; Object.keys(s).filter((k) => nyata(k) && s[k].hasil).forEach((k) => { const idx = +k.slice(1); if (sudahMasuk(kel.kel, idx) < 0 && B.tambahKelompok(kel.kel, { idx, skor: s[k].hasil.skor }) >= 0) n++; }); await simpanKel(kel); if (n) await arsipkan(kel, 'otomatis', true); return kirim(200, { ok: true, ditambah: n }); }
       if (b.a === 'g-hapus-kelompok') { await redis('DEL', K_KEL); return kirim(200, { ok: true }); }
-      if (b.a === 'g-gerbang') { await redis('SET', K_GERBANG, b.buka ? 'buka' : 'tutup'); if (b.buka && !(await ambilKel())) { const s = await semuaSiswa(); await simpanKel({ kel: B.bentukKelompok(selesaiNyata(s)), dibuat: Date.now() }); } return kirim(200, { ok: true }); }
-      if (b.a === 'g-langkah') { const n = Math.max(1, Math.min(4, Number(b.n) || 1)); await redis('SET', K_LANGKAH, String(n)); return kirim(200, { ok: true, n }); }
+      if (b.a === 'g-gerbang') { await redis('SET', K_GERBANG, b.buka ? 'buka' : 'tutup'); if (b.buka && !(await ambilKel())) { const s = await semuaSiswa(); const k1 = { kel: B.bentukKelompok(selesaiNyata(s)), dibuat: Date.now() }; await simpanKel(k1); await arsipkan(k1, 'otomatis', true); } return kirim(200, { ok: true }); }
+      if (b.a === 'g-langkah') {
+        const n = Math.max(1, Math.min(4, Number(b.n) || 1)); let ak = await bacaLangkah();
+        if (b.buka === true) ak.push(n); else if (b.buka === false) ak = ak.filter((x) => x !== n); else ak = [1, 2, 3, 4].filter((x) => x <= n);   /* tanpa 'buka': cara lama = buka langkah 1..n */
+        if (b.semua === true) ak = [1, 2, 3, 4]; if (b.semua === false) ak = [];
+        await tulisLangkah(ak); return kirim(200, { ok: true, n, aktif: [...new Set(ak)].sort() });
+      }
+      if (b.a === 'g-arsip') { const arr = await ambilArsip(); return kirim(200, { ok: true, arsip: arr.map((x) => ({ id: x.id, t: x.t, label: x.label, n: x.kel.length, total: x.kel.reduce((s, g) => s + g.length, 0), kel: tampilKel(x.kel) })) }); }
+      if (b.a === 'g-simpan-kelompok') { const kel = await ambilKel(); if (!kel) return kirim(409, { error: 'belum-ada-kelompok' }); const sn = await arsipkan(kel, String(b.label || 'Disimpan guru').slice(0, 40), false); return kirim(200, { ok: true, id: sn.id }); }
+      if (b.a === 'g-muat-kelompok') { const arr = await ambilArsip(), x = arr.find((q) => q.id === b.id); if (!x) return kirim(404, { error: 'tidak-ada' }); await simpanKel({ kel: x.kel.map((g) => g.map((s) => ({ idx: s.idx, skor: s.skor }))), dibuat: Date.now(), dimuat: x.id }); return kirim(200, { ok: true, kelompok: tampilKel(x.kel) }); }
+      if (b.a === 'g-hapus-arsip') { const arr = (await ambilArsip()).filter((q) => q.id !== b.id); await redis('SET', K_ARSIP, JSON.stringify(arr)); return kirim(200, { ok: true }); }
       if (b.a === 'g-kode') { const r = B.bacaKode(b.kode); if (r.error) return kirim(200, { error: r.error }); let d = await ambilSiswa(r.idx) || { token: null, tahap: 'kode' }; const n = B.nilai(r.idx, r.jawab); if (!d.hasil) { d.hasil = { jawab: r.jawab, benar: n.benar, skor: n.benar, waktu: Date.now(), detik: null }; d.tahap = 'selesai-tes'; await simpanSiswa(r.idx, d); } return kirim(200, { ok: true, idx: r.idx, nama: B.nama(r.idx), benar: n.benar }); }
     }
     return kirim(400, { error: 'Aksi tidak dikenal' });

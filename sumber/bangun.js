@@ -10,5 +10,5 @@ function rakit(judul, jsAkhir, keluar, tambahan) {
   const h = baca('halaman.html').replace('@JUDUL@', judul).replace('/*@FONTS*/', () => fonts).replace('/*@CSS*/', () => css).replace('/*@JS*/', () => js);
   fs.writeFileSync(path.join(R, keluar), h); console.log(keluar.padEnd(28), (Buffer.byteLength(h) / 1024).toFixed(0) + ' KB');
 }
-rakit('Grafik Fungsi', 'siswa.js', 'index.html', ['tahap2.js', 'catatan.js']); rakit('Grafik Fungsi — Guru', 'guru.js', 'guru.html');
+rakit('Grafik Fungsi', 'siswa.js', 'index.html', ['tahap2.js', 'catatan.js']); rakit('Grafik Fungsi — Guru', 'guru.js', 'guru.html', ['cetak.js']);
 fs.mkdirSync(path.join(R, 'cadangan'), { recursive: true }); fs.copyFileSync(path.join(R, 'index.html'), path.join(R, 'cadangan', 'Grafik-Fungsi-siswa.html'));

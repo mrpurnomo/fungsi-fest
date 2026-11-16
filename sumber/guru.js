@@ -51,6 +51,9 @@
       const aksi = el('div', { kelas: 'baris' }); aksi.append(el('button', { kelas: 'btn sekunder', type: 'button', html: ik('kelompok', 'kecil') + (kel ? 'Susun ulang dari hasil terkini' : 'Bentuk kelompok sekarang'), onclick: bentuk }));
       if (kel) aksi.append(el('button', { kelas: 'btn sekunder', type: 'button', html: ik('siswa', 'kecil') + 'Tambahkan yang menyusul', onclick: tambahSusul }));
       if (kel) aksi.append(el('button', { kelas: 'btn sekunder', type: 'button', html: ik('hapus', 'kecil') + 'Hapus', onclick: async () => { if (net === 'online') await ga('g-hapus-kelompok'); else LSset('kelompok', null); muat(); } }));
+      if (kel) aksi.append(el('button', { kelas: 'btn sekunder', type: 'button', html: ik('kirim', 'kecil') + 'Unduh PDF', onclick: () => Cetak.kelompok(kel, { kelas: 'XI-F Soshum' }) }));
+      if (net === 'online' && kel) aksi.append(el('button', { kelas: 'btn sekunder', type: 'button', html: ik('salin', 'kecil') + 'Simpan kelompok', onclick: simpanArsip }));
+      if (net === 'online') aksi.append(el('button', { kelas: 'btn sekunder', type: 'button', html: ik('buku', 'kecil') + 'Muat tersimpan', onclick: muatArsip }));
       ket.append(aksi); w.append(ket);
       if (net === 'online') {
         const selesaiTes = data ? data.daftar.filter((x) => x.skor != null).length : 0;
@@ -64,6 +67,15 @@
     };
     async function muat() { if (net !== 'offline') { const r = await ga('g-status'); if (r.ok) { data = r; net = 'online'; } else if (r._s === 401) { await mintaPin(true); return; } else { net = 'offline'; data = null; } gambarAtas(); } render(); }
     async function tambahSusul() { let n = 0; if (net === 'online') { const r = await ga('g-tambah'); n = r.ditambah || 0; } else { const h = hasilLokal(), k = kelLokal(); if (k) { const ada = new Set(k.flat().map((s) => s.idx)); Object.keys(h).map(Number).filter((i) => !ada.has(i)).forEach((i) => { if (B.tambahKelompok(k, { idx: i, skor: h[i] }) >= 0) n++; }); LSset('kelompok', k); } } UI.toast(n ? n + ' siswa ditambahkan ke kelompok' : 'Tidak ada siswa yang menyusul', n ? 'centang' : 'info'); muat(); }
+    const tglJam = (t) => new Date(t).toLocaleString('id-ID', { weekday: 'short', day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' });
+    async function simpanArsip() { const r = await ga('g-simpan-kelompok', { label: 'XI-F · ' + tglJam(Date.now()) }); if (r.ok) UI.toast('Kelompok disimpan. Bisa dimuat kapan saja, juga setelah data kelas diatur ulang.', 'centang'); else UI.toast('Belum ada kelompok untuk disimpan', 'awas'); }
+    async function muatArsip() {
+      const r = await ga('g-arsip'); if (!r.ok) { UI.toast('Gagal membaca arsip', 'awas'); return; }
+      const isi = el('div', { kelas: 'arsip' }); let tutupFn = null;
+      const gambar = (arsip) => { isi.innerHTML = ''; if (!arsip.length) { isi.append(el('p', { kelas: 'muted tengah' }, 'Belum ada kelompok tersimpan. Kelompok yang terbentuk otomatis tersimpan di sini.')); return; }
+        arsip.forEach((x) => isi.append(el('div', { kelas: 'arsip-baris' }, el('div', { gaya: 'flex:1' }, el('b', null, x.label === 'otomatis' ? 'Terbentuk otomatis' : x.label), el('div', { kelas: 'muted kecil' }, tglJam(x.t) + ' · ' + x.n + ' kelompok · ' + x.total + ' murid')), el('button', { kelas: 'btn sekunder kecil', type: 'button', html: ik('kirim', 'kecil') + 'PDF', onclick: () => Cetak.kelompok(x.kel, { kelas: 'XI-F Soshum', label: x.label === 'otomatis' ? '' : x.label }) }), el('button', { kelas: 'btn kecil', type: 'button', html: 'Muat', onclick: async () => { const ada = kel && kel.length; if (ada && !(await UI.konfirmasi('Ganti kelompok sekarang?', '<p class="tengah">Kelompok yang aktif akan diganti dengan kelompok tersimpan ini.</p>', 'Ya, ganti', 'Batal'))) return; const m = await ga('g-muat-kelompok', { id: x.id }); if (m.ok) { UI.toast('Kelompok dimuat', 'centang'); if (tutupFn) tutupFn(true); muat(); } else UI.toast('Gagal memuat', 'awas'); } }), el('button', { kelas: 'btn sekunder kecil', type: 'button', 'aria-label': 'Hapus', html: ik('hapus', 'kecil'), onclick: async () => { await ga('g-hapus-arsip', { id: x.id }); const r2 = await ga('g-arsip'); gambar(r2.arsip || []); } })))); };
+      gambar(r.arsip || []); UI.dialog({ lebar: true, judul: 'Kelompok tersimpan', ikon: ik('buku', 'besar'), isi, tombol: [{ t: 'Tutup', nilai: null, kelas: 'sekunder' }], tutupLuar: true, saatBuka: (b, t) => { tutupFn = t; } });
+    }
     async function bentuk() {
       if (net === 'online') { const r = await ga('g-bentuk'); if (!r.ok) UI.toast('Gagal membentuk kelompok', 'awas'); } else { const h = hasilLokal(), sel = Object.keys(h).map((k) => ({ idx: +k, skor: h[k] })); if (!sel.length) return UI.toast('Belum ada hasil. Masukkan kode di tab Kode hasil.', 'awas'); LSset('kelompok', B.bentukKelompok(sel)); }
       muat();
@@ -93,9 +105,14 @@
     const render = () => {
       w.innerHTML = ''; if (net !== 'online' || !data || !data.tahap2) { w.append(el('div', { kelas: 'tengah-isi' }, el('h2', null, 'Perlu server'), el('p', { kelas: 'muted' }, 'Pemantauan tahap lanjutan hanya tersedia saat server terhubung.'))); return; }
       const t = data.tahap2, fmt = (v, d) => (v == null ? '–' : v.toFixed(d == null ? 1 : d).replace('.', ',')), lk = t.langkah || 1;
-      const ctrl = el('div', { kelas: 'kartu ctrl-langkah' }); ctrl.append(el('div', null, el('div', { kelas: 'eyebrow', gaya: 'margin:0' }, 'Langkah yang dibuka untuk siswa'), el('div', { kelas: 'muted kecil' }, 'Siswa mengerjakan berurutan. Langkah berikutnya terbuka saat kamu menekannya.')));
-      const seg = el('div', { kelas: 'seg-langkah' }); LANGKAH.forEach((nm, i) => seg.append(el('button', { type: 'button', kelas: (i + 1) === lk ? 'aktif' : ((i + 1) < lk ? 'lalu' : ''), html: '<span class="no">' + (i + 1) + '</span>' + nm + ((i + 1) < lk ? ik('centang', 'kecil') : ''), onclick: async () => { await ga('g-langkah', { n: i + 1 }); if (TM.i !== 3 + i) tmPilih(3 + i, false); UI.toast('Langkah ' + (i + 1) + ' dibuka: ' + nm, 'centang'); muat(); } })));
-      ctrl.append(seg, el('button', { kelas: 'btn sorot', type: 'button', html: ik('bintang', 'kecil') + 'Panggung Kelas', onclick: () => panggungKelas(t) })); w.append(ctrl);
+      const aktifL = Array.isArray(t.aktif) ? t.aktif : [1].filter((n) => n <= lk), sel = t.selStep || [0, 0, 0, 0];
+      const ctrl = el('div', { kelas: 'kartu ctrl-langkah' }); ctrl.append(el('div', { gaya: 'max-width:15rem' }, el('div', { kelas: 'eyebrow', gaya: 'margin:0' }, 'Buka / tutup langkah'), el('div', { kelas: 'muted kecil' }, 'Tiap langkah punya tombolnya sendiri. Kondisinya tersimpan di server dan tidak berubah saat kamu pindah tab.')));
+      const baris = el('div', { kelas: 'langkah-guru' });
+      LANGKAH.forEach((nm, i) => { const n = i + 1, buka = aktifL.indexOf(n) >= 0, pct = Math.min(100, Math.round(sel[i] / 24 * 100));
+        const toggle = async () => { const baru = !buka; data.tahap2.aktif = baru ? aktifL.concat([n]).sort() : aktifL.filter((x) => x !== n); render(); const r = await ga('g-langkah', { n, buka: baru }); if (!r.ok) UI.toast('Gagal menyimpan. Periksa koneksi.', 'awas'); else { UI.toast('Langkah ' + n + (baru ? ' dibuka' : ' ditutup') + ' untuk siswa', baru ? 'centang' : 'info'); if (baru && !TM.jalan && TM.i !== 3 + i) tmPilih(3 + i, false); } muat(); };
+        baris.append(el('div', { kelas: 'lg ' + (buka ? 'buka' : 'tutup') }, el('div', { kelas: 'lg-kep' }, el('span', { kelas: 'no' }, String(n)), el('b', null, nm), el('span', { kelas: 'chip ' + (buka ? 'ok' : 'abu'), html: buka ? 'TERBUKA' : 'TERTUTUP' })), el('div', { kelas: 'lg-bar' }, el('i', { gaya: 'width:' + pct + '%' })), el('div', { kelas: 'muted kecil' }, 'selesai ' + sel[i] + ' dari 24 siswa'), el('button', { kelas: 'btn ' + (buka ? 'sekunder' : 'hijau'), type: 'button', html: ik(buka ? 'gembok' : 'nyala', 'kecil') + (buka ? 'Tutup langkah ' : 'Buka langkah ') + n, onclick: toggle })));
+      });
+      ctrl.append(baris, el('div', { kelas: 'lg-samping' }, el('button', { kelas: 'btn sekunder kecil', type: 'button', html: 'Buka semua', onclick: async () => { await ga('g-langkah', { n: 1, semua: true }); muat(); } }), el('button', { kelas: 'btn sekunder kecil', type: 'button', html: 'Tutup semua', onclick: async () => { await ga('g-langkah', { n: 1, semua: false }); muat(); } }), el('button', { kelas: 'btn sorot kecil', type: 'button', html: ik('bintang', 'kecil') + 'Panggung Kelas', onclick: () => panggungKelas(t) }))); w.append(ctrl);
       w.append(el('div', { kelas: 'stat-guru' }, el('div', { kelas: 'kartu stat fx-log', html: '<div class="eyebrow" style="margin:0">Selesai tahap lanjutan</div><b>' + t.selesai + '/24</b>' }), el('div', { kelas: 'kartu stat fx-trig', html: '<div class="eyebrow" style="margin:0">Tebak fungsinya</div><b>' + fmt(t.diskusi) + ' / 6</b>' }), el('div', { kelas: 'kartu stat fx-eksp', html: '<div class="eyebrow" style="margin:0">Cocokkan grafik</div><b>' + fmt(t.cocok) + ' / 5</b>' }), el('div', { kelas: 'kartu stat fx-poli', html: '<div class="eyebrow" style="margin:0">Tiket keluar</div><b>' + fmt(t.tiket) + ' / 3</b>' })));
       const k = el('div', { kelas: 'kartu gulir', gaya: 'flex:1;min-height:0' }); k.append(el('h3', null, 'Pemahaman per jenis grafik'), el('p', { kelas: 'muted kecil' }, 'Dari refleksi akhir siswa: jenis yang dikuasai dan yang masih membingungkan. Jenis dengan banyak “bingung” layak dibahas ulang.'));
       const maks = Math.max(1, ...Object.values(t.agr).map((x) => x.kuasai + x.bingung));
@@ -149,7 +166,7 @@
   }
   async function pindahTahap(i) {
     if (i >= TAHAP.length) { tmJeda(); ke('t2'); setTimeout(() => { if (data && data.tahap2) panggungKelas(data.tahap2); }, 800); return; }
-    const t = TAHAP[i]; if (t.langkah) await ga('g-langkah', { n: t.langkah }); ke(t.tab); tmPilih(i, true); UI.toast('Pewaktu berjalan: ' + t.nama, 'jam');
+    const t = TAHAP[i]; if (t.langkah) await ga('g-langkah', { n: t.langkah, buka: true }); ke(t.tab); tmPilih(i, true); UI.toast('Pewaktu berjalan: ' + t.nama, 'jam');
   }
   let popupAktif = false;
   async function popupHabis() {

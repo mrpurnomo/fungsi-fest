@@ -15,7 +15,7 @@
 
   /* ---------- poin & sinkron ke guru ---------- */
   function hitung() { const t = T(); return B.hitungPoin({ kartu: t.kartu, fam: t.fam, diskusi: t.dis, cocok: t.cocok, tiket: t.tiket, tamat: t.tamat }); }
-  function sinkron(extra) { const t = T(), p = hitung(); t.poin = p.poin; t.lencana = p.lencana; E.simpan(); kirim(Object.assign({ poin: p.poin, lencana: p.lencana }, extra || {})); return p; }
+  function sinkron(extra) { const t = T(), p = hitung(); t.poin = p.poin; t.lencana = p.lencana; E.simpan(); kirim(Object.assign({ poin: p.poin, lencana: p.lencana, sel: status() }, extra || {})); return p; }
 
   /* ---------- grafik bantu ---------- */
   function miniGrafik(fam, berwarna) {
@@ -88,10 +88,10 @@
 
   /* ============================================================ pusat */
   const status = () => { const t = T(); return [t.fam.every((f) => t.kartu[f]), !!t.dis.selesai, !!t.cocok.selesai, !!t.tamat]; };
-  function terbuka(k, sel) { if (E.idx() === B.DUMMY) return true; if (E.net() === 'online') return k <= (T().buka || 1); return k === 1 || sel[k - 2]; }
+  function terbuka(k, sel) { if (E.idx() === B.DUMMY) return true; if (E.net() === 'online') return (T().aktif || [1]).indexOf(k) >= 0; return k === 1 || sel[k - 2]; }
   async function hub() {
     E.bawahKosong(); E.gambarAtas(); await tentukan(); const t = T(); if (!t.sapa) { await sapaPasangan(); t.sapa = true; E.simpan(); }
-    mulaiCek(); render();
+    mulaiCek(); render(); kirim({ sel: status() });
   }
   function render() {
     const t = T(), sel = status(), selesai = sel.filter(Boolean).length, p = hitung(), fam = t.fam; const w = el('div', { kelas: 't2-hub' });
@@ -105,7 +105,7 @@
     if (t.tiket.selesai) sisi.append(el('button', { kelas: 'btn hijau denyut-h t2-catatan', type: 'button', html: ik('buku', 'kecil') + 'Catatan belajar (PDF)', onclick: bukaCatatan }));
     sisi.append(el('button', { kelas: 'btn ' + (t.tamat ? 'hijau' : 'sekunder') + ' t2-ringkas', type: 'button', disabled: !t.tamat, html: ik(t.tamat ? 'bintang' : 'gembok', 'kecil') + 'Lihat ringkasan akhir', onclick: tamat }));
     /* sisi kanan */
-    const kanan = el('section', { kelas: 't2-utama' }); kanan.append(el('div', { kelas: 't2-judul' }, el('div', null, el('div', { kelas: 'eyebrow' }, 'Tahap lanjutan'), el('h2', { gaya: 'margin:0' }, 'Perjalanan belajarmu')), el('div', { kelas: 'muted', gaya: 'max-width:21rem;text-align:right' }, 'Kerjakan berurutan. Langkah berikutnya dibuka guru saat sudah waktunya.')));
+    const kanan = el('section', { kelas: 't2-utama' }); kanan.append(el('div', { kelas: 't2-judul' }, el('div', null, el('div', { kelas: 'eyebrow' }, 'Tahap lanjutan'), el('h2', { gaya: 'margin:0' }, 'Perjalanan belajarmu')), el('div', { kelas: 't2-sambung' }, el('div', { kelas: 'muted' }, 'Langkah dibuka oleh guru saat sudah waktunya.'), el('div', { kelas: 'baris', gaya: 'justify-content:flex-end;gap:.5rem' }, statusSambung(), el('button', { kelas: 'btn sekunder kecil', type: 'button', html: ik('ulang', 'kecil') + 'Segarkan', onclick: async (e) => { const b = e.currentTarget; b.disabled = true; await cekGuru(true); if (document.querySelector('.t2-hub')) render(); } })))));
     const L = [
       [1, 'Kartu pakar', 'buku', 'Pelajari rumus, bentuk grafik, dan contoh nyata. Lalu uji dengan soal cerita.', fam.filter((f) => t.kartu[f]).length + ' dari ' + fam.length + ' kartu', kartuPakar, 'poli', fam.length, fam.filter((f) => t.kartu[f]).length],
       [2, 'Tebak fungsinya', 'kelompok', 'Diskusi bersama kelompok: kejadian sehari-hari ini grafiknya jenis apa?', ((t.dis.rnd || []).filter((r) => r && r.selesai).length) + ' dari 6 tebakan', diskusi, 'trig', 6, (t.dis.rnd || []).filter((r) => r && r.selesai).length],
@@ -123,11 +123,36 @@
     kanan.append(grid); w.append(sisi, kanan); E.layar(w);
   }
   function bukaCatatan() { if (window.Catatan) Catatan.buka({ idx: E.idx(), P: E.P() }); }
-  function mulaiCek() {
-    clearInterval(tmrCek); if (E.idx() === B.DUMMY) return;
-    const f = async () => { if (E.net() !== 'online') return; const r = await E.api('t2s'); if (!(r && r.ok && r.buka)) return; const t = T(), lama = t.buka || 1; if (r.buka === lama) return; t.buka = r.buka; E.simpan(); if (r.buka > lama) UI.toast('Guru membuka langkah ' + r.buka, 'bintang'); if (document.querySelector('.t2-hub')) render(); };
-    f(); tmrCek = setInterval(f, 5000);
+  /* sambungan ke guru: memeriksa langkah yang dibuka. Gagal diperiksa = ditampilkan jelas, bukan diam-diam. */
+  const sambung = { ok: 0, gagal: 0 };
+  const jam = (ms) => new Date(ms).toTimeString().slice(0, 8);
+  function statusSambung() {
+    if (E.idx() === B.DUMMY) return el('span', { kelas: 'chip sorot', html: 'Akun uji coba: semua langkah terbuka' });
+    if (E.net() !== 'online') return el('span', { kelas: 'chip warn', html: ik('putus', 'kecil') + 'Mode mandiri' });
+    if (sambung.ok && sambung.gagal === 0) return el('span', { kelas: 'chip ok', html: ik('wifi', 'kecil') + 'Terhubung ke guru · ' + jam(sambung.ok) });
+    if (sambung.gagal >= 2) return el('span', { kelas: 'chip warn', html: ik('putus', 'kecil') + 'Belum bisa memeriksa guru' });
+    return el('span', { kelas: 'chip abu', html: 'Memeriksa guru…' });
   }
+  function perbaruiStatus() { const w = document.querySelector('.t2-sambung .baris'); if (w && w.firstChild) w.replaceChild(statusSambung(), w.firstChild); }
+  async function cekGuru(manual) { try { await cekGuru2(manual); } finally { perbaruiStatus(); } }
+  async function cekGuru2(manual) {
+    if (E.idx() === B.DUMMY) return;
+    if (E.net() !== 'online' && E.cekNet) await E.cekNet();
+    if (E.net() !== 'online') { sambung.gagal++; return; }
+    const r = await E.api('t2s', { idx: E.idx() });
+    if (!(r && r.ok)) { sambung.gagal++; if (manual) UI.toast('Belum tersambung ke guru. Coba lagi sebentar lagi.', 'awas'); return; }
+    sambung.ok = Date.now(); sambung.gagal = 0;
+    const t = T(), baru = Array.isArray(r.aktif) ? r.aktif : [1, 2, 3, 4].filter((n) => n <= (r.buka || 1)), lama = t.aktif || [1];
+    if (JSON.stringify(baru) === JSON.stringify(lama)) { if (manual) UI.toast('Sudah yang terbaru', 'centang'); return; }
+    t.aktif = baru; E.simpan(); const nb = baru.filter((n) => lama.indexOf(n) < 0), tutup = lama.filter((n) => baru.indexOf(n) < 0);
+    if (nb.length) UI.toast('Guru membuka langkah ' + nb.join(', '), 'bintang'); else if (tutup.length) UI.toast('Guru menutup langkah ' + tutup.join(', '), 'info');
+    if (document.querySelector('.t2-hub')) render();
+  }
+  function mulaiCek() {
+    clearInterval(tmrCek); document.removeEventListener('visibilitychange', cekLagi); document.addEventListener('visibilitychange', cekLagi);
+    if (E.idx() === B.DUMMY) return; cekGuru(false); tmrCek = setInterval(() => cekGuru(false), 4000);
+  }
+  function cekLagi() { if (!document.hidden && E.idx() !== B.DUMMY) cekGuru(false); }
 
   /* ============================================================ langkah 1: kartu pakar */
   function isiKartu(f, o) {
@@ -274,7 +299,7 @@
   }
 
   root.Tahap2 = { mulai: (env) => {
-    E = env; const P = E.P(); P.t2 = P.t2 || {}; const t = P.t2; t.kartu = t.kartu || {}; t.dis = t.dis || { rnd: [] }; t.cocok = t.cocok || { jawab: [] }; t.cocok.jawab = t.cocok.jawab || []; t.tiket = t.tiket || {}; t.buka = t.buka || 1;
+    E = env; const P = E.P(); P.t2 = P.t2 || {}; const t = P.t2; t.kartu = t.kartu || {}; t.dis = t.dis || { rnd: [] }; t.cocok = t.cocok || { jawab: [] }; t.cocok.jawab = t.cocok.jawab || []; t.tiket = t.tiket || {}; t.aktif = t.aktif || [1];
     if (t.ref && !Array.isArray(t.ref.kuasai)) t.ref = { kuasai: [], bingung: [] };
     hub();
   } };
