@@ -87,7 +87,7 @@
   }
   async function pilihNama(i) {
     const nm = B.nama(i);
-    const ya = await UI.dialog({ judul: 'Apakah benar ini namamu?', ikon: ik('siswa', 'besar'), isi: '<div class="tengah" style="padding:.6rem 0"><div style="font-family:var(--tampil);font-size:2.2rem;font-weight:700;line-height:1.15">' + esc(nm) + '</div><div class="muted" style="margin-top:.5rem">XI-F Soshum</div></div>', tombol: [{ t: 'Bukan, kembali', nilai: false, kelas: 'sekunder' }, { t: 'Ya, benar', nilai: true, kelas: 'hijau', ikon: 'centang' }] });
+    const ya = await UI.dialog({ judul: 'Apakah benar ini namamu?', ikon: ik('siswa', 'besar'), isi: '<div class="tengah" style="padding:.6rem 0"><div style="font-family:var(--tampil);font-size:2.2rem;font-weight:700;line-height:1.15">' + esc(nm) + '</div><div class="muted" style="margin-top:.5rem">' + esc(B.cfg(kelas).nama) + '</div></div>', tombol: [{ t: 'Bukan, kembali', nilai: false, kelas: 'sekunder' }, { t: 'Ya, benar', nilai: true, kelas: 'hijau', ikon: 'centang' }] });
     if (!ya) return;
     return masukSebagai(i);
   }

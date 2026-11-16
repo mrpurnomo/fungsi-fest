@@ -34,7 +34,7 @@ async function arsipkan(kel, label, ganti) {
   const arr = await ambilArsip(), snap = { id: Date.now().toString(36) + Math.random().toString(36).slice(2, 5), t: Date.now(), label: label || 'otomatis', kel: kel.kel.map((g) => g.map((s) => ({ idx: s.idx, skor: s.skor }))) };
   if (ganti && arr[0] && arr[0].label === 'otomatis') arr[0] = snap; else arr.unshift(snap); await redis('SET', ctx().K.A, JSON.stringify(arr.slice(0, 12))); return snap;
 }
-const bersihIdx = (v) => { const n = Number(v); return Number.isInteger(n) && n >= 0 && n <= B.DUMMY ? n : null; };
+const bersihIdx = (v) => { const n = Number(v); return Number.isInteger(n) && n >= 0 && (n < CFG().daftar.length || n === B.DUMMY) ? n : null; };
 const nyata = (k) => +k.slice(1) < CFG().daftar.length;   // tanpa akun uji coba
 const selesaiNyata = (s) => Object.keys(s).filter((k) => nyata(k) && s[k].hasil).map((k) => ({ idx: +k.slice(1), skor: s[k].hasil.skor }));
 const sudahMasuk = (kel, idx) => { for (let g = 0; g < kel.length; g++) if (kel[g].some((s) => s.idx === idx)) return g; return -1; };
@@ -142,7 +142,7 @@ const handler = async (req, res) => {
       if (b.a === 'g-simpan-kelompok') { const kel = await ambilKel(); if (!kel) return kirim(409, { error: 'belum-ada-kelompok' }); const sn = await arsipkan(kel, String(b.label || 'Disimpan guru').slice(0, 40), false); return kirim(200, { ok: true, id: sn.id }); }
       if (b.a === 'g-muat-kelompok') { const arr = await ambilArsip(), x = arr.find((q) => q.id === b.id); if (!x) return kirim(404, { error: 'tidak-ada' }); await simpanKel({ kel: x.kel.map((g) => g.map((s) => ({ idx: s.idx, skor: s.skor }))), dibuat: Date.now(), dimuat: x.id }); return kirim(200, { ok: true, kelompok: tampilKel(x.kel) }); }
       if (b.a === 'g-hapus-arsip') { const arr = (await ambilArsip()).filter((q) => q.id !== b.id); await redis('SET', ctx().K.A, JSON.stringify(arr)); return kirim(200, { ok: true }); }
-      if (b.a === 'g-kode') { const r = B.bacaKode(b.kode); if (r.error) return kirim(200, { error: r.error }); let d = await ambilSiswa(r.idx) || { token: null, tahap: 'kode' }; const n = B.nilai(r.idx, r.jawab); if (!d.hasil) { d.hasil = { jawab: r.jawab, benar: n.benar, skor: n.benar, waktu: Date.now(), detik: null }; d.tahap = 'selesai-tes'; await simpanSiswa(r.idx, d); } return kirim(200, { ok: true, idx: r.idx, nama: nm(r.idx), benar: n.benar }); }
+      if (b.a === 'g-kode') { const r = B.bacaKode(b.kode); if (r.error) return kirim(200, { error: r.error }); if (r.idx >= CFG().daftar.length) return kirim(200, { error: 'Kode ini bukan milik kelas yang sedang dipilih' }); let d = await ambilSiswa(r.idx) || { token: null, tahap: 'kode' }; const n = B.nilai(r.idx, r.jawab); if (!d.hasil) { d.hasil = { jawab: r.jawab, benar: n.benar, skor: n.benar, waktu: Date.now(), detik: null }; d.tahap = 'selesai-tes'; await simpanSiswa(r.idx, d); } return kirim(200, { ok: true, idx: r.idx, nama: nm(r.idx), benar: n.benar }); }
     }
     return kirim(400, { error: 'Aksi tidak dikenal' });
   } catch (e) { return kirim(500, { error: 'galat-server', pesan: String(e.message || e).slice(0, 120) }); }

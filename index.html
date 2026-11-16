@@ -142,6 +142,9 @@ sup { font-size: .68em; line-height: 0; vertical-align: baseline; position: rela
 .akar { display: inline-flex; align-items: flex-end; } .akar .di { border-top: .07em solid currentColor; padding: 0 .15em; margin-left: -.04em; }
 .cabang { display: inline-flex; align-items: center; gap: .3em; white-space: nowrap; } .kurawal { font-size: 3em; line-height: 1; font-weight: 300; transform: scaleX(.6); font-family: var(--isi); } .isi-cabang { display: flex; flex-direction: column; gap: .2em; text-align: left; }
 
+sub { font-size: .68em; line-height: 0; vertical-align: baseline; position: relative; top: .32em; margin-left: .03em; }
+.umum { margin-top: .5rem; padding-top: .45rem; border-top: .1rem dashed rgba(0,0,0,.18); font-family: var(--mat); font-size: 1.12rem; font-style: normal; font-weight: 400; line-height: 1.5; color: var(--td); } .umum span { display: block; font-family: var(--isi); font-size: .72rem; letter-spacing: .09em; text-transform: uppercase; font-weight: 700; margin-bottom: .1rem; opacity: .85; }
+
 /* Pengantar (animasi bergaya motion graphic). Dipakai bersama oleh tablet siswa dan layar guru. */
 .intro { position: absolute; inset: 0; display: flex; flex-direction: column; }
 .intro .kepala-intro { flex: none; display: flex; align-items: center; gap: .8rem; padding: .5rem 1rem; margin-bottom: .7rem; background: #fff; border: 1px solid var(--garis); border-radius: 1.3rem; box-shadow: var(--bayang); }
@@ -340,6 +343,15 @@ sup { font-size: .68em; line-height: 0; vertical-align: baseline; position: rela
 .pam-guru { display: flex; align-items: center; gap: 1rem; margin: 0 0 .7rem; padding: .6rem 1.1rem; }
 .kb-grup.aktif { border-color: var(--mentari); background: #FFFBEA; box-shadow: 0 0 0 .22rem rgba(255,194,51,.55); }
 
+.kelas-aktif { display: inline-flex; align-items: center; gap: .5rem; flex: none; border: .14rem solid var(--garis-2); background: #fff; border-radius: 1rem; padding: .15rem .8rem .15rem .7rem; cursor: pointer; text-align: left; line-height: 1.05; min-height: 2.6rem; box-shadow: 0 .15rem 0 var(--garis-2); }
+.kelas-aktif small { display: block; font-size: .6rem; letter-spacing: .08em; font-weight: 700; color: var(--tinta-3); } .kelas-aktif b { font-family: var(--tampil); font-size: 1.05rem; color: var(--tinta); } .kelas-aktif .ik { color: var(--tinta-3); }
+.kelas-aktif.k-xif { background: var(--f-trig-t); border-color: var(--f-trig); } .kelas-aktif.k-xig { background: var(--f-eksp-t); border-color: var(--f-eksp); }
+.pilih-kelas-isi { display: flex; flex-direction: column; gap: .7rem; } .kartu-pilih { display: flex; align-items: center; gap: 1rem; text-align: left; border: .16rem solid var(--garis-2); background: #fff; border-radius: 1.3rem; padding: .9rem 1.2rem; cursor: pointer; box-shadow: 0 .2rem 0 var(--garis-2); font-size: 1.1rem; }
+.kartu-pilih:active { transform: translateY(.15rem); box-shadow: none; } .kartu-pilih.sekarang { border-color: var(--mint); background: var(--mint-100); }
+.kp-ubin { width: 4.6rem; height: 4.6rem; border-radius: 1.2rem; display: grid; place-items: center; font-family: var(--tampil); font-size: 1.7rem; font-weight: 700; color: #fff; flex: none; } .k-xif .kp-ubin { background: var(--f-trig); } .k-xig .kp-ubin { background: var(--f-eksp); }
+.kp-teks { flex: 1; display: flex; flex-direction: column; } .kp-teks b { font-family: var(--tampil); font-size: 1.5rem; } .kp-teks small { color: var(--tinta-3); font-size: .95rem; }
+.tabs-guru button { padding: 0 .65rem; gap: .35rem; font-size: .92rem; } .tabs-guru { gap: .15rem; } #atas { gap: .5rem; }
+
 /* Tahap lanjutan: pakar berpasangan */
 .t2-hub { position: absolute; inset: 0; display: grid; grid-template-columns: 21rem 1fr; gap: 1.1rem; }
 .t2-sisi { margin: 0; display: flex; flex-direction: column; gap: .6rem; min-height: 0; overflow: auto; padding: 1rem 1.1rem; scrollbar-width: thin; }
@@ -423,6 +435,16 @@ sup { font-size: .68em; line-height: 0; vertical-align: baseline; position: rela
 .fung-rumus { font-size: 2.4rem; line-height: 1.6; display: flex; align-items: center; flex-wrap: wrap; gap: .3rem; font-style: normal; white-space: pre; }
 .slot-f { min-width: 3.6rem; height: 3.4rem; border: .16rem dashed var(--markisa); background: var(--markisa-muda); color: var(--markisa-tua); border-radius: 1rem; font-family: var(--tampil); font-size: 1.8rem; font-weight: 700; cursor: pointer; padding: 0 .6rem; margin: 0 .15rem; } .slot-f.terisi { border-style: solid; background: #fff; } .slot-f.isi { border-style: solid; border-color: var(--mint); background: var(--mint-100); color: var(--mint-800); cursor: default; }
 .t2-pameran .isi { min-height: 0; }
+
+.fung-umum { background: var(--tt); border: .12rem solid var(--markisa-100); border-radius: 1.1rem; padding: .6rem .9rem; } .fung-umum span { display: block; font-size: .72rem; letter-spacing: .09em; text-transform: uppercase; font-weight: 700; color: var(--markisa-tua); } .fung-umum .mat { font-size: 1.9rem; font-style: normal; line-height: 1.4; } .fung-umum small { color: var(--tinta-2); font-size: .98rem; }
+.huruf-l { display: inline-block; min-width: 1.5em; text-align: center; background: var(--markisa); color: #fff; border-radius: .45em; padding: 0 .25em; font-family: var(--mat); font-style: italic; font-weight: 700; margin: 0 .08em; }
+.slot-f.kosong { font-style: italic; color: var(--tinta-3); } .slot-f.denyut { animation: denyutl 1s ease-in-out infinite; }
+.fd-cap { min-height: 6.2rem; background: var(--mentari-100); border-radius: 1.1rem; padding: .7rem 1rem; font-size: 1.12rem; line-height: 1.4; } .fd-n { display: block; font-size: .72rem; letter-spacing: .09em; text-transform: uppercase; font-weight: 700; color: var(--mentari-800); margin-bottom: .15rem; }
+.fd-titik { display: flex; gap: .4rem; justify-content: center; } .fd-titik .dt { width: .8rem; height: .8rem; border-radius: 50%; background: var(--garis-2); } .fd-titik .dt.isi { background: var(--mint); } .fd-titik .dt.now { background: var(--markisa); transform: scale(1.35); }
+.fd-tabel tr.sorot td { background: #FFE9A8; font-weight: 700; } .fd-tabel .fd-sel { color: var(--mint-800); font-weight: 700; } .fd-tabel .dl { display: inline-block; }
+.fd-plot { overflow: hidden; border-radius: .8rem; } .fd-plot svg { will-change: transform; } .fd-kiri { overflow: hidden; } .fung-rumus.benar { color: var(--mint-800); } .fung-rumus.benar .slot-f { border-color: var(--mint); background: var(--mint-100); color: var(--mint-800); }
+.fd-terbang { position: fixed; z-index: 450; pointer-events: none; background: var(--mint); color: #04382A; font-family: var(--tampil); font-weight: 700; font-size: 1.7rem; border-radius: .9rem; padding: .05rem .8rem; box-shadow: 0 .6rem 1.4rem rgba(18,184,134,.5); }
+.plot-besar { height: 20rem; }
 </style>
 </head>
 <body>
@@ -640,6 +662,7 @@ sup { font-size: .68em; line-height: 0; vertical-align: baseline; position: rela
     varian: [{ nama: 'Dua cabang', rumus: '<span class="cabang"><i>f</i>(<i>x</i>) =<span class="kurawal">{</span><span class="isi-cabang"><span><i>x</i> + 1,&emsp;jika <i>x</i> &lt; 2</span><span>6 − <i>x</i>,&emsp;jika <i>x</i> ≥ 2</span></span></span>', spec: { xmin: -1, xmax: 5, ymin: -1, ymax: 6, xt: [-1, 0, 1, 2, 3, 4, 5], yt: [0, 1, 2, 3, 4, 5, 6] }, garis: () => [[[-1, 0], [2, 3]], [[2, 4], [5, 1]]], titik: [{ x: 2, y: 3, t: 'kosong' }, { x: 2, y: 4, t: 'isi' }] }] };
   K.sepotong.varian[0].panjang = true;
 
+  const UMUM = {"poli":"<i>f</i>(<i>x</i>) = <i>a</i><sub><i>n</i></sub><i>x</i><sup><i>n</i></sup> + … + <i>a</i><sub>1</sub><i>x</i> + <i>a</i><sub>0</sub>","eksp":"<i>f</i>(<i>x</i>) = <i>a</i> · <i>b</i><sup><i>x</i></sup>,&emsp;<i>b</i> &gt; 0 dan <i>b</i> ≠ 1","log":"<i>f</i>(<i>x</i>) = <sup><i>b</i></sup>log <i>x</i>,&emsp;<i>b</i> &gt; 0 dan <i>b</i> ≠ 1","trig":"<i>f</i>(<i>x</i>) = <i>a</i> sin <i>x</i>,&emsp;<i>a</i> cos <i>x</i>,&emsp;atau tan <i>x</i>","rasional":"<i>f</i>(<i>x</i>) = <i>k</i> ÷ <i>x</i>&emsp;atau&emsp;<i>p</i>(<i>x</i>) ÷ <i>q</i>(<i>x</i>),&emsp;<i>q</i>(<i>x</i>) ≠ 0","akar":"<i>f</i>(<i>x</i>) = <i>a</i>√(<i>x</i> + <i>c</i>)&emsp;(bentuk paling sederhana: √<i>x</i>)","mutlak":"<i>f</i>(<i>x</i>) = |<i>ax</i> + <i>b</i>|&emsp;(bentuk paling sederhana: |<i>x</i>|)","tangga":"<i>f</i>(<i>x</i>) = ⌈<i>x</i>⌉ (dibulatkan ke atas)&emsp;atau&emsp;⌊<i>x</i>⌋ (dibulatkan ke bawah)","sepotong":"rumus<sub>1</sub> untuk <i>x</i> &lt; <i>c</i>,&emsp;rumus<sub>2</sub> untuk <i>x</i> ≥ <i>c</i>&emsp;(tiap rumus punya rentang sendiri)"}; Object.keys(UMUM).forEach((f) => { K[f].umum = UMUM[f]; });
   /* gambar satu varian ke dalam bidang baru; animasi opsional */
   function gambarVarian(v, warna, tebal) {
     const b = bidang(Object.assign({ W: 640, H: 440 }, v.spec)); if (v.tegak) v.tegak.forEach((x) => b.tegak(x, warna));
@@ -658,13 +681,13 @@ sup { font-size: .68em; line-height: 0; vertical-align: baseline; position: rela
   const KELAS = 'XI-F Soshum';
   const DAFTAR = ['AGASTYA DWI PRASETYA', 'ANDI YASMIN SYAURAH DIMITRI', 'AURELLYA AZ ZAHRA MAKARIM', 'BRILIANDHIKA KHAIRUNAS NATAGUNA', 'DHAFIN RIZQI ABDILLAH', 'DZAKIRA ESTA FAHIMA AZARIA', 'EVAN FABIAN', 'FIDYA ALIFA DEMETERY ABDULLAH', 'JHONSON LEONARD NADAEK', 'JIHAN RAMEYZA ALYA', 'KEYSHA EFITA YASMIN', 'KHAIRUNNISA AL-ZAHWA', 'LUNETTA ADZRA PANPILA', 'MUHAMMAD DANISH ALFAIZHA', 'MUHAMMAD FAKHRI IQBAL ZUHAIR', 'MUHAMMAD IRSYAD IHSANI', 'NABILA CYRA RAMADHANI', 'NABILA KHALISHAH SETIAWAN', 'NAURA DZAKIYYATURROHMAH', 'RAISYA ABIDAH SYAIFULLAH', 'RESKI ADITIYA IBRAHIM', 'SUCI KANAYA DIFKA', 'SYAKIIRA JESSENIA', 'YOSEFA GABRIELA'];
   const judulKata = (s) => s.toLowerCase().replace(/(^|[\s-])([a-z])/g, (m, a, b) => a + b.toUpperCase());
-  const DUMMY = 24;                    // akun uji coba guru (tidak masuk kelompok dan statistik)
+  const DUMMY = 30;                    // akun uji coba guru (tidak masuk kelompok dan statistik)
 const PIN_GURU = '30594';
-const DAFTAR_G = ['AFRA ATIQAH BALQIS', 'AMINAH', 'ANDI ALMAHYRA ZOYA TENRI AJENG', 'AURELFA SAFWA ANNORA NAAZHEEN', 'CHESTA ADABI DESAINI', 'DHINI RAHMADHANI ISMAIL PUTRI', 'DHIYA NABILAH RAHMAN', 'GABY MARCELLINA BAKARA', 'KANIA ALMIRA RUSDI', 'MAHERA GHANIYA HISYAM', 'MUHAMMAD NAUFAL ATHAYA RAMADHAN', 'MUHAMMAD TAUFIQURRAHMAN', 'MUHAMMAD YANISKO APRIALDI', 'NAYLA RAFA NABILA', 'NAYMA FAKHIRA ARDIFA', 'NAYSYILA PUTRI RABANI', 'RAIHAN FARELLIO', 'RAISSYA DAMAYANTI ATHA TSANIAH', 'SILAH MAHARANI PUTRI', 'SOFIE SASIKIRANA', 'SULMI IKHWAN KHAIRI', 'TSALTSA ANIN NURHUMAIRA', 'ZAHIRAH ALYA MUKHBITA YUCHA', 'ZUFAIRA QONITA MAZAYA'];
+const DAFTAR_G = ['ALEFIA RIMASENA','ALYA JAZILAH','ANDI MUHAMMAD IHDA AKMA AKHTAR',"ASMA NADIA LU'LUA ELHANAN",'ASSIF BARQIYAH ARYA NUR UTORO','AZHAR RAMADHAN','CARISSA QUINN YULIZHA','EVELINE AMARTA','EVELYSHIA VIANY LANDO','FAQIH AHMAD GUNAWAN','FARADILA SYIFA RAMADHANI','INTAN DWI LESTARI','KALYA ARINA RAMADHANI','KIARA FATHIYYA RAZANI','LANDUNG TEGAR REKSA','MAHESTI PUTRI MULANSARI','MANYARI SADIYA LITUHAYU','MUHAMMAD RISQI NUR GEMILANG','SISTA POPRIYA AWANDA','SWITY ANOINTY MARIA',"SYATHIRA QURROTA A'YUNIN",'TSABITAH FREDDY RHAMADANI','UTYA AYUNDA RAHMA','WIDYA AMELIA NINGRUM','YEKTI CAHYANI WIJANARKO','ZAHRA NURUL HAFIZAH','ZAHRAH ZAHIRAH DARMAWAN'];
   /* pengaturan per kelas: XI-F (kelompok otomatis dari tes) dan XI-G (kelompok disusun guru, 9 kelompok, pakar satu jenis per kelompok) */
   const KELAS_CFG = {
     xif: { kode: 'xif', nama: 'XI-F Soshum', daftar: DAFTAR, durasi: 600, manual: false, langkah: 4, jmlKelompok: 4 },
-    xig: { kode: 'xig', nama: 'XI-G', daftar: DAFTAR_G, durasi: 300, manual: true, langkah: 6, jmlKelompok: 9 }
+    xig: { kode: 'xig', nama: 'XI-G Soshum', daftar: DAFTAR_G, durasi: 300, manual: true, langkah: 6, jmlKelompok: 9 }
   };
   let AKTIF = 'xif';
   const cfg = (k) => KELAS_CFG[k || AKTIF] || KELAS_CFG.xif;
@@ -716,12 +739,12 @@ const DAFTAR_G = ['AFRA ATIQAH BALQIS', 'AMINAH', 'ANDI ALMAHYRA ZOYA TENRI AJEN
 
   /* ---------- kode hasil 5 karakter (4 data + 1 cek), alfabet tanpa 0 O 1 I ---------- */
   const ALFA = '23456789ABCDEFGHJKLMNPQRSTUVWXYZ';
-  function buatKode(idx, jawab) { let a = 0, kali = 1; for (let i = 0; i < 5; i++) { const v = jawab[i] == null ? 5 : jawab[i]; a += v * kali; kali *= 6; } let n = idx + 25 * a, s = ''; for (let i = 0; i < 4; i++) { s = ALFA[n % 32] + s; n = Math.floor(n / 32); } let c = 0; for (let i = 0; i < 4; i++) c += (ALFA.indexOf(s[i]) + 1) * (2 * i + 3); return s + ALFA[c % 32]; }
+  function buatKode(idx, jawab) { let a = 0, kali = 1; for (let i = 0; i < 5; i++) { const v = jawab[i] == null ? 5 : jawab[i]; a += v * kali; kali *= 6; } let n = idx + 31 * a, s = ''; for (let i = 0; i < 4; i++) { s = ALFA[n % 32] + s; n = Math.floor(n / 32); } let c = 0; for (let i = 0; i < 4; i++) c += (ALFA.indexOf(s[i]) + 1) * (2 * i + 3); return s + ALFA[c % 32]; }
   function bacaKode(kode) {
     const k = String(kode || '').toUpperCase().replace(/[^A-Z2-9]/g, ''); if (k.length !== 5) return { error: 'Kode harus 5 karakter' };
     let c = 0, n = 0; for (let i = 0; i < 4; i++) { const p = ALFA.indexOf(k[i]); if (p < 0) return { error: 'Karakter kode tidak dikenali' }; c += (p + 1) * (2 * i + 3); n = n * 32 + p; }
     if (ALFA[c % 32] !== k[4]) return { error: 'Kode salah ketik (karakter terakhir tidak cocok)' };
-    const idx = n % 25; let a = Math.floor(n / 25); if (a >= 7776) return { error: 'Kode tidak valid' };
+    const idx = n % 31; let a = Math.floor(n / 31); if (a >= 7776) return { error: 'Kode tidak valid' };
     const jawab = []; for (let i = 0; i < 5; i++) { const v = a % 6; jawab.push(v === 5 ? null : v); a = Math.floor(a / 6); }
     return { idx, jawab, kode: k };
   }
@@ -814,18 +837,18 @@ const DAFTAR_G = ['AFRA ATIQAH BALQIS', 'AMINAH', 'ANDI ALMAHYRA ZOYA TENRI AJEN
   const PROMPT = ['Siapa yang bisa membaca konteksnya dengan kata-kata sendiri?', 'Apa yang terjadi pada y saat x makin besar: naik, turun, berulang, atau melompat?', 'Mirip dengan contoh grafik yang mana? Beri satu alasan.'];
   function diskusiSiswa(seed) { const r = mulberry(1300 + seed * 733); return acak(r, DISKUSI.map((_, i) => i)).slice(0, 6).map((i, n) => Object.assign({ no: n + 1, ref: i }, DISKUSI[i])); }
   /* dari tabel ke aturan fungsi (tambahan XI-G): tiga tugas per murid, angkanya diacak tetapi bentuknya tetap */
-  function tugasFungsi(idx) {
-    const r = mulberry(8800 + idx * 271), fn = (n) => String(n).replace('-', '−'), T = [];
-    { const a = pil(r, [2, 3, 4, 5, -2, -3]), b = pil(r, [-5, -3, -2, 1, 2, 3, 4, 6]), xs = [0, 1, 2, 3];
-      T.push({ jenis: 'linear', fam: 'poli', judul: 'Aturan garis lurus', rumus: '<i>f</i>(<i>x</i>) = [a]<i>x</i> + [b]', label: ['a', 'b'], jawab: [a, b], baris: xs.map((x) => [x, a * x + b]),
+  function tugasFungsi(seed) {
+    const r = mulberry(8800 + (seed | 0) * 271), fn = (n) => String(n).replace('-', '−'), T = [];
+    { const a = pil(r, [2, 3, 4, 5, -2, -3]), b = pil(r, [-5, -3, -2, 1, 2, 3, 4, 6]), xs = [0, 1, 2, 3], tmp = r();
+      T.push({ jenis: 'linear', fam: 'poli', tampil: 'tabel', umum: '<i>f</i>(<i>x</i>) = <i>a</i><i>x</i> + <i>b</i>', judul: 'Aturan garis lurus', rumus: '<i>f</i>(<i>x</i>) = [a]<i>x</i> + [b]', label: ['a', 'b'], jawab: [a, b], baris: xs.map((x) => [x, a * x + b]),
         petunjuk: ['Lihat baris x = 0. Nilai y pada baris itu adalah b.', 'Setiap x naik 1, y bertambah berapa? Tambahan itu adalah a.'],
         jelas: 'Saat x = 0, y = ' + fn(b) + ', jadi b = ' + fn(b) + '. Setiap x naik 1, y bertambah ' + fn(a) + ', jadi a = ' + fn(a) + '. Aturannya: f(x) = ' + fn(a) + 'x ' + (b < 0 ? '− ' + (-b) : '+ ' + b) + '. Pola “bertambah tetap” adalah ciri garis lurus.' }); }
     { const a = pil(r, [1, 2, 3]), c = pil(r, [-6, -5, -4, -3, -2, -1, 1, 2, 3, 4, 5, 6]), xs = [-2, -1, 0, 1, 2];
-      T.push({ jenis: 'kuadrat', fam: 'poli', judul: 'Aturan lengkung (parabola)', rumus: '<i>f</i>(<i>x</i>) = [a]<i>x</i><sup>2</sup> + [c]', label: ['a', 'c'], jawab: [a, c], baris: xs.map((x) => [x, a * x * x + c]),
+      T.push({ jenis: 'kuadrat', fam: 'poli', tampil: r() < .5 ? 'tabel' : 'grafik', umum: '<i>f</i>(<i>x</i>) = <i>a</i><i>x</i><sup>2</sup> + <i>c</i>', judul: 'Aturan lengkung (parabola)', rumus: '<i>f</i>(<i>x</i>) = [a]<i>x</i><sup>2</sup> + [c]', label: ['a', 'c'], jawab: [a, c], baris: xs.map((x) => [x, a * x * x + c]),
         petunjuk: ['Lihat baris x = 0. Karena 0² = 0, nilai y di sana adalah c.', 'Lihat baris x = 1: y = a + c. Kurangi c untuk mendapatkan a.'],
         jelas: 'Saat x = 0, y = ' + fn(c) + ', jadi c = ' + fn(c) + '. Saat x = 1, y = ' + fn(a + c) + ', jadi a = ' + fn(a + c) + ' − (' + fn(c) + ') = ' + a + '. Aturannya: f(x) = ' + (a === 1 ? '' : a) + 'x² ' + (c < 0 ? '− ' + (-c) : '+ ' + c) + '. Nilai y sama untuk x dan −x: grafik simetris.' }); }
     { const b = pil(r, [2, 3]), a = pil(r, [1, 2, 3, 4]), xs = [0, 1, 2, 3];
-      T.push({ jenis: 'eksponen', fam: 'eksp', judul: 'Aturan yang berlipat', rumus: '<i>f</i>(<i>x</i>) = [a] · [b]<sup><i>x</i></sup>', label: ['a', 'b'], jawab: [a, b], baris: xs.map((x) => [x, a * Math.pow(b, x)]),
+      T.push({ jenis: 'eksponen', fam: 'eksp', tampil: r() < .5 ? 'tabel' : 'grafik', umum: '<i>f</i>(<i>x</i>) = <i>a</i> · <i>b</i><sup><i>x</i></sup>', judul: 'Aturan yang berlipat', rumus: '<i>f</i>(<i>x</i>) = [a] · [b]<sup><i>x</i></sup>', label: ['a', 'b'], jawab: [a, b], baris: xs.map((x) => [x, a * Math.pow(b, x)]),
         petunjuk: ['Lihat baris x = 0. Karena b⁰ = 1, nilai y di sana adalah a.', 'Bagi y baris berikutnya dengan y baris sebelumnya. Hasilnya adalah b.'],
         jelas: 'Saat x = 0, y = ' + a + ', jadi a = ' + a + '. Tiap x naik 1, y dikali ' + b + ', jadi b = ' + b + '. Aturannya: f(x) = ' + (a === 1 ? '' : a + ' · ') + b + 'ˣ. Perubahan “dikali tetap” adalah ciri eksponensial.' }); }
     return T;
@@ -878,7 +901,7 @@ const DAFTAR_G = ['AFRA ATIQAH BALQIS', 'AMINAH', 'ANDI ALMAHYRA ZOYA TENRI AJEN
   /* ======================================================== adegan: judul */
   async function adJudul(c) {
     const { a, t } = c; const wadah = el('div', { kelas: 'hero kartu' }); a.append(wadah);
-    wadah.innerHTML = '<div class="eyebrow">Matematika Tingkat Lanjut · XI-F</div><h1>Mengenal <span class="hl">Grafik Fungsi</span></h1><p>Fungsi itu seperti mesin: kita masukkan satu angka, mesin memberi satu angka baru. Hari ini kita belajar menghitungnya, menggambarnya, dan mengenal bermacam-macam bentuknya.</p><div id="mini" style="width:22rem;height:11rem;margin:.4rem auto 0"></div>';
+    wadah.innerHTML = '<div class="eyebrow">Matematika Tingkat Lanjut · ' + BS.cfg(BS.kelasAktif()).nama + '</div><h1>Mengenal <span class="hl">Grafik Fungsi</span></h1><p>Fungsi itu seperti mesin: kita masukkan satu angka, mesin memberi satu angka baru. Hari ini kita belajar menghitungnya, menggambarnya, dan mengenal bermacam-macam bentuknya.</p><div id="mini" style="width:22rem;height:11rem;margin:.4rem auto 0"></div>';
     await muncul(wadah, 600); t.cek();
     const b = GF.bidang({ xmin: -3, xmax: 3, ymin: -2, ymax: 6, xt: [], yt: [], W: 400, H: 200 }); wadah.querySelector('#mini').append(b.svg);
     const g = b.kurva(GF.sampel((x) => x * x - 1, -2.6, 2.6, 80, -2, 6), { warna: '#6D35E8', tebal: 6, sembunyi: true }); await GF.gambarKurva(g, 1600, t); c.siap();
@@ -992,7 +1015,7 @@ const DAFTAR_G = ['AFRA ATIQAH BALQIS', 'AMINAH', 'ANDI ALMAHYRA ZOYA TENRI AJEN
       kanan.append(nama, el('div', { kelas: 'baris', gaya: 'flex-wrap:wrap;gap:.35rem' }, el('span', { kelas: 'muted kecil' }, 'Nama lain:'), d.alias.map((x) => el('span', { kelas: 'chip abu' }, x))), rk); if (d.varian.length > 1) kanan.append(sv);
       kanan.append(el('div', null, el('div', { kelas: 'eyebrow' }, 'Ciri grafik'), el('ul', null, d.ciri.map((x) => el('li', null, x)))), el('div', null, el('div', { kelas: 'eyebrow' }, 'Contoh dalam kehidupan'), el('ul', null, d.konteks.map((x) => el('li', null, x)))));
       const gb = el('div', { kelas: 'baris', gaya: 'justify-content:space-between;margin-top:auto' }, el('button', { kelas: 'btn sekunder kecil', type: 'button', html: ik('kembali', 'kecil') + 'Sebelumnya', disabled: i === 0, onclick: () => tampil(i - 1) }), el('button', { kelas: 'btn kecil', type: 'button', html: 'Berikutnya' + ik('panah', 'kecil'), disabled: i === 8, onclick: () => tampil(i + 1) })); kanan.append(gb);
-      const gambar = (v) => { const cur = tt; wad.innerHTML = ''; const r = GF.gambarVarian(d.varian[v], 'var(--t)'); wad.append(r.b.svg); rk.innerHTML = '<div class="eyebrow" style="margin:0">Contoh fungsi · ' + esc(d.varian[v].nama) + '</div><div class="mat" style="font-size:' + ((d.varian[v].panjang || d.varian[v].rumus.replace(/<[^>]+>/g, '').length > 24) ? '1.4rem' : '2.1rem') + '">' + d.varian[v].rumus + '</div>';
+      const gambar = (v) => { const cur = tt; wad.innerHTML = ''; const r = GF.gambarVarian(d.varian[v], 'var(--t)'); wad.append(r.b.svg); rk.innerHTML = '<div class="eyebrow" style="margin:0">Contoh fungsi · ' + esc(d.varian[v].nama) + '</div><div class="mat" style="font-size:' + ((d.varian[v].panjang || d.varian[v].rumus.replace(/<[^>]+>/g, '').length > 24) ? '1.4rem' : '2.1rem') + '">' + d.varian[v].rumus + '</div>' + '<div class="umum"><span>Bentuk umum</span>' + d.umum + '</div>';
         (async () => { try { await GF.gambarKurva(r.kurva, 1300, cur); r.b.svg.querySelectorAll('.tk').forEach((c2) => c2.setAttribute('opacity', 1)); } catch (e) { if (!(e instanceof UI.Batal)) throw e; } })(); };
       if (d.varian.length > 1) d.varian.forEach((v, k) => sv.append(el('button', { type: 'button', kelas: k === 0 ? 'aktif' : '', onclick: (e) => { [...sv.children].forEach((x) => x.classList.remove('aktif')); e.currentTarget.classList.add('aktif'); gambar(k); } }, v.nama.split('·')[0].trim())));
       gambar(0); if (lihat.size >= 9 || guru) c.siap(true);
@@ -1094,7 +1117,7 @@ const DAFTAR_G = ['AFRA ATIQAH BALQIS', 'AMINAH', 'ANDI ALMAHYRA ZOYA TENRI AJEN
   }
   /* titik-titik data masalah sehari-hari digambar pada bidang Kartesius; kurva dihaluskan untuk jenis yang mulus */
   const MULUS = ['poli', 'eksp', 'log', 'trig', 'rasional', 'akar'];
-  function plotData(s, fam) {
+  function plotData(s, fam, o) {
     const xs = s.baris.map((r) => num(r[0])), ys = s.baris.map((r) => num(r[1]));
     const rentang = (a) => { let lo = Math.min.apply(null, a), hi = Math.max.apply(null, a); const r = (hi - lo) || 1; lo = (lo >= 0 && lo <= 0.4 * hi) ? 0 : lo - 0.14 * r; return [lo, hi + 0.14 * r]; };
     const [x0, x1] = rentang(xs), [y0, y1] = rentang(ys);
@@ -1102,7 +1125,7 @@ const DAFTAR_G = ['AFRA ATIQAH BALQIS', 'AMINAH', 'ANDI ALMAHYRA ZOYA TENRI AJEN
     if (fam && MULUS.indexOf(fam) >= 0 && P.length > 2) { let d = 'M' + P[0][0].toFixed(1) + ' ' + P[0][1].toFixed(1); for (let i = 0; i < P.length - 1; i++) { const p0 = P[Math.max(0, i - 1)], p1 = P[i], p2 = P[i + 1], p3 = P[Math.min(P.length - 1, i + 2)]; d += 'C' + (p1[0] + (p2[0] - p0[0]) / 6).toFixed(1) + ' ' + (p1[1] + (p2[1] - p0[1]) / 6).toFixed(1) + ',' + (p2[0] - (p3[0] - p1[0]) / 6).toFixed(1) + ' ' + (p2[1] - (p3[1] - p1[1]) / 6).toFixed(1) + ',' + p2[0].toFixed(1) + ' ' + p2[1].toFixed(1); } b.lapis.kurva.append(GF.S('path', { d, fill: 'none', stroke: warna, 'stroke-width': 4.5, 'stroke-linecap': 'round', opacity: .85 })); }
     else if (fam === 'tangga') { for (let i = 0; i < P.length - 1; i++) if (ys[i] === ys[i + 1]) b.lapis.kurva.append(GF.S('line', { x1: P[i][0], y1: P[i][1], x2: P[i + 1][0], y2: P[i + 1][1], stroke: warna, 'stroke-width': 4.5, 'stroke-linecap': 'round' })); }
     else b.lapis.kurva.append(GF.S('polyline', { points: P.map((p) => p[0].toFixed(1) + ',' + p[1].toFixed(1)).join(' '), fill: 'none', stroke: warna, 'stroke-width': 4.5, 'stroke-linejoin': 'round', 'stroke-linecap': 'round', opacity: .85 }));
-    xs.forEach((x, i) => b.titik(x, ys[i], { teks: false, r: 9, warna: '#1E1B4B' })); return b.svg;
+    xs.forEach((x, i) => b.titik(x, ys[i], { teks: !!(o && o.label), r: 9, warna: '#1E1B4B' })); return b.svg;
   }
   /* penjelasan dengan tombol untuk melihat grafiknya (tidak langsung di soal supaya siswa membaca soalnya) */
   function grafikDialog(s, fam) {
@@ -1244,7 +1267,7 @@ const DAFTAR_G = ['AFRA ATIQAH BALQIS', 'AMINAH', 'ANDI ALMAHYRA ZOYA TENRI AJEN
     const kanan = el('div', { kelas: 'info gulir' }), rk = el('div', { kelas: 'rumus-kartu' }), sv = el('div', { kelas: 'seg-varian' });
     kanan.append(el('div', { kelas: 'baris' }, el('div', { html: UI.ubin(f) }).firstChild, el('h3', { gaya: 'margin:0;font-size:1.6rem;color:var(--td)' }, NAMA[f])), el('div', { kelas: 'baris', gaya: 'flex-wrap:wrap;gap:.35rem' }, el('span', { kelas: 'muted kecil' }, 'Nama lain:'), d.alias.map((x) => el('span', { kelas: 'chip abu' }, x))), rk); if (d.varian.length > 1) kanan.append(sv);
     kanan.append(el('div', null, el('div', { kelas: 'eyebrow' }, 'Ciri grafik'), el('ul', null, d.ciri.map((x) => el('li', null, x)))), el('div', null, el('div', { kelas: 'eyebrow' }, 'Contoh dalam kehidupan'), el('ul', null, d.konteks.map((x) => el('li', null, x)))));
-    const gambar = (v) => { wad.innerHTML = ''; const r = GF.gambarVarian(d.varian[v], 'var(--t)'); wad.append(r.b.svg); rk.innerHTML = '<div class="eyebrow" style="margin:0">Contoh fungsi · ' + esc(d.varian[v].nama) + '</div><div class="mat" style="font-size:' + ((d.varian[v].panjang || d.varian[v].rumus.replace(/<[^>]+>/g, '').length > 24) ? '1.4rem' : '2.1rem') + '">' + d.varian[v].rumus + '</div>'; GF.gambarKurva(r.kurva, 1200).then(() => r.b.svg.querySelectorAll('.tk').forEach((c) => c.setAttribute('opacity', 1))).catch(() => {}); };
+    const gambar = (v) => { wad.innerHTML = ''; const r = GF.gambarVarian(d.varian[v], 'var(--t)'); wad.append(r.b.svg); rk.innerHTML = '<div class="eyebrow" style="margin:0">Contoh fungsi · ' + esc(d.varian[v].nama) + '</div><div class="mat" style="font-size:' + ((d.varian[v].panjang || d.varian[v].rumus.replace(/<[^>]+>/g, '').length > 24) ? '1.4rem' : '2.1rem') + '">' + d.varian[v].rumus + '</div>' + '<div class="umum"><span>Bentuk umum</span>' + d.umum + '</div>'; GF.gambarKurva(r.kurva, 1200).then(() => r.b.svg.querySelectorAll('.tk').forEach((c) => c.setAttribute('opacity', 1))).catch(() => {}); };
     if (d.varian.length > 1) d.varian.forEach((v, k) => sv.append(el('button', { type: 'button', kelas: k === 0 ? 'aktif' : '', onclick: (e) => { [...sv.children].forEach((x) => x.classList.remove('aktif')); e.currentTarget.classList.add('aktif'); gambar(k); } }, v.nama.split('·')[0].trim())));
     gambar(0); kolom.append(kiri, kanan); return { kolom, kanan };
   }
@@ -1411,23 +1434,62 @@ const DAFTAR_G = ['AFRA ATIQAH BALQIS', 'AMINAH', 'ANDI ALMAHYRA ZOYA TENRI AJEN
     gambar();
   }
 
+  /* ============================================================ XI-G · langkah 5a: contoh beranimasi (satu soal, langkah demi langkah) */
+  function fungsiDemo() {
+    E.bawahKosong(); const w = el('div', { kelas: 't2-bingkai' }); E.layar(w);
+    const XS = [0, 1, 2, 3], YS = [3, 5, 7, 9]; let langkah = 0, tk = UI.token(), sibuk = false;
+    const k = kerangka('Langkah ' + NO().fung + ' · contoh dulu', 'Dari grafik ke fungsi', {});
+    const kiri = el('div', { kelas: 'kartu cocok-sit fd-kiri' }); kiri.innerHTML = '<div class="eyebrow">Contoh dulu, lalu giliranmu</div><h3>Menemukan aturan dari tabel dan grafik</h3><div class="data-baris"><div><table class="tabel-mini fd-tabel"><thead><tr><th>x</th><th>y</th><th class="fd-sel">naik</th></tr></thead><tbody>' + XS.map((x, i) => '<tr data-i="' + i + '"><td class="cx">' + x + '</td><td class="cy">' + YS[i] + '</td><td class="fd-sel"><span class="dl">' + (i ? '+' + (YS[i] - YS[i - 1]) : '') + '</span></td></tr>').join('') + '</tbody></table></div><div class="plot-kecil fd-plot"></div></div>';
+    const bd = GF.bidang({ W: 460, H: 330, xmin: -1, xmax: 4, ymin: -1, ymax: 10, xt: [0, 1, 2, 3, 4], yt: [0, 2, 4, 6, 8, 10], labelX: 'x', labelY: 'y' }); bd.kurva([[-0.5, 2], [3.5, 10]], { warna: '#9B5DE5', tebal: 4.5 }); XS.forEach((x, i) => bd.titik(x, YS[i], { teks: false, r: 8, warna: '#1E1B4B' }));
+    const ov = GF.S('g', { class: 'ov' }); bd.svg.append(ov); kiri.querySelector('.fd-plot').append(bd.svg); const plot = bd.svg;
+    const kanan = el('div', { kelas: 'kartu fung-aturan' }); kanan.innerHTML = '<div class="fung-umum"><span>Bentuk umum</span><div class="mat"><i>f</i>(<i>x</i>) = <b class="huruf-l">a</b><i>x</i> + <b class="huruf-l">b</b></div><small><b class="huruf-l">a</b> = tambahan <i>y</i> setiap <i>x</i> naik 1. <b class="huruf-l">b</b> = nilai <i>y</i> saat <i>x</i> = 0.</small></div><div class="eyebrow">Aturan rahasia</div><div class="fung-rumus mat"><i>f</i>(<i>x</i>) = <button type="button" class="slot-f kosong" data-l="a" disabled>a</button><i>x</i> + <button type="button" class="slot-f kosong" data-l="b" disabled>b</button></div><div class="fd-cap"></div><div class="fd-titik"></div>';
+    k.isi.append(el('div', { kelas: 'cocok-isi' }, kiri, kanan)); k.isi.classList.add('fung-isi');
+    const cap = kanan.querySelector('.fd-cap'), slot = (l) => kanan.querySelector('.slot-f[data-l="' + l + '"]'), baris = (i) => kiri.querySelector('tr[data-i="' + i + '"]'), dots = kanan.querySelector('.fd-titik');
+    const TEKS = ['Ada sebuah fungsi rahasia berbentuk <b>f(x) = ax + b</b>. Tugas kita: menemukan angka <b>a</b> dan <b>b</b> dari tabel dan grafik.', 'Cari <b>b</b>. Saat <i>x</i> = 0, bagian <i>ax</i> menjadi 0, jadi <i>y</i> = b. Di tabel, saat <i>x</i> = 0 nilai <i>y</i> = 3. Maka <b>b = 3</b>.', 'Cari <b>a</b>. Lihat berapa <i>y</i> bertambah setiap <i>x</i> naik 1: dari 3 ke 5, dari 5 ke 7, dari 7 ke 9. Selalu naik 2. Maka <b>a = 2</b>.', 'Gabungkan: <b>f(x) = 2x + 3</b>.', 'Cek dengan <i>x</i> = 2: 2 · 2 + 3 = 7. Di tabel, saat <i>x</i> = 2 nilai <i>y</i> = 7. Cocok, aturannya benar!'];
+    const pulsa = async (x, y, an, kali) => { const c = GF.S('circle', { cx: bd.sx(x), cy: bd.sy(y), r: 12, fill: 'none', stroke: '#FF8A1F', 'stroke-width': 4 }); c.style.transformBox = 'fill-box'; c.style.transformOrigin = 'center'; ov.append(c); if (an) await tk.anim(c, [{ transform: 'scale(.8)', opacity: 1 }, { transform: 'scale(2.6)', opacity: 0 }], { duration: 800, iterations: kali || 2 }); else c.style.opacity = 0; };
+    const zoom = async (x, y, an, skala) => { plot.style.transformOrigin = (bd.sx(x) / 460 * 100) + '% ' + (bd.sy(y) / 330 * 100) + '%'; if (an) await tk.anim(plot, [{ transform: 'scale(1)' }, { transform: 'scale(' + (skala || 1.5) + ')' }], { duration: 700 }); else plot.style.transform = 'scale(' + (skala || 1.5) + ')'; };
+    const keluarZoom = async (an) => { if (an) { await tk.anim(plot, [{ transform: plot.style.transform || 'scale(1.5)' }, { transform: 'scale(1)' }], { duration: 600 }); } plot.getAnimations().forEach((x) => x.cancel()); plot.style.transform = ''; };
+    const terbang = async (dariEl, keEl, teks, an) => { if (!an || !dariEl || !keEl) return; const r1 = dariEl.getBoundingClientRect(), r2 = keEl.getBoundingClientRect(), f = el('div', { kelas: 'fd-terbang' }, teks); f.style.left = r1.left + 'px'; f.style.top = r1.top + 'px'; document.body.append(f); try { await tk.anim(f, [{ transform: 'translate(0,0) scale(1)' }, { transform: 'translate(' + (r2.left - r1.left) + 'px,' + (r2.top - r1.top) + 'px) scale(1.4)' }], { duration: 1000, easing: 'ease-in-out' }); } finally { f.remove(); } };
+    const isi = (l, v) => { const s = slot(l); s.textContent = v; s.classList.remove('kosong'); s.classList.add('isi'); };
+    const garis = async (x1, y1, x2, y2, warna, teks, an) => { const L = GF.S('line', { x1: bd.sx(x1), y1: bd.sy(y1), x2: bd.sx(x2), y2: bd.sy(y2), stroke: warna, 'stroke-width': 4, 'stroke-dasharray': '7 5', 'stroke-linecap': 'round' }); ov.append(L); const tx = GF.S('text', { x: (bd.sx(x1) + bd.sx(x2)) / 2 + (x1 === x2 ? 10 : 0), y: (bd.sy(y1) + bd.sy(y2)) / 2 + (x1 === x2 ? 5 : 22), 'font-size': 19, 'font-weight': 700, fill: warna, 'paint-order': 'stroke', stroke: '#fff', 'stroke-width': 4 }, teks); ov.append(tx); if (an) { UI.instan = false; await GF.tumbuh(L, bd.sx(x1), bd.sy(y1), bd.sx(x2), bd.sy(y2), 600, tk); tx.setAttribute('opacity', 0); await tk.anim(tx, [{ opacity: 0 }, { opacity: 1 }], { duration: 300 }); } };
+    function reset() { tk.cek(); ov.innerHTML = ''; document.querySelectorAll('.fd-terbang').forEach((x) => x.remove()); kiri.querySelectorAll('tr').forEach((r) => r.classList.remove('sorot')); kiri.querySelectorAll('.fd-sel .dl').forEach((d) => { d.style.opacity = 0; }); plot.getAnimations().forEach((x) => x.cancel()); plot.style.transform = ''; ['a', 'b'].forEach((l) => { const s = slot(l); s.textContent = l; s.className = 'slot-f kosong'; }); cap.innerHTML = ''; }
+    const S = [
+      async (an) => { if (an) await tk.tidur(300); ['a', 'b'].forEach((l) => slot(l).classList.add('denyut')); },
+      async (an) => { baris(0).classList.add('sorot'); await zoom(0, 3, an, 1.45); await pulsa(0, 3, an, 2); await terbang(baris(0).querySelector('.cy'), slot('b'), '3', an); isi('b', '3'); if (an) await tk.tidur(500); await keluarZoom(an); },
+      async (an) => { for (let i = 1; i <= 3; i++) { baris(i - 1).classList.add('sorot'); baris(i).classList.add('sorot'); await garis(XS[i - 1], YS[i - 1], XS[i], YS[i - 1], '#FF8A1F', '+1', an); await garis(XS[i], YS[i - 1], XS[i], YS[i], '#12B886', '+2', an); const d = baris(i).querySelector('.dl'); if (an) { await tk.anim(d, [{ opacity: 0, transform: 'translateY(-.4rem)' }, { opacity: 1, transform: 'none' }], { duration: 350 }); await tk.tidur(i === 3 ? 400 : 200); } else d.style.opacity = 1; } await terbang(baris(3).querySelector('.dl'), slot('a'), '2', an); isi('a', '2'); },
+      async (an) => { ['a', 'b'].forEach((l) => slot(l).classList.remove('denyut')); const r = kanan.querySelector('.fung-rumus'); r.classList.add('benar'); if (an) { await tk.anim(r, [{ transform: 'scale(1)' }, { transform: 'scale(1.12)' }, { transform: 'scale(1)' }], { duration: 700 }); E.konfeti(innerWidth * .7, innerHeight * .45, 22); } },
+      async (an) => { baris(2).classList.add('sorot'); await zoom(2, 7, an, 1.45); await pulsa(2, 7, an, 3); if (an) await tk.tidur(500); await keluarZoom(an); }
+    ];
+    const kontrol = () => { k.nav.innerHTML = ''; dots.innerHTML = ''; for (let i = 0; i < 5; i++) dots.append(el('span', { kelas: 'dt' + (i === langkah ? ' now' : (i < langkah ? ' isi' : '')) }));
+      k.nav.append(tombol('Sebelumnya', 'kembali', { kelas: 'sekunder', kiri: true, p: { disabled: langkah === 0 || sibuk, onclick: () => jalankan(langkah - 1, false) } }), el('div', { kelas: 'baris', gaya: 'gap:.5rem' }, el('button', { kelas: 'btn sekunder', type: 'button', disabled: sibuk, html: ik('ulang', 'kecil') + 'Ulangi animasi', onclick: () => jalankan(langkah, true) }), el('button', { kelas: 'btn sekunder', type: 'button', disabled: sibuk, html: ik('main', 'kecil') + 'Putar semua', onclick: putarSemua }), el('button', { kelas: 'btn sekunder kecil', type: 'button', html: 'Lewati ke soal', onclick: () => { tk.stop(); fungsiSoal(); } })), langkah < 4 ? tombol('Berikutnya', 'panah', { p: { disabled: sibuk, onclick: () => jalankan(langkah + 1, true) } }) : tombol('Mulai mencoba', 'panah', { kelas: 'hijau denyut-h', p: { onclick: () => { tk.stop(); fungsiSoal(); } } })); };
+    async function jalankan(n, an) {
+      if (sibuk) return; tk.stop(); tk = UI.token(); sibuk = true; langkah = n; kontrol();
+      try { reset(); cap.innerHTML = '<span class="fd-n">Langkah ' + (n + 1) + ' dari 5</span>' + TEKS[n]; UI.instan = true; for (let i = 0; i < n; i++) await S[i](false); UI.instan = false; await S[n](an); }
+      catch (e) { if (!(e instanceof UI.Batal)) throw e; } finally { UI.instan = false; sibuk = false; kontrol(); }
+    }
+    async function putarSemua() { for (let n = 0; n < 5; n++) { if (!w.isConnected) return; await jalankan(n, true); if (!w.isConnected) return; await UI.tidur(1500); } }
+    w.append(k.w); kontrol(); jalankan(0, true);
+  }
+
   /* ============================================================ XI-G · langkah 5: dari tabel ke aturan fungsi */
-  function fungsi() {
-    E.bawahKosong(); const t = T(), tugas = B.tugasFungsi(E.idx()); t.fung = t.fung || { hasil: [] }; t.fung.hasil = t.fung.hasil || []; let no = Math.min(2, t.fung.hasil.filter(Boolean).length);
+  function fungsi() { const t = T(); t.fung = t.fung || { hasil: [] }; t.fung.hasil = t.fung.hasil || []; if (t.fung.seed == null) { t.fung.seed = Math.floor(Math.random() * 1e6); E.simpan(); } if (t.fung.hasil.some(Boolean)) fungsiSoal(); else fungsiDemo(); }
+  function fungsiSoal() {
+    E.bawahKosong(); const t = T(), tugas = B.tugasFungsi(t.fung.seed); t.fung = t.fung || { hasil: [] }; t.fung.hasil = t.fung.hasil || []; let no = Math.min(2, t.fung.hasil.filter(Boolean).length);
     const w = el('div', { kelas: 't2-bingkai' }); E.layar(w); const nilai = tugas.map((tg) => tg.label.map(() => null)), salah = tugas.map(() => 0), buka = tugas.map(() => 0);
     const skor = () => t.fung.hasil.filter((h) => h && h.ok).length;
     function gambar() {
       w.innerHTML = ''; const tg = tugas[no], h = t.fung.hasil[no], sel = skor();
       const k = kerangka('Langkah ' + NO().fung + ' · tugas ' + (no + 1) + ' dari 3', 'Dari grafik ke fungsi', { titik: tugas.map((_, i) => (i === no ? 'now' : (t.fung.hasil[i] ? 'isi' : ''))), ke: (i) => { no = i; gambar(); } });
       const kiri = el('div', { kelas: 'kartu cocok-sit gulir' }), s = { judul: tg.judul, x: 'x', y: 'y', baris: tg.baris };
-      kiri.innerHTML = '<div class="eyebrow">Mesin misterius</div><h3>' + esc(tg.judul) + '</h3><p style="font-size:1.1rem;margin:.1rem 0 .3rem">Tabel ini dibuat oleh sebuah fungsi. Temukan aturan yang menghasilkannya.</p><div class="data-baris"><div>' + tabelData(s) + '</div><div class="plot-kecil"></div></div>'; kiri.querySelector('.plot-kecil').append(plotData(s, tg.fam));
+      kiri.innerHTML = '<div class="eyebrow">Mesin misterius</div><h3>' + esc(tg.judul) + '</h3><p style="font-size:1.1rem;margin:.1rem 0 .3rem">' + (tg.tampil === 'grafik' ? 'Grafik ini dibuat oleh sebuah fungsi. Baca koordinat titik-titiknya, lalu temukan aturannya.' : 'Tabel ini dibuat oleh sebuah fungsi. Temukan aturan yang menghasilkannya.') + '</p>' + (tg.tampil === 'grafik' ? '<div class="plot-besar"></div>' : '<div class="data-baris"><div>' + tabelData(s) + '</div><div class="plot-kecil"></div></div>'); kiri.querySelector(tg.tampil === 'grafik' ? '.plot-besar' : '.plot-kecil').append(plotData(s, tg.fam, { label: tg.tampil === 'grafik' }));
       const kanan = el('div', { kelas: 'kartu fung-aturan' }), formula = el('div', { kelas: 'fung-rumus mat' }); formula.innerHTML = tg.rumus.replace(/\[(\w)\]/g, (m, l) => '<button type="button" class="slot-f" data-l="' + l + '"></button>');
-      kanan.append(el('div', { kelas: 'eyebrow' }, 'Tulis aturannya'), formula);
-      formula.querySelectorAll('.slot-f').forEach((b) => { const i = tg.label.indexOf(b.dataset.l), selesai = !!h; b.textContent = selesai ? F(tg.jawab[i]) : (nilai[no][i] == null ? '?' : F(nilai[no][i])); b.disabled = selesai; if (selesai) b.classList.add('isi'); else if (nilai[no][i] != null) b.classList.add('terisi'); b.onclick = async () => { const v = await UI.keypadAngka({ judul: 'Nilai ' + b.dataset.l, tanya: 'Berapa nilai <b>' + b.dataset.l + '</b> pada aturan fungsi ini?', ikon: ik('pensil', 'besar') }); if (v != null) { nilai[no][i] = v; gambar(); } }; });
+      kanan.append(el('div', { kelas: 'fung-umum', html: '<span>Bentuk umum</span><div class="mat">' + tg.umum.replace(/<i>(\w)<\/i>(?=<i>|<sup>| |$)/g, (m, l) => (tg.label.indexOf(l) >= 0 ? '<b class="huruf-l">' + l + '</b>' : m)) + '</div><small>Cari nilai ' + tg.label.map((l) => '<b class="huruf-l">' + l + '</b>').join(' dan ') + ' pada bentuk umum ini.</small>' }), el('div', { kelas: 'eyebrow' }, 'Tulis aturannya'), formula);
+      formula.querySelectorAll('.slot-f').forEach((b) => { const i = tg.label.indexOf(b.dataset.l), selesai = !!h; b.textContent = selesai ? F(tg.jawab[i]) : (nilai[no][i] == null ? b.dataset.l : F(nilai[no][i])); if (!selesai && nilai[no][i] == null) b.classList.add('kosong'); b.disabled = selesai; if (selesai) b.classList.add('isi'); else if (nilai[no][i] != null) b.classList.add('terisi'); b.onclick = async () => { const v = await UI.keypadAngka({ judul: 'Nilai ' + b.dataset.l, tanya: 'Berapa nilai <b>' + b.dataset.l + '</b> pada aturan fungsi ini?', ikon: ik('pensil', 'besar') }); if (v != null) { nilai[no][i] = v; gambar(); } }; });
       const ph = el('div', { kelas: 'fung-petunjuk' }); for (let i = 0; i < buka[no]; i++) ph.append(el('div', { kelas: 'umpan hint', html: ik('info') + '<span><b>Petunjuk ' + (i + 1) + ':</b> ' + esc(tg.petunjuk[i]) + '</span>' }));
       kanan.append(ph);
       if (h) kanan.append(el('div', { kelas: 'umpan ' + (h.ok ? 'ok' : 'hint'), html: ik(h.ok ? 'centang' : 'info') + '<span><b>' + (h.ok ? 'Tepat!' : 'Ini aturannya.') + '</b> ' + esc(tg.jelas) + '</span>' }));
-      else kanan.append(el('div', { kelas: 'baris', gaya: 'margin-top:auto;flex-wrap:wrap' }, el('button', { kelas: 'btn sekunder', type: 'button', disabled: buka[no] >= 2, html: ik('info', 'kecil') + (buka[no] ? 'Petunjuk berikutnya' : 'Minta petunjuk'), onclick: () => { buka[no]++; gambar(); } }), el('button', { kelas: 'btn hijau', type: 'button', disabled: nilai[no].some((v) => v == null), html: ik('centang') + 'Periksa', onclick: periksa })));
+      else kanan.append(el('div', { kelas: 'baris', gaya: 'margin-top:auto;flex-wrap:wrap' }, el('button', { kelas: 'btn sekunder', type: 'button', disabled: buka[no] >= 2, html: ik('info', 'kecil') + (buka[no] ? 'Petunjuk berikutnya' : 'Minta petunjuk'), onclick: () => { buka[no]++; gambar(); } }), el('button', { kelas: 'btn sekunder', type: 'button', html: ik('main', 'kecil') + 'Lihat contoh', onclick: fungsiDemo }), el('button', { kelas: 'btn hijau', type: 'button', disabled: nilai[no].some((v) => v == null), html: ik('centang') + 'Periksa', onclick: periksa })));
+      if (t.fung.hasil.filter(Boolean).length >= 3) kanan.append(el('button', { kelas: 'btn sekunder', type: 'button', gaya: 'align-self:flex-start', html: ik('ulang', 'kecil') + 'Latihan dengan soal baru', onclick: () => { t.fung.seed = Math.floor(Math.random() * 1e6); t.fung.hasil = []; E.simpan(); fungsiSoal(); } }));
       k.isi.append(el('div', { kelas: 'cocok-isi' }, kiri, kanan)); k.isi.classList.add('fung-isi');
       k.nav.append(tombol('Sebelumnya', 'kembali', { kelas: 'sekunder', kiri: true, p: { disabled: no === 0, onclick: () => { no--; gambar(); } } }), el('span', { kelas: 'muted' }, sel + ' dari 3 tugas ditemukan aturannya'), no < 2 ? tombol('Berikutnya', 'panah', { p: { onclick: () => { no++; gambar(); } } }) : tombol('Selesai', 'centang', { kelas: 'hijau', kiri: true, p: { disabled: t.fung.hasil.filter(Boolean).length < 3, onclick: hub } }));
       w.append(k.w);
@@ -1436,7 +1498,7 @@ const DAFTAR_G = ['AFRA ATIQAH BALQIS', 'AMINAH', 'ANDI ALMAHYRA ZOYA TENRI AJEN
       const tg = tugas[no], ok = tg.jawab.every((v, i) => v === nilai[no][i]);
       if (ok) { t.fung.hasil[no] = { ok: true, petunjuk: buka[no] }; E.konfeti(innerWidth / 2, innerHeight / 3, 30); }
       else { salah[no]++; if (salah[no] >= 3) t.fung.hasil[no] = { ok: false }; }
-      t.fung.skor = skor(); t.fung.selesai = t.fung.hasil.filter(Boolean).length >= 3; sinkron({ fung: { skor: t.fung.skor } }); gambar();
+      t.fung.skor = Math.max(t.fung.skor || 0, skor()); t.fung.selesai = t.fung.selesai || t.fung.hasil.filter(Boolean).length >= 3; sinkron({ fung: { skor: t.fung.skor } }); gambar();
       if (ok) await UI.info('Tepat!', '<div class="tengah"><p style="font-size:1.2rem">' + esc(tg.jelas) + '</p></div>', 'Lanjut', { ikon: ik('centang', 'besar') });
       else if (salah[no] >= 3) await UI.info('Ini aturannya', '<div class="tengah"><p style="font-size:1.2rem">' + esc(tg.jelas) + '</p><p class="muted">Tidak apa-apa. Coba pahami langkahnya.</p></div>', 'Mengerti', { ikon: ik('info', 'besar') });
       else await UI.info('Belum tepat', '<div class="tengah"><p style="font-size:1.2rem">Coba periksa lagi nilai yang kamu tulis.</p><p class="muted">Tekan “Minta petunjuk” bila perlu.</p></div>', 'Coba lagi', { ikon: ik('info', 'besar') });
@@ -1484,7 +1546,7 @@ const DAFTAR_G = ['AFRA ATIQAH BALQIS', 'AMINAH', 'ANDI ALMAHYRA ZOYA TENRI AJEN
   function bangunHalaman(d) {
     const idx = d.idx, P = d.P, t = P.t2 || {}, nama = B.nama(idx).replace(/\s*\(.*\)\s*$/, ''), tgl = new Date().toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' });
     const pg = []; let no = 0;
-    const hal = (judul, nomor, isi, kelas) => { no++; return '<section class="hal ' + (kelas || '') + '"><header class="h-kop"><div class="h-logo">Grafik <b>Fungsi</b></div><div class="h-nama">' + esc(nama) + '</div></header>' + (judul ? '<div class="h-judul"><span class="h-no">' + nomor + '</span><h2>' + judul + '</h2></div>' : '') + '<div class="h-isi">' + isi + '</div><footer class="h-kaki"><span>Matematika Tingkat Lanjut · XI-F · SMA YPVDP Bontang</span><b>' + (no + 1) + '</b></footer></section>'; };
+    const hal = (judul, nomor, isi, kelas) => { no++; return '<section class="hal ' + (kelas || '') + '"><header class="h-kop"><div class="h-logo">Grafik <b>Fungsi</b></div><div class="h-nama">' + esc(nama) + '</div></header>' + (judul ? '<div class="h-judul"><span class="h-no">' + nomor + '</span><h2>' + judul + '</h2></div>' : '') + '<div class="h-isi">' + isi + '</div><footer class="h-kaki"><span>Matematika Tingkat Lanjut · ' + B.cfg(B.kelasAktif()).nama + ' · SMA YPVDP Bontang</span><b>' + (no + 1) + '</b></footer></section>'; };
 
     /* 1. mesin fungsi */
     const f1 = (x) => 2 * x + 1, xs1 = [-1, 0, 1, 2, 3];
@@ -1536,7 +1598,7 @@ const DAFTAR_G = ['AFRA ATIQAH BALQIS', 'AMINAH', 'ANDI ALMAHYRA ZOYA TENRI AJEN
 
     /* tambahan XI-G: dari tabel ke aturan fungsi */
     if (B.cfg(B.kelasAktif()).manual) {
-      const tf = B.tugasFungsi(idx), hf = (t.fung && t.fung.hasil) || [];
+      const tf = B.tugasFungsi(t.fung && t.fung.seed != null ? t.fung.seed : idx), hf = (t.fung && t.fung.hasil) || [];
       pg.push(hal('Dari grafik ke fungsi', 'F', '<p class="lead">Tabel angka dapat ditelusuri kembali ke aturan fungsinya: lihat nilai saat <i>x</i> = 0, lalu lihat pola perubahannya.</p>' + tf.map((tg, i) => { const h = hf[i]; return '<div class="soal ' + (h && h.ok ? 'ok' : 'salah') + '"><div class="s-kep"><span class="s-no">' + (i + 1) + '</span><div class="s-tanya">' + esc(tg.judul) + ': ' + tg.rumus.replace(/\[(\w)\]/g, (m, l) => '<b>' + F(tg.jawab[tg.label.indexOf(l)]) + '</b>') + '</div><span class="s-st">' + (h ? (h.ok ? '✓ ditemukan' : 'dibahas') : 'belum dikerjakan') + '</span></div><div class="s-opsi">' + tg.baris.map((b) => '<span>x = ' + F(b[0]) + ' → y = ' + F(b[1]) + '</span>').join('') + '</div><div class="s-jelas"><b>Cara menemukan:</b> ' + esc(tg.jelas) + '</div></div>'; }).join('')));
     }
     /* 10. tiket + refleksi */
@@ -1554,7 +1616,7 @@ const DAFTAR_G = ['AFRA ATIQAH BALQIS', 'AMINAH', 'ANDI ALMAHYRA ZOYA TENRI AJEN
       + '<div class="kotak mint"><div class="kecil-judul">Tugas kecil</div><p>Temukan satu hal di sekitarmu yang grafiknya mirip salah satu dari sembilan jenis di atas. Tuliskan namanya dan jenis grafik yang menurutmu cocok, lalu ceritakan alasannya di pertemuan berikutnya.</p></div>'));
 
     /* sampul */
-    const sk = '<section class="hal sampul"><svg class="s-hias" viewBox="0 0 800 500" preserveAspectRatio="none"><g fill="none" stroke-linecap="round" stroke-width="6"><path d="M-20 380C120 380 150 90 270 90S400 380 520 380 640 90 820 90" stroke="#2EA7F2" opacity=".5"/><path d="M-20 330L170 150 330 330 490 150 650 330 820 170" stroke="#FFC233" opacity=".55"/><path d="M-20 470C200 460 380 400 540 250S740 40 820 20" stroke="#FF8A1F" opacity=".5"/></g></svg><div class="s-isi"><div class="s-eye">Matematika Tingkat Lanjut · Kelas XI-F</div><h1>Catatan<br>Belajar</h1><div class="s-sub">Grafik <b>Fungsi</b></div><div class="s-nama"><small>Catatan milik</small>' + esc(nama) + '</div></div><div class="s-bawah"><div><b>' + benar + '/5</b><span>tes awal</span></div><div><b>' + poin.poin + '</b><span>poin</span></div><div><b>' + esc(poin.gelar) + '</b><span>gelar</span></div></div><div class="s-kaki">SMA YPVDP Bontang · ' + tgl + '</div></section>';
+    const sk = '<section class="hal sampul"><svg class="s-hias" viewBox="0 0 800 500" preserveAspectRatio="none"><g fill="none" stroke-linecap="round" stroke-width="6"><path d="M-20 380C120 380 150 90 270 90S400 380 520 380 640 90 820 90" stroke="#2EA7F2" opacity=".5"/><path d="M-20 330L170 150 330 330 490 150 650 330 820 170" stroke="#FFC233" opacity=".55"/><path d="M-20 470C200 460 380 400 540 250S740 40 820 20" stroke="#FF8A1F" opacity=".5"/></g></svg><div class="s-isi"><div class="s-eye">Matematika Tingkat Lanjut · ' + B.cfg(B.kelasAktif()).nama + '</div><h1>Catatan<br>Belajar</h1><div class="s-sub">Grafik <b>Fungsi</b></div><div class="s-nama"><small>Catatan milik</small>' + esc(nama) + '</div></div><div class="s-bawah"><div><b>' + benar + '/5</b><span>tes awal</span></div><div><b>' + poin.poin + '</b><span>poin</span></div><div><b>' + esc(poin.gelar) + '</b><span>gelar</span></div></div><div class="s-kaki">SMA YPVDP Bontang · ' + tgl + '</div></section>';
     return sk + pg.join('');
   }
 
@@ -1693,7 +1755,7 @@ const DAFTAR_G = ['AFRA ATIQAH BALQIS', 'AMINAH', 'ANDI ALMAHYRA ZOYA TENRI AJEN
   }
   async function pilihNama(i) {
     const nm = B.nama(i);
-    const ya = await UI.dialog({ judul: 'Apakah benar ini namamu?', ikon: ik('siswa', 'besar'), isi: '<div class="tengah" style="padding:.6rem 0"><div style="font-family:var(--tampil);font-size:2.2rem;font-weight:700;line-height:1.15">' + esc(nm) + '</div><div class="muted" style="margin-top:.5rem">XI-F Soshum</div></div>', tombol: [{ t: 'Bukan, kembali', nilai: false, kelas: 'sekunder' }, { t: 'Ya, benar', nilai: true, kelas: 'hijau', ikon: 'centang' }] });
+    const ya = await UI.dialog({ judul: 'Apakah benar ini namamu?', ikon: ik('siswa', 'besar'), isi: '<div class="tengah" style="padding:.6rem 0"><div style="font-family:var(--tampil);font-size:2.2rem;font-weight:700;line-height:1.15">' + esc(nm) + '</div><div class="muted" style="margin-top:.5rem">' + esc(B.cfg(kelas).nama) + '</div></div>', tombol: [{ t: 'Bukan, kembali', nilai: false, kelas: 'sekunder' }, { t: 'Ya, benar', nilai: true, kelas: 'hijau', ikon: 'centang' }] });
     if (!ya) return;
     return masukSebagai(i);
   }

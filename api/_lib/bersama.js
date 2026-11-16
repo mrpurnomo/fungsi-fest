@@ -4,13 +4,13 @@
   const KELAS = 'XI-F Soshum';
   const DAFTAR = ['AGASTYA DWI PRASETYA', 'ANDI YASMIN SYAURAH DIMITRI', 'AURELLYA AZ ZAHRA MAKARIM', 'BRILIANDHIKA KHAIRUNAS NATAGUNA', 'DHAFIN RIZQI ABDILLAH', 'DZAKIRA ESTA FAHIMA AZARIA', 'EVAN FABIAN', 'FIDYA ALIFA DEMETERY ABDULLAH', 'JHONSON LEONARD NADAEK', 'JIHAN RAMEYZA ALYA', 'KEYSHA EFITA YASMIN', 'KHAIRUNNISA AL-ZAHWA', 'LUNETTA ADZRA PANPILA', 'MUHAMMAD DANISH ALFAIZHA', 'MUHAMMAD FAKHRI IQBAL ZUHAIR', 'MUHAMMAD IRSYAD IHSANI', 'NABILA CYRA RAMADHANI', 'NABILA KHALISHAH SETIAWAN', 'NAURA DZAKIYYATURROHMAH', 'RAISYA ABIDAH SYAIFULLAH', 'RESKI ADITIYA IBRAHIM', 'SUCI KANAYA DIFKA', 'SYAKIIRA JESSENIA', 'YOSEFA GABRIELA'];
   const judulKata = (s) => s.toLowerCase().replace(/(^|[\s-])([a-z])/g, (m, a, b) => a + b.toUpperCase());
-  const DUMMY = 24;                    // akun uji coba guru (tidak masuk kelompok dan statistik)
+  const DUMMY = 30;                    // akun uji coba guru (tidak masuk kelompok dan statistik)
 const PIN_GURU = '30594';
-const DAFTAR_G = ['AFRA ATIQAH BALQIS', 'AMINAH', 'ANDI ALMAHYRA ZOYA TENRI AJENG', 'AURELFA SAFWA ANNORA NAAZHEEN', 'CHESTA ADABI DESAINI', 'DHINI RAHMADHANI ISMAIL PUTRI', 'DHIYA NABILAH RAHMAN', 'GABY MARCELLINA BAKARA', 'KANIA ALMIRA RUSDI', 'MAHERA GHANIYA HISYAM', 'MUHAMMAD NAUFAL ATHAYA RAMADHAN', 'MUHAMMAD TAUFIQURRAHMAN', 'MUHAMMAD YANISKO APRIALDI', 'NAYLA RAFA NABILA', 'NAYMA FAKHIRA ARDIFA', 'NAYSYILA PUTRI RABANI', 'RAIHAN FARELLIO', 'RAISSYA DAMAYANTI ATHA TSANIAH', 'SILAH MAHARANI PUTRI', 'SOFIE SASIKIRANA', 'SULMI IKHWAN KHAIRI', 'TSALTSA ANIN NURHUMAIRA', 'ZAHIRAH ALYA MUKHBITA YUCHA', 'ZUFAIRA QONITA MAZAYA'];
+const DAFTAR_G = ['ALEFIA RIMASENA','ALYA JAZILAH','ANDI MUHAMMAD IHDA AKMA AKHTAR',"ASMA NADIA LU'LUA ELHANAN",'ASSIF BARQIYAH ARYA NUR UTORO','AZHAR RAMADHAN','CARISSA QUINN YULIZHA','EVELINE AMARTA','EVELYSHIA VIANY LANDO','FAQIH AHMAD GUNAWAN','FARADILA SYIFA RAMADHANI','INTAN DWI LESTARI','KALYA ARINA RAMADHANI','KIARA FATHIYYA RAZANI','LANDUNG TEGAR REKSA','MAHESTI PUTRI MULANSARI','MANYARI SADIYA LITUHAYU','MUHAMMAD RISQI NUR GEMILANG','SISTA POPRIYA AWANDA','SWITY ANOINTY MARIA',"SYATHIRA QURROTA A'YUNIN",'TSABITAH FREDDY RHAMADANI','UTYA AYUNDA RAHMA','WIDYA AMELIA NINGRUM','YEKTI CAHYANI WIJANARKO','ZAHRA NURUL HAFIZAH','ZAHRAH ZAHIRAH DARMAWAN'];
   /* pengaturan per kelas: XI-F (kelompok otomatis dari tes) dan XI-G (kelompok disusun guru, 9 kelompok, pakar satu jenis per kelompok) */
   const KELAS_CFG = {
     xif: { kode: 'xif', nama: 'XI-F Soshum', daftar: DAFTAR, durasi: 600, manual: false, langkah: 4, jmlKelompok: 4 },
-    xig: { kode: 'xig', nama: 'XI-G', daftar: DAFTAR_G, durasi: 300, manual: true, langkah: 6, jmlKelompok: 9 }
+    xig: { kode: 'xig', nama: 'XI-G Soshum', daftar: DAFTAR_G, durasi: 300, manual: true, langkah: 6, jmlKelompok: 9 }
   };
   let AKTIF = 'xif';
   const cfg = (k) => KELAS_CFG[k || AKTIF] || KELAS_CFG.xif;
@@ -62,12 +62,12 @@ const DAFTAR_G = ['AFRA ATIQAH BALQIS', 'AMINAH', 'ANDI ALMAHYRA ZOYA TENRI AJEN
 
   /* ---------- kode hasil 5 karakter (4 data + 1 cek), alfabet tanpa 0 O 1 I ---------- */
   const ALFA = '23456789ABCDEFGHJKLMNPQRSTUVWXYZ';
-  function buatKode(idx, jawab) { let a = 0, kali = 1; for (let i = 0; i < 5; i++) { const v = jawab[i] == null ? 5 : jawab[i]; a += v * kali; kali *= 6; } let n = idx + 25 * a, s = ''; for (let i = 0; i < 4; i++) { s = ALFA[n % 32] + s; n = Math.floor(n / 32); } let c = 0; for (let i = 0; i < 4; i++) c += (ALFA.indexOf(s[i]) + 1) * (2 * i + 3); return s + ALFA[c % 32]; }
+  function buatKode(idx, jawab) { let a = 0, kali = 1; for (let i = 0; i < 5; i++) { const v = jawab[i] == null ? 5 : jawab[i]; a += v * kali; kali *= 6; } let n = idx + 31 * a, s = ''; for (let i = 0; i < 4; i++) { s = ALFA[n % 32] + s; n = Math.floor(n / 32); } let c = 0; for (let i = 0; i < 4; i++) c += (ALFA.indexOf(s[i]) + 1) * (2 * i + 3); return s + ALFA[c % 32]; }
   function bacaKode(kode) {
     const k = String(kode || '').toUpperCase().replace(/[^A-Z2-9]/g, ''); if (k.length !== 5) return { error: 'Kode harus 5 karakter' };
     let c = 0, n = 0; for (let i = 0; i < 4; i++) { const p = ALFA.indexOf(k[i]); if (p < 0) return { error: 'Karakter kode tidak dikenali' }; c += (p + 1) * (2 * i + 3); n = n * 32 + p; }
     if (ALFA[c % 32] !== k[4]) return { error: 'Kode salah ketik (karakter terakhir tidak cocok)' };
-    const idx = n % 25; let a = Math.floor(n / 25); if (a >= 7776) return { error: 'Kode tidak valid' };
+    const idx = n % 31; let a = Math.floor(n / 31); if (a >= 7776) return { error: 'Kode tidak valid' };
     const jawab = []; for (let i = 0; i < 5; i++) { const v = a % 6; jawab.push(v === 5 ? null : v); a = Math.floor(a / 6); }
     return { idx, jawab, kode: k };
   }
@@ -160,18 +160,18 @@ const DAFTAR_G = ['AFRA ATIQAH BALQIS', 'AMINAH', 'ANDI ALMAHYRA ZOYA TENRI AJEN
   const PROMPT = ['Siapa yang bisa membaca konteksnya dengan kata-kata sendiri?', 'Apa yang terjadi pada y saat x makin besar: naik, turun, berulang, atau melompat?', 'Mirip dengan contoh grafik yang mana? Beri satu alasan.'];
   function diskusiSiswa(seed) { const r = mulberry(1300 + seed * 733); return acak(r, DISKUSI.map((_, i) => i)).slice(0, 6).map((i, n) => Object.assign({ no: n + 1, ref: i }, DISKUSI[i])); }
   /* dari tabel ke aturan fungsi (tambahan XI-G): tiga tugas per murid, angkanya diacak tetapi bentuknya tetap */
-  function tugasFungsi(idx) {
-    const r = mulberry(8800 + idx * 271), fn = (n) => String(n).replace('-', '−'), T = [];
-    { const a = pil(r, [2, 3, 4, 5, -2, -3]), b = pil(r, [-5, -3, -2, 1, 2, 3, 4, 6]), xs = [0, 1, 2, 3];
-      T.push({ jenis: 'linear', fam: 'poli', judul: 'Aturan garis lurus', rumus: '<i>f</i>(<i>x</i>) = [a]<i>x</i> + [b]', label: ['a', 'b'], jawab: [a, b], baris: xs.map((x) => [x, a * x + b]),
+  function tugasFungsi(seed) {
+    const r = mulberry(8800 + (seed | 0) * 271), fn = (n) => String(n).replace('-', '−'), T = [];
+    { const a = pil(r, [2, 3, 4, 5, -2, -3]), b = pil(r, [-5, -3, -2, 1, 2, 3, 4, 6]), xs = [0, 1, 2, 3], tmp = r();
+      T.push({ jenis: 'linear', fam: 'poli', tampil: 'tabel', umum: '<i>f</i>(<i>x</i>) = <i>a</i><i>x</i> + <i>b</i>', judul: 'Aturan garis lurus', rumus: '<i>f</i>(<i>x</i>) = [a]<i>x</i> + [b]', label: ['a', 'b'], jawab: [a, b], baris: xs.map((x) => [x, a * x + b]),
         petunjuk: ['Lihat baris x = 0. Nilai y pada baris itu adalah b.', 'Setiap x naik 1, y bertambah berapa? Tambahan itu adalah a.'],
         jelas: 'Saat x = 0, y = ' + fn(b) + ', jadi b = ' + fn(b) + '. Setiap x naik 1, y bertambah ' + fn(a) + ', jadi a = ' + fn(a) + '. Aturannya: f(x) = ' + fn(a) + 'x ' + (b < 0 ? '− ' + (-b) : '+ ' + b) + '. Pola “bertambah tetap” adalah ciri garis lurus.' }); }
     { const a = pil(r, [1, 2, 3]), c = pil(r, [-6, -5, -4, -3, -2, -1, 1, 2, 3, 4, 5, 6]), xs = [-2, -1, 0, 1, 2];
-      T.push({ jenis: 'kuadrat', fam: 'poli', judul: 'Aturan lengkung (parabola)', rumus: '<i>f</i>(<i>x</i>) = [a]<i>x</i><sup>2</sup> + [c]', label: ['a', 'c'], jawab: [a, c], baris: xs.map((x) => [x, a * x * x + c]),
+      T.push({ jenis: 'kuadrat', fam: 'poli', tampil: r() < .5 ? 'tabel' : 'grafik', umum: '<i>f</i>(<i>x</i>) = <i>a</i><i>x</i><sup>2</sup> + <i>c</i>', judul: 'Aturan lengkung (parabola)', rumus: '<i>f</i>(<i>x</i>) = [a]<i>x</i><sup>2</sup> + [c]', label: ['a', 'c'], jawab: [a, c], baris: xs.map((x) => [x, a * x * x + c]),
         petunjuk: ['Lihat baris x = 0. Karena 0² = 0, nilai y di sana adalah c.', 'Lihat baris x = 1: y = a + c. Kurangi c untuk mendapatkan a.'],
         jelas: 'Saat x = 0, y = ' + fn(c) + ', jadi c = ' + fn(c) + '. Saat x = 1, y = ' + fn(a + c) + ', jadi a = ' + fn(a + c) + ' − (' + fn(c) + ') = ' + a + '. Aturannya: f(x) = ' + (a === 1 ? '' : a) + 'x² ' + (c < 0 ? '− ' + (-c) : '+ ' + c) + '. Nilai y sama untuk x dan −x: grafik simetris.' }); }
     { const b = pil(r, [2, 3]), a = pil(r, [1, 2, 3, 4]), xs = [0, 1, 2, 3];
-      T.push({ jenis: 'eksponen', fam: 'eksp', judul: 'Aturan yang berlipat', rumus: '<i>f</i>(<i>x</i>) = [a] · [b]<sup><i>x</i></sup>', label: ['a', 'b'], jawab: [a, b], baris: xs.map((x) => [x, a * Math.pow(b, x)]),
+      T.push({ jenis: 'eksponen', fam: 'eksp', tampil: r() < .5 ? 'tabel' : 'grafik', umum: '<i>f</i>(<i>x</i>) = <i>a</i> · <i>b</i><sup><i>x</i></sup>', judul: 'Aturan yang berlipat', rumus: '<i>f</i>(<i>x</i>) = [a] · [b]<sup><i>x</i></sup>', label: ['a', 'b'], jawab: [a, b], baris: xs.map((x) => [x, a * Math.pow(b, x)]),
         petunjuk: ['Lihat baris x = 0. Karena b⁰ = 1, nilai y di sana adalah a.', 'Bagi y baris berikutnya dengan y baris sebelumnya. Hasilnya adalah b.'],
         jelas: 'Saat x = 0, y = ' + a + ', jadi a = ' + a + '. Tiap x naik 1, y dikali ' + b + ', jadi b = ' + b + '. Aturannya: f(x) = ' + (a === 1 ? '' : a + ' · ') + b + 'ˣ. Perubahan “dikali tetap” adalah ciri eksponensial.' }); }
     return T;

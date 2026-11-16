@@ -30,7 +30,7 @@
   function bangunHalaman(d) {
     const idx = d.idx, P = d.P, t = P.t2 || {}, nama = B.nama(idx).replace(/\s*\(.*\)\s*$/, ''), tgl = new Date().toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' });
     const pg = []; let no = 0;
-    const hal = (judul, nomor, isi, kelas) => { no++; return '<section class="hal ' + (kelas || '') + '"><header class="h-kop"><div class="h-logo">Grafik <b>Fungsi</b></div><div class="h-nama">' + esc(nama) + '</div></header>' + (judul ? '<div class="h-judul"><span class="h-no">' + nomor + '</span><h2>' + judul + '</h2></div>' : '') + '<div class="h-isi">' + isi + '</div><footer class="h-kaki"><span>Matematika Tingkat Lanjut · XI-F · SMA YPVDP Bontang</span><b>' + (no + 1) + '</b></footer></section>'; };
+    const hal = (judul, nomor, isi, kelas) => { no++; return '<section class="hal ' + (kelas || '') + '"><header class="h-kop"><div class="h-logo">Grafik <b>Fungsi</b></div><div class="h-nama">' + esc(nama) + '</div></header>' + (judul ? '<div class="h-judul"><span class="h-no">' + nomor + '</span><h2>' + judul + '</h2></div>' : '') + '<div class="h-isi">' + isi + '</div><footer class="h-kaki"><span>Matematika Tingkat Lanjut · ' + B.cfg(B.kelasAktif()).nama + ' · SMA YPVDP Bontang</span><b>' + (no + 1) + '</b></footer></section>'; };
 
     /* 1. mesin fungsi */
     const f1 = (x) => 2 * x + 1, xs1 = [-1, 0, 1, 2, 3];
@@ -82,7 +82,7 @@
 
     /* tambahan XI-G: dari tabel ke aturan fungsi */
     if (B.cfg(B.kelasAktif()).manual) {
-      const tf = B.tugasFungsi(idx), hf = (t.fung && t.fung.hasil) || [];
+      const tf = B.tugasFungsi(t.fung && t.fung.seed != null ? t.fung.seed : idx), hf = (t.fung && t.fung.hasil) || [];
       pg.push(hal('Dari grafik ke fungsi', 'F', '<p class="lead">Tabel angka dapat ditelusuri kembali ke aturan fungsinya: lihat nilai saat <i>x</i> = 0, lalu lihat pola perubahannya.</p>' + tf.map((tg, i) => { const h = hf[i]; return '<div class="soal ' + (h && h.ok ? 'ok' : 'salah') + '"><div class="s-kep"><span class="s-no">' + (i + 1) + '</span><div class="s-tanya">' + esc(tg.judul) + ': ' + tg.rumus.replace(/\[(\w)\]/g, (m, l) => '<b>' + F(tg.jawab[tg.label.indexOf(l)]) + '</b>') + '</div><span class="s-st">' + (h ? (h.ok ? '✓ ditemukan' : 'dibahas') : 'belum dikerjakan') + '</span></div><div class="s-opsi">' + tg.baris.map((b) => '<span>x = ' + F(b[0]) + ' → y = ' + F(b[1]) + '</span>').join('') + '</div><div class="s-jelas"><b>Cara menemukan:</b> ' + esc(tg.jelas) + '</div></div>'; }).join('')));
     }
     /* 10. tiket + refleksi */
@@ -100,7 +100,7 @@
       + '<div class="kotak mint"><div class="kecil-judul">Tugas kecil</div><p>Temukan satu hal di sekitarmu yang grafiknya mirip salah satu dari sembilan jenis di atas. Tuliskan namanya dan jenis grafik yang menurutmu cocok, lalu ceritakan alasannya di pertemuan berikutnya.</p></div>'));
 
     /* sampul */
-    const sk = '<section class="hal sampul"><svg class="s-hias" viewBox="0 0 800 500" preserveAspectRatio="none"><g fill="none" stroke-linecap="round" stroke-width="6"><path d="M-20 380C120 380 150 90 270 90S400 380 520 380 640 90 820 90" stroke="#2EA7F2" opacity=".5"/><path d="M-20 330L170 150 330 330 490 150 650 330 820 170" stroke="#FFC233" opacity=".55"/><path d="M-20 470C200 460 380 400 540 250S740 40 820 20" stroke="#FF8A1F" opacity=".5"/></g></svg><div class="s-isi"><div class="s-eye">Matematika Tingkat Lanjut · Kelas XI-F</div><h1>Catatan<br>Belajar</h1><div class="s-sub">Grafik <b>Fungsi</b></div><div class="s-nama"><small>Catatan milik</small>' + esc(nama) + '</div></div><div class="s-bawah"><div><b>' + benar + '/5</b><span>tes awal</span></div><div><b>' + poin.poin + '</b><span>poin</span></div><div><b>' + esc(poin.gelar) + '</b><span>gelar</span></div></div><div class="s-kaki">SMA YPVDP Bontang · ' + tgl + '</div></section>';
+    const sk = '<section class="hal sampul"><svg class="s-hias" viewBox="0 0 800 500" preserveAspectRatio="none"><g fill="none" stroke-linecap="round" stroke-width="6"><path d="M-20 380C120 380 150 90 270 90S400 380 520 380 640 90 820 90" stroke="#2EA7F2" opacity=".5"/><path d="M-20 330L170 150 330 330 490 150 650 330 820 170" stroke="#FFC233" opacity=".55"/><path d="M-20 470C200 460 380 400 540 250S740 40 820 20" stroke="#FF8A1F" opacity=".5"/></g></svg><div class="s-isi"><div class="s-eye">Matematika Tingkat Lanjut · ' + B.cfg(B.kelasAktif()).nama + '</div><h1>Catatan<br>Belajar</h1><div class="s-sub">Grafik <b>Fungsi</b></div><div class="s-nama"><small>Catatan milik</small>' + esc(nama) + '</div></div><div class="s-bawah"><div><b>' + benar + '/5</b><span>tes awal</span></div><div><b>' + poin.poin + '</b><span>poin</span></div><div><b>' + esc(poin.gelar) + '</b><span>gelar</span></div></div><div class="s-kaki">SMA YPVDP Bontang · ' + tgl + '</div></section>';
     return sk + pg.join('');
   }
 
