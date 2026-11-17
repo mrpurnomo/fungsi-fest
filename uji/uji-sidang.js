@@ -87,6 +87,16 @@ const G = (a, o) => api(Object.assign({ a, pin: B.PIN_GURU, kelas: 'xig2' }, o))
   r = await G('g-sd-reset-kelompok', { giliran: 0 }); ok(r.ok, 'guru mereset progres kelompok 1'); r = await G('g-sd-status'); ok(r.ringkas[0].suaraN === 0 && r.ringkas[0].jawabN === 0 && r.ringkas[0].tgN === 0 && r.ringkas[0].guru === null && !r.sd.selesai.includes(0), 'progres kelompok 1 bersih, status belum tampil'); r = await G('g-sd-rekap'); ok(r.kelompok[0].bintang === null && r.kelompok[0].mengajar === null, 'rekap kelompok 1 kosong setelah reset');
   r = await G('g-sd-reset-kelompok', { giliran: 99 }); ok(r._s === 400, 'reset kelompok di luar rentang ditolak');
   await G('g-sd-set', { giliran: 3 }); await G('g-sd-set', { hapusSelesaiG: 2 }); r = await G('g-sd-status'); ok(!r.sd.selesai.includes(2), 'kelompok selesai bisa dimunculkan kembali (hapusSelesaiG)');
+  /* fase tanya jawab, coretan penyaji, dan klaim peran atomik */
+  r = await G('g-sd-set', { giliran: 4, fase: 'tanya' }); r = await S('sd-status', 20); ok(r.fase === 'tanya' && r.giliran === 4 && r.durasi.tanya === 120, 'fase tanya jawab tersedia (durasi 2 menit)');
+  r = await G('g-sd-set', { durasi: { tanya: 90 } }); r = await S('sd-status', 20); ok(r.durasi.tanya === 90, 'durasi tanya jawab bisa diubah guru');
+  r = await S('sd-coret', 13, { slide: 2, strokes: [{ c: '#000', w: 3, m: 'pena', p: [10, 10, 20, 20] }] }); ok(r.ok, 'penyaji mengirim coretan');
+  r = await S('sd-coret', 20, { slide: 2, strokes: [] }); ok(r._s === 403, 'penonton tidak boleh mengirim coretan');
+  r = await G('g-sd-coret'); ok(r.coret && r.coret.g === 4 && r.coret.slide === 2 && r.coret.strokes.length === 1, 'guru menerima coretan penyaji');
+  r = await S('sd-coret', 13, { slide: 99, strokes: [] }); ok(r._s === 400, 'nomor slide coretan divalidasi');
+  const pp = await Promise.all([S('sd-peran', 15, { peran: 2 }), S('sd-peran', 16, { peran: 2 })]); ok(pp.filter((x) => x.ok).length === 1, 'dua murid menekan peran sama bersamaan: hanya satu berhasil');
+  r = await S('sd-peran', 15, { peran: 3 }); r = await S('sd-info', 20); const p5 = r.peran['5'] || {}; ok(Object.values(p5).filter((v) => v === 2).length <= 1 && Object.keys(p5).length >= 1, 'peran tidak pernah ganda dalam satu kelompok');
+  r = await S('sd-peran', 15, { peran: 0 }); r = await S('sd-info', 20); ok(!(r.peran['5'] || {})['15'], 'murid melepas perannya sendiri');
   await G('g-sd-reset'); r = await G('g-sd-status'); ok(r.sd.giliran === null && r.sd.selesai.length === 0, 'atur ulang sidang');
   await G('g-reset-semua'); await api({ a: 'g-reset-semua', pin: B.PIN_GURU, kelas: 'xig' });
 })();
