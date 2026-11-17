@@ -65,3 +65,15 @@
 .sd-alur { padding-bottom: .3rem; } .sd-peran-ringkas { grid-template-columns: repeat(3, minmax(0, 1fr)); }
 .sd-s-kep { flex-wrap: nowrap !important; } .sd-s-kep .chip { order: 0; flex: none; } .sd-s-kep h2 { order: 1; flex: 1 1 0 !important; min-width: 0; font-size: 1.5rem !important; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; } .sd-s-no { order: 2; margin-left: 0 !important; flex: none; }
 .sd-s-isi.dua .sd-daftar { font-size: 1.1rem; gap: .35rem; } .sd-s-isi .sd-ring { font-size: 1.05rem; padding: .4rem .8rem; } .sd-s-isi .sd-tabel { font-size: 1.05rem; } .sd-s-isi .sd-sub { font-size: 1.1rem; } .sd-s-isi.dua .sd-j-kiri2 { gap: .35rem; } .sd-daftar.kecil2 { font-size: 1rem; }
+
+/* akun uji coba + perapihan agar tidak terpotong */
+.sd-dash-kiri > *, .sd-dash-kanan > * { flex: none; }
+.sd, .sd-body, .sd-main, .sd-panel, .sd-pv, .sd-dash, .sd-ban { min-width: 0; max-width: 100%; }
+.sd-ban { flex-wrap: wrap !important; overflow: visible !important; row-gap: .3rem; } .sd-ban > * { flex: 0 1 auto !important; min-width: 0; } .sd-ban .ruang { flex: 1 1 0 !important; min-width: 0; }
+.sd-sim { flex: none; display: flex; align-items: center; gap: .5rem; flex-wrap: wrap; background: var(--mentari-100); border: .1rem dashed var(--mentari); border-radius: 1rem; padding: .35rem .7rem; font-size: .85rem; }
+.sd-sim-g, .sd-sim-f { display: flex; gap: .25rem; flex-wrap: wrap; } .sd-sim-n { appearance: none; width: 1.9rem; height: 1.9rem; border-radius: .5rem; border: .1rem solid var(--garis-2); background: #fff; font: inherit; font-weight: 700; font-size: .8rem; cursor: pointer; } .sd-sim-n.aku { border-color: var(--t); color: var(--td); } .sd-sim-n.on { background: var(--t); border-color: var(--t); color: #fff; }
+.sd-sim-f button { appearance: none; border: .1rem solid var(--garis-2); background: #fff; border-radius: 99px; padding: .2rem .7rem; font: inherit; font-weight: 700; font-size: .8rem; cursor: pointer; } .sd-sim-f button.on { background: var(--markisa); border-color: var(--markisa); color: #fff; } .sd-sim-f button:disabled { opacity: .45; cursor: default; }
+.sd-sim .btn.kecil { min-height: 1.9rem; padding: 0 .7rem; font-size: .8rem; }
+.sd-uji-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); } .sd-uji-k small { max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+/* area aman layar (takik/sudut membulat pada tablet) */
+#app { box-sizing: border-box; padding-left: env(safe-area-inset-left, 0px); padding-right: env(safe-area-inset-right, 0px); max-width: 100vw; overflow-x: hidden; }

@@ -22,7 +22,7 @@
   --ease: cubic-bezier(.2,.8,.2,1); --pegas: cubic-bezier(.34,1.56,.64,1);
 }
 * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-html { font-size: max(11px, min(calc(100vw / 74), calc(100vh / 51))); height: 100%; overflow: hidden; -webkit-text-size-adjust: 100%; }
+html { font-size: max(8px, min(calc(100vw / 74), calc(100vh / 51))); height: 100%; overflow: hidden; -webkit-text-size-adjust: 100%; }
 body { margin: 0; height: 100%; overflow: hidden; font-family: var(--isi); font-size: 1.05rem; line-height: 1.45; color: var(--tinta); background: var(--awan); -webkit-font-smoothing: antialiased; user-select: none; -webkit-user-select: none; touch-action: manipulation; overscroll-behavior: none; }
 h1, h2, h3, h4 { font-family: var(--tampil); margin: 0 0 .3em; line-height: 1.1; letter-spacing: -.01em; }
 h1 { font-size: 2.6rem; } h2 { font-size: 1.9rem; } h3 { font-size: 1.25rem; } p { margin: 0 0 .6em; }

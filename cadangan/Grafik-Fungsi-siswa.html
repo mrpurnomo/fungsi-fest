@@ -33,7 +33,7 @@
   --ease: cubic-bezier(.2,.8,.2,1); --pegas: cubic-bezier(.34,1.56,.64,1);
 }
 * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-html { font-size: max(11px, min(calc(100vw / 74), calc(100vh / 51))); height: 100%; overflow: hidden; -webkit-text-size-adjust: 100%; }
+html { font-size: max(8px, min(calc(100vw / 74), calc(100vh / 51))); height: 100%; overflow: hidden; -webkit-text-size-adjust: 100%; }
 body { margin: 0; height: 100%; overflow: hidden; font-family: var(--isi); font-size: 1.05rem; line-height: 1.45; color: var(--tinta); background: var(--awan); -webkit-font-smoothing: antialiased; user-select: none; -webkit-user-select: none; touch-action: manipulation; overscroll-behavior: none; }
 h1, h2, h3, h4 { font-family: var(--tampil); margin: 0 0 .3em; line-height: 1.1; letter-spacing: -.01em; }
 h1 { font-size: 2.6rem; } h2 { font-size: 1.9rem; } h3 { font-size: 1.25rem; } p { margin: 0 0 .6em; }
@@ -616,6 +616,18 @@ sub { font-size: .68em; line-height: 0; vertical-align: baseline; position: rela
 .sd-alur { padding-bottom: .3rem; } .sd-peran-ringkas { grid-template-columns: repeat(3, minmax(0, 1fr)); }
 .sd-s-kep { flex-wrap: nowrap !important; } .sd-s-kep .chip { order: 0; flex: none; } .sd-s-kep h2 { order: 1; flex: 1 1 0 !important; min-width: 0; font-size: 1.5rem !important; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; } .sd-s-no { order: 2; margin-left: 0 !important; flex: none; }
 .sd-s-isi.dua .sd-daftar { font-size: 1.1rem; gap: .35rem; } .sd-s-isi .sd-ring { font-size: 1.05rem; padding: .4rem .8rem; } .sd-s-isi .sd-tabel { font-size: 1.05rem; } .sd-s-isi .sd-sub { font-size: 1.1rem; } .sd-s-isi.dua .sd-j-kiri2 { gap: .35rem; } .sd-daftar.kecil2 { font-size: 1rem; }
+
+/* akun uji coba + perapihan agar tidak terpotong */
+.sd-dash-kiri > *, .sd-dash-kanan > * { flex: none; }
+.sd, .sd-body, .sd-main, .sd-panel, .sd-pv, .sd-dash, .sd-ban { min-width: 0; max-width: 100%; }
+.sd-ban { flex-wrap: wrap !important; overflow: visible !important; row-gap: .3rem; } .sd-ban > * { flex: 0 1 auto !important; min-width: 0; } .sd-ban .ruang { flex: 1 1 0 !important; min-width: 0; }
+.sd-sim { flex: none; display: flex; align-items: center; gap: .5rem; flex-wrap: wrap; background: var(--mentari-100); border: .1rem dashed var(--mentari); border-radius: 1rem; padding: .35rem .7rem; font-size: .85rem; }
+.sd-sim-g, .sd-sim-f { display: flex; gap: .25rem; flex-wrap: wrap; } .sd-sim-n { appearance: none; width: 1.9rem; height: 1.9rem; border-radius: .5rem; border: .1rem solid var(--garis-2); background: #fff; font: inherit; font-weight: 700; font-size: .8rem; cursor: pointer; } .sd-sim-n.aku { border-color: var(--t); color: var(--td); } .sd-sim-n.on { background: var(--t); border-color: var(--t); color: #fff; }
+.sd-sim-f button { appearance: none; border: .1rem solid var(--garis-2); background: #fff; border-radius: 99px; padding: .2rem .7rem; font: inherit; font-weight: 700; font-size: .8rem; cursor: pointer; } .sd-sim-f button.on { background: var(--markisa); border-color: var(--markisa); color: #fff; } .sd-sim-f button:disabled { opacity: .45; cursor: default; }
+.sd-sim .btn.kecil { min-height: 1.9rem; padding: 0 .7rem; font-size: .8rem; }
+.sd-uji-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); } .sd-uji-k small { max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+/* area aman layar (takik/sudut membulat pada tablet) */
+#app { box-sizing: border-box; padding-left: env(safe-area-inset-left, 0px); padding-right: env(safe-area-inset-right, 0px); max-width: 100vw; overflow-x: hidden; }
 </style>
 </head>
 <body>
@@ -2050,7 +2062,7 @@ const DAFTAR_G = ['ALEFIA RIMASENA','ALYA JAZILAH','ANDI MUHAMMAD IHDA AKMA AKHT
   /* rapor kelompok penyaji */
   async function rapor(A) {
     const r = await A('sd-rapor'); if (!r.ok) { UI.toast('Rapor belum tersedia', 'awas'); return; } const f = (v) => (v == null ? '–' : v.toFixed(1).replace('.', ',')), isi = el('div', { kelas: 'sd-rapor fx-' + r.jenis });
-    isi.append(el('div', { kelas: 'sdg-hitung' }, [['Bintang kelompok', '★ ' + f(r.suara.rata), r.suara.n + ' penilai'], ['Penonton benar', r.jawab.n ? Math.round(r.jawab.benar / r.jawab.n * 100) + '%' : '–', r.jawab.benar + ' dari ' + r.jawab.n], ['Tanggapan', String(r.tanggapan.total), r.tanggapan.tanya + ' tanya · ' + r.tanggapan.saran + ' saran · ' + r.tanggapan.apresiasi + ' apresiasi']].map(([t, v, s]) => el('div', { kelas: 'kartu sdg-h' }, el('div', { kelas: 'eyebrow', gaya: 'margin:0' }, t), el('b', null, v), el('span', { kelas: 'muted' }, s)))), el('div', { kelas: 'eyebrow', gaya: 'margin-top:.8rem' }, 'Bintang pembicara'), el('div', { kelas: 'baris', gaya: 'gap:.5rem;flex-wrap:wrap' }, r.pembicara.map((p) => el('span', { kelas: 'chip', gaya: 'font-size:1rem' }, depan(p.nama) + ' ★ ' + f(p.rata) + (p.n ? ' (' + p.n + ')' : '')))), el('p', { kelas: 'muted kecil' }, 'Penilaian teman bersifat anonim. Nilai akhir diumumkan guru.'));
+    isi.append(el('div', { kelas: 'sdg-hitung' }, [['Bintang kelompok', '★ ' + f(r.suara.rata), r.suara.n + ' penilai'], ['Penonton benar', r.jawab.n ? Math.round(r.jawab.benar / r.jawab.n * 100) + '%' : '–', r.jawab.benar + ' dari ' + r.jawab.n], ['Tanggapan', String(r.tanggapan.total), r.tanggapan.tanya + ' tanya · ' + r.tanggapan.saran + ' saran · ' + r.tanggapan.apresiasi + ' apresiasi']].map(([t, v, s]) => el('div', { kelas: 'kartu sdg-h' }, el('div', { kelas: 'eyebrow', gaya: 'margin:0' }, t), el('b', null, v), el('span', { kelas: 'muted' }, s)))), el('div', { kelas: 'eyebrow', gaya: 'margin-top:.8rem' }, 'Bintang pembicara'), el('div', { kelas: 'baris', gaya: 'gap:.5rem;flex-wrap:wrap' }, r.pembicara.map((p) => el('span', { kelas: 'chip', gaya: 'font-size:1rem' }, depan(p.nama) + ' ★ ' + f(p.rata) + (p.n ? ' (' + p.n + ')' : '')))), el('p', { kelas: 'muted kecil' }, (r.contoh ? 'Angka contoh (mode uji coba). ' : '') + 'Penilaian teman bersifat anonim. Nilai akhir diumumkan guru.'));
     UI.dialog({ lebar: true, judul: 'Rapor presentasi · Kelompok ' + (r.g + 1), ikon: ik('bintang', 'besar'), isi, tombol: [{ t: 'Tutup', nilai: true, kelas: 'sekunder' }, { t: 'Unduh catatan', nilai: false, ikon: 'kirim' }], tutupLuar: true }).then((v) => { if (v === false) catatan(r.g); });
   }
 
@@ -2070,15 +2082,47 @@ const DAFTAR_G = ['ALEFIA RIMASENA','ALYA JAZILAH','ANDI MUHAMMAD IHDA AKMA AKHT
 
   /* ---------------------------------------------------------------- murid: dasbor, latihan, penyaji, penonton */
   function murid(E) {
-    E.kosongkan(); const idx = E.idx(), uji = idx === B.DUMMY, TULIS = ['sd-slide', 'sd-pembicara', 'sd-suara', 'sd-jawab', 'sd-mulai', 'sd-peran', 'sd-rapor'];
-    const A = (x, d) => (uji && TULIS.includes(x) ? Promise.resolve({ ok: false, uji: true, _s: 0 }) : E.api(x, Object.assign({ idx }, d))), w = el('div', { kelas: 'sd' }), ban = el('div', { kelas: 'sd-ban' }), body = el('div', { kelas: 'sd-body' }); w.append(ban, body); E.layar(w);
-    let S = null, INFO = null, off = 0, gagal = 0, view = 'dash', lokal = null, jwLokal = null, suaraLokal = null, kB = '', kV = '', kC = '', kM = '', kP = '', infoT = 0, sibuk = false, mainBox = null, panelBox = null, ujiG = null;
+    E.kosongkan(); let idx = E.idx(); const idx0 = idx, uji = idx0 === B.DUMMY;
+    const A = (x, d) => (uji ? simA(x, d) : E.api(x, Object.assign({ idx }, d))), w = el('div', { kelas: 'sd' }), ban = el('div', { kelas: 'sd-ban' }), bar = el('div', { kelas: 'sd-sim' }), body = el('div', { kelas: 'sd-body' }); bar.style.display = 'none'; w.append(ban, bar, body); E.layar(w);
+    let S = null, INFO = null, off = 0, gagal = 0, view = 'dash', lokal = null, jwLokal = null, ujiPilih = null, kS2 = '', kB = '', kV = '', kC = '', kM = '', kP = '', infoT = 0, sibuk = false, mainBox = null, panelBox = null, ujiG = null;
     let lat = { g: 0, tab: 'alur', slide: 0, timer: null, jwb: null };
     const sayaP = () => !!(S && S.sayaPenyaji), sayaG = () => (uji ? ujiG : (INFO ? INFO.sayaKelompok : -1)), nmKel = (g) => (INFO && INFO.kelompok[g] ? INFO.kelompok[g] : []), peranKel = (g) => (INFO && INFO.peran && INFO.peran[g]) || {};
     const live = () => !!(S && S.giliran != null && !['siap', 'selesai'].includes(S.fase));
     const durP = () => (S && S.durasi ? S.durasi.presentasi + (S.fase === 'presentasi' ? (S.tambah || 0) : 0) : 180);
     const setView = (v) => { view = v; kV = ''; kB = ''; gambar(); };
     const tolakUji = () => UI.toast('Mode uji coba: tidak dikirim ke server', 'info');
+    /* ---- sandbox akun uji coba guru: meniru server di tablet ini saja, data asli tidak tersentuh ---- */
+    const SIM = { giliran: null, fase: 'siap', slide: 0, pembicara: null, mulaiFase: Date.now(), durasi: { presentasi: 180, soal: 90, tanggapan: 120 }, selesai: [], berikut: null, peran: {}, jawab: {}, suara: {} };
+    const simQ = (g) => B.tantanganAcak(JENIS[g], B.seedSoal(g));
+    function simHasil(g) { const q = simQ(g), jw = SIM.jawab[g], ok = !!(jw && jw.j === q.kunci); return { kunci: q.kunci, jelas: q.jelas, n: jw ? 1 : 0, benar: ok ? 1 : 0, persen: ok ? 100 : 0 }; }
+    function simStatus() {
+      const g = SIM.giliran, tampilHasil = ['hasil', 'tanggapan', 'selesai'].includes(SIM.fase);
+      const out = { ok: true, sekarang: Date.now(), fase: SIM.fase, giliran: g, jenis: g != null ? JENIS[g] : null, slide: SIM.slide, pembicara: SIM.pembicara, mulaiFase: SIM.mulaiFase, durasi: SIM.durasi, tambah: 0, jedaAt: null, peran: g != null ? (SIM.peran[g] || {}) : {}, anggota: g != null ? nmKel(g) : [], berikut: SIM.berikut, selesai: SIM.selesai, sayaPenyaji: g != null && g === ujiG, hasilSoal: g != null && tampilHasil ? simHasil(g) : null };
+      if (g != null && ['soal', 'hasil', 'tanggapan', 'selesai'].includes(SIM.fase)) out.soal = { tanya: simQ(g).tanya };
+      if (g != null && g !== ujiG && ['soal', 'hasil', 'tanggapan'].includes(SIM.fase)) { const jw = SIM.jawab[g]; if (jw) out.jawabanSaya = { j: jw.j, benar: tampilHasil ? jw.j === simQ(g).kunci : undefined }; if (SIM.suara[g]) out.suaraSaya = SIM.suara[g]; }
+      return out;
+    }
+    async function simA(x, d) {
+      d = d || {}; const g = SIM.giliran;
+      if (x === 'sd-status') return simStatus();
+      if (x === 'sd-info') { const r = await E.api('sd-info', { idx: idx0 }); if (!r.ok) return r; r.peran = SIM.peran; r.sayaKelompok = ujiG == null ? -1 : ujiG; return r; }
+      if (x === 'sd-peran') { if (ujiG == null) return { ok: false, _s: 409 }; const p = Number(d.peran), cur = (SIM.peran[ujiG] = SIM.peran[ujiG] || {}), lain = Object.keys(cur).find((k) => +k !== idx && cur[k] === p); if (p && lain) return { ok: false, _s: 409, error: 'peran-diambil' }; if (p) cur[idx] = p; else delete cur[idx]; if (INFO) INFO.peran = SIM.peran; return { ok: true, g: ujiG, peran: cur }; }
+      if (x === 'sd-mulai') { if (ujiG == null) return { ok: false, _s: 409 }; if (!((SIM.peran[ujiG] || {})[idx])) return { ok: false, _s: 409, error: 'peran-belum' }; if (g !== null && g !== ujiG && !['siap', 'selesai'].includes(SIM.fase)) return { ok: false, _s: 409, error: 'kelompok-lain-tampil' }; if (g !== ujiG || ['siap', 'selesai'].includes(SIM.fase)) { SIM.giliran = ujiG; SIM.fase = 'presentasi'; SIM.mulaiFase = Date.now(); SIM.slide = 0; SIM.pembicara = null; SIM.selesai = SIM.selesai.filter((q) => q !== ujiG); } return { ok: true, giliran: ujiG }; }
+      if (x === 'sd-slide') { if (g == null || g !== ujiG) return { ok: false, _s: 403 }; SIM.slide = d.slide; if (d.pembicara != null) SIM.pembicara = d.pembicara; return { ok: true }; }
+      if (x === 'sd-pembicara') { if (g == null || g !== ujiG) return { ok: false, _s: 403 }; SIM.pembicara = d.pembicara; return { ok: true }; }
+      if (x === 'sd-jawab') { if (g == null || g === ujiG || SIM.fase !== 'soal') return { ok: false, _s: 409 }; SIM.jawab[g] = { j: d.j }; return { ok: true }; }
+      if (x === 'sd-suara') { if (g == null || g === ujiG || !['soal', 'hasil', 'tanggapan'].includes(SIM.fase)) return { ok: false, _s: 409 }; const cur = (SIM.suara[g] = SIM.suara[g] || { k: null, p: {} }); if (d.k) cur.k = d.k; if (d.p) cur.p[d.pembicara] = d.p; return { ok: true, suaraSaya: cur }; }
+      if (x === 'sd-rapor') { const a = nmKel(ujiG); return { ok: true, g: ujiG, jenis: JENIS[ujiG], contoh: true, suara: { n: 24, rata: 4.3 }, pembicara: a.map((m, i) => ({ nama: m.nama, n: 24, rata: 4.5 - i * 0.3 })), jawab: { n: 24, benar: 17 }, tanggapan: { total: 8, tanya: 3, saran: 3, apresiasi: 2 } }; }
+      return { ok: false, uji: true, _s: 0 };
+    }
+    const setSim = (p) => { Object.assign(SIM, p); S = simStatus(); kB = ''; kC = ''; kM = ''; kP = ''; gambar(); };
+    function bangunSim() {
+      const key = [ujiG, SIM.giliran, SIM.fase].join('|'); if (key === kS2) return; kS2 = key; bar.innerHTML = '';
+      if (!uji || ujiG == null) { bar.style.display = 'none'; return; } bar.style.display = '';
+      const gr = el('div', { kelas: 'sd-sim-g' }); for (let i = 0; i < 9; i++) gr.append(el('button', { type: 'button', kelas: 'sd-sim-n fx-' + JENIS[i] + (SIM.giliran === i ? ' on' : '') + (i === ujiG ? ' aku' : ''), title: 'Kelompok ' + (i + 1) + (i === ujiG ? ' (kelompokmu di uji coba)' : ''), onclick: () => setSim({ giliran: i, fase: 'presentasi', mulaiFase: Date.now(), slide: 0, pembicara: null }) }, String(i + 1)));
+      const fs = el('div', { kelas: 'sd-sim-f' }); [['siap', 'Siap'], ['presentasi', 'Presentasi'], ['soal', 'Soal'], ['hasil', 'Hasil'], ['tanggapan', 'Bintang'], ['selesai', 'Selesai']].forEach(([id, t]) => fs.append(el('button', { type: 'button', kelas: SIM.fase === id ? 'on' : '', disabled: SIM.giliran == null, onclick: () => setSim({ fase: id, mulaiFase: Date.now(), selesai: id === 'selesai' && SIM.giliran != null && !SIM.selesai.includes(SIM.giliran) ? SIM.selesai.concat([SIM.giliran]) : SIM.selesai }) }, t)));
+      ap(bar, el('b', null, 'Simulasi guru'), el('span', { kelas: 'muted kecil' }, 'Tampilkan kelompok:'), gr, fs, el('button', { type: 'button', kelas: 'btn kecil sekunder', onclick: () => setSim({ giliran: null, fase: 'siap', slide: 0, pembicara: null }) }, 'Kosongkan'), el('button', { type: 'button', kelas: 'btn kecil sekunder', onclick: () => { const a = nmKel(ujiG), pr = {}; a.forEach((m, i) => { pr[m.idx] = i + 1; }); SIM.peran[ujiG] = pr; if (INFO) INFO.peran = SIM.peran; kC = ''; setSim({}); UI.toast('Peran terisi otomatis untuk kelompok ini', 'centang'); } }, 'Peran otomatis'), el('button', { type: 'button', kelas: 'btn kecil bahaya', onclick: () => { Object.assign(SIM, { giliran: null, fase: 'siap', slide: 0, pembicara: null, selesai: [], berikut: null, peran: {}, jawab: {}, suara: {} }); jwLokal = null; if (INFO) INFO.peran = SIM.peran; setSim({}); UI.toast('Simulasi direset', 'info'); } }, 'Reset simulasi'));
+    }
     async function muatInfo() { const i = await A('sd-info'); if (i.ok) { INFO = i; infoT = Date.now(); kC = ''; } return i.ok; }
     async function ambil() {
       if (!w.isConnected) { clearInterval(iv); clearInterval(iv2); return; } if (sibuk) return; sibuk = true;
@@ -2086,9 +2130,9 @@ const DAFTAR_G = ['ALEFIA RIMASENA','ALYA JAZILAH','ANDI MUHAMMAD IHDA AKMA AKHT
     }
     function skel(v) { if (kV === v) return false; kV = v; body.innerHTML = ''; kC = ''; kM = ''; kP = ''; mainBox = null; panelBox = null; return true; }
     function gambar() {
-      const kb = [gagal > 1, view, S && S.fase, S && S.giliran, S && S.berikut].join('|'); if (kb !== kB) { kB = kb; bangunBan(); }
+      const kb = [gagal > 1, view, S && S.fase, S && S.giliran, S && S.berikut].join('|'); if (kb !== kB) { kB = kb; bangunBan(); } bangunSim();
       if (!S) { skel('tunggu'); body.innerHTML = '<div class="sd-tunggu">Menghubungkan ke guru…</div>'; return; }
-      if (view === 'penyaji' && (!sayaP() || uji)) view = 'dash'; if (view === 'penonton' && sayaP()) view = 'dash';
+      if (view === 'penyaji' && !sayaP()) view = 'dash'; if (view === 'penonton' && sayaP()) view = 'dash';
       if (view === 'dash') dash(); else if (view === 'latihan') latihan(); else if (view === 'penyaji') penyaji(); else penonton();
     }
     function bangunBan() {
@@ -2117,25 +2161,26 @@ const DAFTAR_G = ['ALEFIA RIMASENA','ALYA JAZILAH','ANDI MUHAMMAD IHDA AKMA AKHT
       const g = sayaG(), kiri = el('div', { kelas: 'sd-dash-kiri' }), kanan = el('div', { kelas: 'sd-dash-kanan' }), wrap = el('div', { kelas: 'sd-dash' }, kiri, kanan); body.append(wrap);
       if (!INFO) { kiri.append(el('div', { kelas: 'sd-tunggu' }, 'Memuat daftar kelompok…')); return; }
       const mine = sayaP(), lain = live() && S.giliran !== g;
-      if (uji) {
-        kiri.append(el('div', { kelas: 'sd-uji' }, el('b', null, 'Mode uji coba guru'), el('p', { kelas: 'muted', gaya: 'margin:.2rem 0 .5rem' }, 'Pilih kelompok mana pun untuk dilihat: slide, soal, alur bicara, dan simulasi hasil. Semuanya hanya di tablet ini, tidak mengubah data siswa.')));
-        const gr = el('div', { kelas: 'sd-uji-grid' }); for (let i = 0; i < 9; i++) gr.append(el('button', { type: 'button', kelas: 'sd-uji-k fx-' + JENIS[i] + (ujiG === i ? ' pilih' : ''), onclick: () => { ujiG = i; kC = ''; gambar(); } }, el('span', { html: UI.ubin(JENIS[i]) }), el('b', null, 'Kel. ' + (i + 1)), el('small', null, NAMA[JENIS[i]]))); kiri.append(gr);
+      if (uji && ujiG == null) {
+        kiri.append(el('div', { kelas: 'sd-uji' }, el('b', null, 'Mode uji coba guru'), el('p', { kelas: 'muted', gaya: 'margin:.2rem 0 .5rem' }, 'Pilih kelompok yang ingin kamu perankan, lalu tekan Aktifkan. Kamu akan masuk ke dasbor siswa kelompok itu dan bisa mencoba semuanya: latihan, presentasi, soal, voting. Semua hanya di tablet ini dan tidak mengubah data siswa.')));
+        const gr = el('div', { kelas: 'sd-uji-grid' }); for (let i = 0; i < 9; i++) gr.append(el('button', { type: 'button', kelas: 'sd-uji-k fx-' + JENIS[i] + (ujiPilih === i ? ' pilih' : ''), onclick: () => { ujiPilih = i; kC = ''; gambar(); } }, el('span', { html: UI.ubin(JENIS[i]) }), el('b', null, 'Kelompok ' + (i + 1)), el('small', null, NAMA[JENIS[i]]), el('small', null, nmKel(i).map((a) => depan(a.nama)).join(', ')))); kiri.append(gr);
+        kiri.append(el('button', { kelas: 'btn besar hijau', type: 'button', disabled: ujiPilih == null, html: ik('centang') + (ujiPilih == null ? 'Pilih kelompok dulu' : 'Aktifkan sebagai Kelompok ' + (ujiPilih + 1)), onclick: () => { ujiG = ujiPilih; const a = nmKel(ujiG); idx = a.length ? a[0].idx : idx0; Object.assign(SIM, { giliran: null, fase: 'siap', slide: 0, pembicara: null }); kS2 = ''; setView('dash'); UI.toast('Aktif sebagai ' + (a[0] ? depan(a[0].nama) : 'anggota') + ', Kelompok ' + (ujiG + 1), 'centang'); } })); return;
       }
+      if (uji) kiri.append(el('div', { kelas: 'sd-uji baris', gaya: 'align-items:center;gap:.6rem;justify-content:space-between' }, el('div', null, el('b', null, 'Uji coba: kamu berperan sebagai ' + depan((nmKel(ujiG).find((a) => a.idx === idx) || {}).nama) + ' (Kelompok ' + (ujiG + 1) + ')'), el('div', { kelas: 'muted kecil' }, 'Gunakan bilah “Simulasi guru” di atas untuk menampilkan kelompok dan mengganti fase.')), el('button', { kelas: 'btn kecil sekunder', type: 'button', html: ik('kembali', 'kecil') + 'Ganti kelompok', onclick: () => { ujiG = null; ujiPilih = null; idx = idx0; Object.assign(SIM, { giliran: null, fase: 'siap', slide: 0, pembicara: null }); kS2 = ''; setView('dash'); } })));
       if (g == null || g < 0) { if (!uji) kiri.append(el('div', { kelas: 'sd-hero' }, el('h2', null, 'Namamu belum masuk kelompok'), el('p', { kelas: 'sd-hero-p' }, 'Beri tahu gurumu agar namamu dimasukkan ke sebuah kelompok, lalu tekan Segarkan.'))); }
       else {
         const f = JENIS[g], sudah = (S.selesai || []).includes(g) && S.giliran !== g, pr = peranKel(g), saya = pr[idx];
-        const teks = uji ? 'Kamu melihat kelompok ini sebagai guru. Tombol mulai tidak tersedia di mode uji coba.' : mine ? 'Kelompokmu sedang tampil sekarang.' : lain ? 'Kelompok ' + (S.giliran + 1) + ' sedang tampil. Sambil menunggu, latihan dulu!' : sudah ? 'Presentasi kelompokmu sudah selesai. Kerja bagus!' : S.berikut === g ? 'Giliran kelompokmu selanjutnya! Siapkan diri.' : saya ? 'Latihan dulu, lalu tekan Mulai presentasi saat gurumu memanggil kelompokmu.' : 'Pilih perananmu, latihan, lalu mulai presentasi saat dipanggil.';
+        const teks = mine ? 'Kelompokmu sedang tampil sekarang.' : lain ? 'Kelompok ' + (S.giliran + 1) + ' sedang tampil. Sambil menunggu, latihan dulu!' : sudah ? 'Presentasi kelompokmu sudah selesai. Kerja bagus!' : S.berikut === g ? 'Giliran kelompokmu selanjutnya! Siapkan diri.' : saya ? 'Latihan dulu, lalu tekan Mulai presentasi saat gurumu memanggil kelompokmu.' : 'Pilih perananmu, latihan, lalu mulai presentasi saat dipanggil.';
         const aksi = el('div', { kelas: 'baris', gaya: 'gap:.6rem;flex-wrap:wrap' });
         aksi.append(el('button', { kelas: 'btn besar', type: 'button', html: ik('buku') + 'Latihan presentasi', onclick: () => { lat = { g, tab: 'alur', slide: 0, timer: null, jwb: null }; setView('latihan'); } }));
-        if (!uji) { const btn = el('button', { kelas: 'btn besar sorot' + (mine || S.berikut === g ? ' denyut' : ''), type: 'button', disabled: lain, html: ik('main') + (mine ? 'Buka layar presentasi' : sudah ? 'Tampil lagi' : 'Mulai presentasi'), onclick: () => (mine ? setView('penyaji') : mulaiPresentasi(btn)) }); aksi.append(btn, el('button', { kelas: 'btn sekunder', type: 'button', html: ik('siswa') + (saya ? 'Ganti peran' : 'Pilih peran'), onclick: () => pilihPeran(g) })); if (sudah || (S.selesai || []).includes(g)) aksi.append(el('button', { kelas: 'btn sekunder', type: 'button', html: ik('bintang') + 'Lihat rapor', onclick: () => rapor(A) })); }
-        else if (live()) aksi.append(el('button', { kelas: 'btn besar hijau', type: 'button', html: ik('bintang') + 'Lihat sebagai penonton', onclick: () => setView('penonton') }));
-        kiri.append(el('div', { kelas: 'sd-hero fx-' + f }, el('div', { kelas: 'sd-hero-a' }, el('span', { html: UI.ubin(f) }), el('div', null, el('div', { kelas: 'eyebrow' }, uji ? 'Kelompok yang dilihat' : 'Kelompokmu'), el('h2', null, 'Kelompok ' + (g + 1) + ' · ' + NAMA[f]))), el('div', { kelas: 'sd-anggota' }, nmKel(g).map((a) => el('span', { kelas: 'sd-ang' + (a.idx === idx ? ' aku' : '') }, depan(a.nama) + (a.idx === idx ? ' (kamu)' : '') + (pr[a.idx] ? ' · ' + PERAN[pr[a.idx]].nama : ' · belum pilih peran')))), el('p', { kelas: 'sd-hero-p' }, teks), aksi));
+        { const btn = el('button', { kelas: 'btn besar sorot' + (mine || S.berikut === g ? ' denyut' : ''), type: 'button', disabled: lain, html: ik('main') + (mine ? 'Buka layar presentasi' : sudah ? 'Tampil lagi' : 'Mulai presentasi'), onclick: () => (mine ? setView('penyaji') : mulaiPresentasi(btn)) }); aksi.append(btn, el('button', { kelas: 'btn sekunder', type: 'button', html: ik('siswa') + (saya ? 'Ganti peran' : 'Pilih peran'), onclick: () => pilihPeran(g) })); if (sudah || (S.selesai || []).includes(g)) aksi.append(el('button', { kelas: 'btn sekunder', type: 'button', html: ik('bintang') + 'Lihat rapor', onclick: () => rapor(A) })); }
+        kiri.append(el('div', { kelas: 'sd-hero fx-' + f }, el('div', { kelas: 'sd-hero-a' }, el('span', { html: UI.ubin(f) }), el('div', null, el('div', { kelas: 'eyebrow' }, 'Kelompokmu'), el('h2', null, 'Kelompok ' + (g + 1) + ' · ' + NAMA[f]))), el('div', { kelas: 'sd-anggota' }, nmKel(g).map((a) => el('span', { kelas: 'sd-ang' + (a.idx === idx ? ' aku' : '') }, depan(a.nama) + (a.idx === idx ? ' (kamu)' : '') + (pr[a.idx] ? ' · ' + PERAN[pr[a.idx]].nama : ' · belum pilih peran')))), el('p', { kelas: 'sd-hero-p' }, teks), aksi));
       }
       if (live() && !mine) { const f = JENIS[S.giliran]; kiri.append(el('div', { kelas: 'sd-live fx-' + f }, el('span', { kelas: 'chip ok' }, 'Sedang berlangsung'), el('h3', null, 'Kelompok ' + (S.giliran + 1) + ' · ' + NAMA[f]), el('div', { kelas: 'muted' }, FASE_NAMA[S.fase]), el('button', { kelas: 'btn besar hijau', type: 'button', html: ik('bintang') + 'Lihat presentasi & beri penilaian', onclick: () => setView('penonton') }))); }
       else if (!mine) kiri.append(el('div', { kelas: 'sd-live kosong' }, el('h3', null, S.berikut != null ? 'Giliran selanjutnya: Kelompok ' + (S.berikut + 1) : 'Belum ada presentasi berlangsung'), el('div', { kelas: 'muted' }, 'Halaman ini berganti sendiri saat guru memulai.')));
-      kanan.append(el('div', { kelas: 'eyebrow' }, uji ? 'Semua kelompok' : 'Kelompok lain'));
+      kanan.append(el('div', { kelas: 'eyebrow' }, 'Kelompok lain'));
       const daftar = el('div', { kelas: 'sd-daftar-kel' }); kanan.append(daftar);
-      for (let i = 0; i < 9; i++) { if (i === g && !uji) continue; const st = statusKel(i), f = JENIS[i], nm = nmKel(i).map((a) => depan(a.nama)).join(', ');
+      for (let i = 0; i < 9; i++) { if (i === g) continue; const st = statusKel(i), f = JENIS[i], nm = nmKel(i).map((a) => depan(a.nama)).join(', ');
         daftar.append(el('div', { kelas: 'sd-kel fx-' + f + ' ' + st }, el('span', { html: UI.ubin(f) }), el('div', { gaya: 'flex:1;min-width:0' }, el('b', null, 'Kelompok ' + (i + 1) + ' · ' + NAMA[f]), el('div', { kelas: 'muted kecil sd-nm' }, nm || '–')), st === 'tampil' && !mine ? el('button', { kelas: 'btn kecil hijau', type: 'button', onclick: () => setView('penonton') }, 'Lihat') : st === 'selesai' ? el('button', { kelas: 'btn kecil sekunder', type: 'button', html: ik('kirim', 'kecil') + 'Catatan', onclick: () => catatan(i) }) : el('span', { kelas: 'chip ' + (st === 'tampil' || st === 'bersiap' ? 'sorot' : 'abu') }, st === 'tampil' ? 'Tampil' : st === 'bersiap' ? 'Bersiap' : 'Belum'))); }
     }
     /* ---- latihan presentasi (lokal, tidak dikirim) ---- */
@@ -2182,11 +2227,10 @@ const DAFTAR_G = ['ALEFIA RIMASENA','ALYA JAZILAH','ANDI MUHAMMAD IHDA AKMA AKHT
       for (let i = 1; i <= 5; i++) s.append(el('button', { type: 'button', kelas: 'sd-b' + (nilai >= i ? ' on' : ''), 'aria-label': i + ' bintang', onclick: () => pilih(i) }, '★')); r.append(s); return r;
     }
     async function kirimSuara(data) {
-      if (uji) { suaraLokal = suaraLokal || { k: null, p: {} }; if (data.k) suaraLokal.k = data.k; if (data.p) suaraLokal.p[data.pembicara] = data.p; S.suaraSaya = suaraLokal; kC = ''; gambar(); return; }
+      
       const r = await A('sd-suara', data); if (r.ok) { S.suaraSaya = r.suaraSaya; kC = ''; gambar(); } else UI.toast(r._s === 409 ? 'Bintang sudah ditutup guru' : 'Gagal terkirim. Coba lagi.', 'awas');
     }
     function penonton() {
-      if (uji && suaraLokal && S) S.suaraSaya = suaraLokal;
       const jw0 = S.jawabanSaya || (jwLokal ? { j: jwLokal.j, benar: S.hasilSoal ? jwLokal.j === S.hasilSoal.kunci : undefined } : null);
       const k = ['n', S.fase, S.giliran, S.pembicara, JSON.stringify(jw0), JSON.stringify(S.suaraSaya), S.hasilSoal && S.hasilSoal.persen, JSON.stringify(S.peran)].join('|'); if (!skel('penonton') && k === kC) return; kC = k; body.innerHTML = '';
       const box = el('div', { kelas: 'sd-pv' }); body.append(box);
@@ -2198,7 +2242,7 @@ const DAFTAR_G = ['ALEFIA RIMASENA','ALYA JAZILAH','ANDI MUHAMMAD IHDA AKMA AKHT
       if (S.fase === 'siap' || S.fase === 'presentasi') isi.append(el('div', { kelas: 'sd-besar' }, el('h3', null, 'Simak presentasinya'), el('p', null, 'Perhatikan penjelasan kelompok ini. Sebentar lagi ada soal untukmu, lalu kamu bisa memberi bintang.')));
       if (S.fase === 'soal' && S.soal) {
         const jw = jw0;
-        isi.append(el('div', { kelas: 'sd-soal-p', html: S.soal.tanya }), el('div', { kelas: 'baris', gaya: 'gap:1rem;flex-wrap:wrap' }, el('button', { kelas: 'btn besar hijau', type: 'button', html: ik('pensil') + (jw ? 'Ubah jawaban' : 'Jawab'), onclick: async () => { const v = await UI.keypadAngka({ tanya: S.soal.tanya, judul: 'Jawabanmu' }); if (v === null) return; if (uji) { jwLokal = { j: v }; kC = ''; gambar(); return; } const r = await A('sd-jawab', { j: v }); if (r.ok) { jwLokal = { j: v }; if (S) S.jawabanSaya = { j: v }; kC = ''; gambar(); } else UI.toast(r._s === 409 ? 'Waktu menjawab sudah ditutup' : 'Gagal terkirim. Coba lagi.', 'awas'); } }), jw ? el('span', { kelas: 'chip ok', gaya: 'font-size:1.2rem' }, (uji ? 'Jawaban uji coba: ' : 'Jawabanmu terkirim: ') + String(jw.j).replace('-', '−')) : el('span', { kelas: 'muted' }, 'Belum menjawab')));
+        isi.append(el('div', { kelas: 'sd-soal-p', html: S.soal.tanya }), el('div', { kelas: 'baris', gaya: 'gap:1rem;flex-wrap:wrap' }, el('button', { kelas: 'btn besar hijau', type: 'button', html: ik('pensil') + (jw ? 'Ubah jawaban' : 'Jawab'), onclick: async () => { const v = await UI.keypadAngka({ tanya: S.soal.tanya, judul: 'Jawabanmu' }); if (v === null) return; const r = await A('sd-jawab', { j: v }); if (r.ok) { jwLokal = { j: v }; if (S) S.jawabanSaya = { j: v }; kC = ''; gambar(); } else UI.toast(r._s === 409 ? 'Waktu menjawab sudah ditutup' : 'Gagal terkirim. Coba lagi.', 'awas'); } }), jw ? el('span', { kelas: 'chip ok', gaya: 'font-size:1.2rem' }, (uji ? 'Jawaban uji coba: ' : 'Jawabanmu terkirim: ') + String(jw.j).replace('-', '−')) : el('span', { kelas: 'muted' }, 'Belum menjawab')));
       }
       if (['hasil', 'tanggapan', 'selesai'].includes(S.fase)) {
         if (S.hasilSoal && S.fase !== 'selesai') { const jw = jw0; isi.append(el('div', { kelas: 'umpan ' + (jw && jw.benar ? 'ok' : ''), html: '<span><b>Jawaban benar: ' + String(S.hasilSoal.kunci).replace('-', '−') + '</b> · ' + S.hasilSoal.persen + '% penonton benar. ' + (jw ? (jw.benar ? 'Jawabanmu benar.' : 'Jawabanmu: ' + String(jw.j).replace('-', '−') + '.') : 'Kamu belum menjawab.') + '</span>' }), el('div', { kelas: 'sd-jelas kecil' }, S.hasilSoal.jelas)); }
@@ -2444,7 +2488,7 @@ const DAFTAR_G = ['ALEFIA RIMASENA','ALYA JAZILAH','ANDI MUHAMMAD IHDA AKMA AKHT
     atas.innerHTML = '';
     atas.append(el('span', { kelas: 'logo' }, 'Grafik ', el('b', null, 'Fungsi')), el('span', { kelas: 'ruang' }));
     if (idx !== null) atas.append(el('span', { kelas: 'chip' + (idx === B.DUMMY ? ' sorot' : ''), html: ik('siswa', 'kecil') + (idx === B.DUMMY ? 'UJI COBA' : esc(B.nama(idx).split(' ')[0])) }));
-    if (idx === B.DUMMY) atas.append(el('button', { kelas: 'btn sekunder kecil', type: 'button', html: ik('nyala', 'kecil') + 'Lompat ke…', onclick: lompatUji }));
+    if (idx === B.DUMMY && !B.cfg(kelas).sidang) atas.append(el('button', { kelas: 'btn sekunder kecil', type: 'button', html: ik('nyala', 'kecil') + 'Lompat ke…', onclick: lompatUji }));
     if (idx === B.DUMMY) atas.append(el('button', { kelas: 'btn sekunder kecil', type: 'button', html: ik('kembali', 'kecil') + 'Keluar uji coba', onclick: async () => { if (await UI.konfirmasi('Keluar dari uji coba?', '<p class="tengah">Progres uji coba tidak disimpan dan tidak memengaruhi siswa lain.</p>', 'Keluar', 'Batal')) { clearInterval(ping); lsSet(kunciP(B.DUMMY), null); idx = null; P = null; sWelcome(); } } }));
     if (idx !== null) atas.append(el('button', { kelas: 'btn sekunder kecil', type: 'button', html: ik('ulang', 'kecil') + 'Segarkan', onclick: segarkan }));
     atas.append(el('span', { kelas: 'chip ' + (net === 'online' ? 'ok' : (net === 'cek' ? 'abu' : 'warn')), html: ik(net === 'online' ? 'wifi' : 'putus', 'kecil') + (net === 'online' ? 'Terhubung ke guru' : (net === 'cek' ? 'Memeriksa…' : 'Mode mandiri')), title: net === 'offline' ? 'Tidak terhubung ke guru. Hasil diserahkan lewat kode.' : '' }));
