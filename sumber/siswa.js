@@ -69,8 +69,15 @@
     kosongkanBawah(); gambarAtas();
     const w = el('div', { kelas: 'tengah-isi' }); w.append(el('div', { kelas: 'eyebrow' }, 'Langkah 1 dari 2'), el('h2', null, 'Pilih kelasmu'));
     const kartuK = (k) => { const c = B.cfg(k); return el('button', { kelas: 'kartu-kelas', type: 'button', gaya: 'margin-bottom:.7rem', onclick: () => { setKelas(k); sNama(); }, html: '<span class="ubin fx-' + (k === 'xif' ? 'poli' : 'trig') + '">' + UI.glif('trig') + '</span><div><div class="kelas-nama">' + esc(c.nama) + '</div><div class="muted">' + c.daftar.length + ' murid · Matematika Tingkat Lanjut</div></div>' + ik('panah', 'besar') }); };
-    const k = el('div', null, kartuK('xif'), kartuK('xig'), kartuK('xig2'));
+    const kartuG = el('button', { kelas: 'kartu-kelas', type: 'button', gaya: 'margin-bottom:.7rem', onclick: sPertemuan, html: '<span class="ubin fx-trig">' + UI.glif('trig') + '</span><div><div class="kelas-nama">XI-G Soshum</div><div class="muted">' + B.cfg('xig').daftar.length + ' murid · pilih pertemuan 1 atau 2</div></div>' + ik('panah', 'besar') });
+    const k = el('div', null, kartuK('xif'), kartuG);
     w.append(k, el('button', { kelas: 'btn sekunder', type: 'button', gaya: 'margin-top:1.4rem', html: ik('kembali') + 'Kembali', onclick: sWelcome })); layar(w, 'tengah-layar');
+  }
+
+  function sPertemuan() {
+    kosongkanBawah(); gambarAtas(); const w = el('div', { kelas: 'tengah-isi' }); w.append(el('div', { kelas: 'eyebrow' }, 'XI-G Soshum'), el('h2', null, 'Pilih pertemuan'));
+    const pk = (k, judul, sub, kls) => el('button', { kelas: 'kartu-kelas', type: 'button', gaya: 'margin-bottom:.7rem', onclick: () => { setKelas(k); sNama(); }, html: '<span class="ubin fx-' + kls + '">' + UI.glif(kls) + '</span><div><div class="kelas-nama">' + judul + '</div><div class="muted">' + sub + '</div></div>' + ik('panah', 'besar') });
+    w.append(pk('xig', 'Pertemuan 1', 'Tes awal, kelompok, dan kartu pakar', 'trig'), pk('xig2', 'Pertemuan 2', 'Sidang presentasi kelompok', 'eksp'), el('button', { kelas: 'btn sekunder', type: 'button', gaya: 'margin-top:1rem', html: ik('kembali') + 'Kembali', onclick: sKelas })); layar(w, 'tengah-layar');
   }
 
   /* ---------------------------------------------------------------- 3. pilih nama */

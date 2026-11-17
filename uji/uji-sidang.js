@@ -57,6 +57,19 @@ const G = (a, o) => api(Object.assign({ a, pin: B.PIN_GURU, kelas: 'xig2' }, o))
   r = await api({ a: 'g-sd-status', kelas: 'xig2', pin: '99999' }); ok(r._s === 401, 'aksi guru butuh PIN');
   r = await api({ a: 'status', kelas: 'xig2' }); ok(r.manual && r.kelasBuka && r.diklaim.length === 27, 'status kelas xig2 memuat 27 murid terpisah dari xig');
   r = await api({ a: 'status', kelas: 'xig' }); ok(r.diklaim.length === 0, 'XI-G pertemuan 1 tidak terpengaruh');
+  /* jeda, tambah/kurang waktu, aktivasi oleh murid, info kelompok */
+  r = await G('g-sd-set', { giliran: 2, fase: 'selesai' }); await G('g-sd-set', { fase: 'presentasi' }); r = await S('sd-status', 20); const m0 = r.mulaiFase;
+  r = await G('g-sd-set', { tambahDetik: 60 }); r = await S('sd-status', 20); ok(r.tambah === 60, '+1 menit tercatat');
+  r = await G('g-sd-set', { tambahDetik: -120 }); r = await S('sd-status', 20); ok(r.tambah === -60, '-2 menit: akumulasi -60');
+  r = await G('g-sd-set', { tambahDetik: 9999 }); r = await S('sd-status', 20); ok(r.tambah === -60, 'tambah di luar batas diabaikan');
+  r = await G('g-sd-set', { jeda: true }); r = await S('sd-status', 20); ok(r.jedaAt > 0, 'jeda mencatat waktu henti');
+  await new Promise((q) => setTimeout(q, 1200)); r = await G('g-sd-set', { jeda: false }); r = await S('sd-status', 20); ok(r.jedaAt === null && r.mulaiFase - m0 >= 1000, 'lanjut dari jeda menggeser awal fase');
+  r = await G('g-sd-set', { fase: 'soal' }); r = await S('sd-status', 20); ok(r.tambah === 0 && r.jedaAt === null, 'ganti fase mereset tambah dan jeda');
+  r = await S('sd-info', 20); ok(r.ok && r.kelompok.length === 9 && r.sayaKelompok === 6 && r.jenis[6] === 'mutlak', 'sd-info memuat 9 kelompok dan kelompok sendiri');
+  r = await S('sd-mulai', 9); ok(r._s === 409 && r.error === 'kelompok-lain-tampil', 'murid kelompok lain tidak bisa memulai saat kelompok lain tampil');
+  await G('g-sd-set', { fase: 'selesai' }); r = await S('sd-mulai', 9); ok(r.ok && r.giliran === 3, 'murid mengaktifkan kelompoknya setelah giliran selesai');
+  r = await S('sd-status', 9); ok(r.giliran === 3 && r.fase === 'presentasi' && r.sayaPenyaji === true, 'status: kelompok murid aktif sebagai penyaji');
+  r = await S('sd-mulai', 9); ok(r.ok, 'mulai berulang tidak merusak (idempoten)'); r = await S('sd-mulai', 12); ok(r._s === 409, 'kelompok lain ditolak saat presentasi berjalan');
   await G('g-sd-reset'); r = await G('g-sd-status'); ok(r.sd.giliran === null && r.sd.selesai.length === 0, 'atur ulang sidang');
   await G('g-reset-semua'); await api({ a: 'g-reset-semua', pin: B.PIN_GURU, kelas: 'xig' });
 })();
