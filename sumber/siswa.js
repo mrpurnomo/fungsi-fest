@@ -5,7 +5,7 @@
   const app = document.getElementById('app'), pg = document.getElementById('panggung'), atas = document.getElementById('atas'), bawah = document.getElementById('bawah');
   const LK = 'gf_', lsGet = (k, d) => { try { const v = localStorage.getItem(LK + k); return v == null ? d : JSON.parse(v); } catch (e) { return d; } }, lsSet = (k, v) => { try { localStorage.setItem(LK + k, JSON.stringify(v)); } catch (e) { /* abaikan */ } };
   let token = lsGet('token', null); if (!token) { token = Math.random().toString(36).slice(2) + Date.now().toString(36); lsSet('token', token); }
-  let kelas = lsGet('kelas', 'xif'); if (!['xif', 'xig'].includes(kelas)) kelas = 'xif'; B.setKelas(kelas);
+  let kelas = lsGet('kelas', 'xif'); if (!['xif', 'xig', 'xig2'].includes(kelas)) kelas = 'xif'; B.setKelas(kelas);
   const setKelas = (k) => { kelas = k; B.setKelas(k); lsSet('kelas', k); };
   const kunciP = (i) => 'p' + (kelas === 'xif' ? '' : kelas + '_') + i, kunciAk = () => (kelas === 'xif' ? 'aktif' : 'aktif_' + kelas);
   let net = 'cek', idx = null, P = null, intro = null, tmr = null, ping = null;
@@ -69,7 +69,7 @@
     kosongkanBawah(); gambarAtas();
     const w = el('div', { kelas: 'tengah-isi' }); w.append(el('div', { kelas: 'eyebrow' }, 'Langkah 1 dari 2'), el('h2', null, 'Pilih kelasmu'));
     const kartuK = (k) => { const c = B.cfg(k); return el('button', { kelas: 'kartu-kelas', type: 'button', gaya: 'margin-bottom:.7rem', onclick: () => { setKelas(k); sNama(); }, html: '<span class="ubin fx-' + (k === 'xif' ? 'poli' : 'trig') + '">' + UI.glif('trig') + '</span><div><div class="kelas-nama">' + esc(c.nama) + '</div><div class="muted">' + c.daftar.length + ' murid · Matematika Tingkat Lanjut</div></div>' + ik('panah', 'besar') }); };
-    const k = el('div', null, kartuK('xif'), kartuK('xig'));
+    const k = el('div', null, kartuK('xif'), kartuK('xig'), kartuK('xig2'));
     w.append(k, el('button', { kelas: 'btn sekunder', type: 'button', gaya: 'margin-top:1.4rem', html: ik('kembali') + 'Kembali', onclick: sWelcome })); layar(w, 'tengah-layar');
   }
 
@@ -102,7 +102,8 @@
     simpan(); gambarAtas(); mulaiPing(); lanjutDari();
   }
   function mulaiPing() { clearInterval(ping); if (net !== 'online') return; ping = setInterval(() => api('ping', { idx, tahap: P && P.tahap }), 20000); }
-  function lanjutDari() { if (P.tahap === 'intro') return sIntro(); if (P.tahap === 'tes') return sTes(); if (P.tahap === 'hasil') return sHasil(); if (P.tahap === 'kelompok') return sKelompok(); return sLanjut(); }
+  function sSidang() { gambarAtas(); Sidang.murid({ idx: () => idx, api, layar, kosongkan: kosongkanBawah, konfeti }); }
+  function lanjutDari() { if (B.cfg(kelas).sidang) return sSidang(); if (P.tahap === 'intro') return sIntro(); if (P.tahap === 'tes') return sTes(); if (P.tahap === 'hasil') return sHasil(); if (P.tahap === 'kelompok') return sKelompok(); return sLanjut(); }
 
   /* ---------------------------------------------------------------- 4. pengantar */
   async function sIntro() {
@@ -203,5 +204,5 @@
 
   /* ---------------------------------------------------------------- mulai */
   UI.pasangPutar(); gambarAtas(); sWelcome(); cekJaringan();
-  window.gfDebug = { intro: () => intro, P: () => P, idx: () => idx, net: () => net, ke: { welcome: sWelcome, kelas: sKelas, nama: sNama, intro: sIntro, tes: sTes, hasil: sHasil, kelompok: sKelompok, lanjut: sLanjut }, pilih: (i) => { idx = i; P = lsGet(kunciP(i), null) || baruP(); return P; }, set: (i, p) => { idx = i; P = p; simpan(); } };
+  window.gfDebug = { intro: () => intro, P: () => P, idx: () => idx, net: () => net, ke: { sidang: sSidang, welcome: sWelcome, kelas: sKelas, nama: sNama, intro: sIntro, tes: sTes, hasil: sHasil, kelompok: sKelompok, lanjut: sLanjut }, pilih: (i) => { idx = i; P = lsGet(kunciP(i), null) || baruP(); return P; }, set: (i, p) => { idx = i; P = p; simpan(); } };
 })();

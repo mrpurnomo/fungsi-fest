@@ -10,7 +10,8 @@ const DAFTAR_G = ['ALEFIA RIMASENA','ALYA JAZILAH','ANDI MUHAMMAD IHDA AKMA AKHT
   /* pengaturan per kelas: XI-F (kelompok otomatis dari tes) dan XI-G (kelompok disusun guru, 9 kelompok, pakar satu jenis per kelompok) */
   const KELAS_CFG = {
     xif: { kode: 'xif', nama: 'XI-F Soshum', daftar: DAFTAR, durasi: 600, manual: false, langkah: 4, jmlKelompok: 4 },
-    xig: { kode: 'xig', nama: 'XI-G Soshum', daftar: DAFTAR_G, durasi: 300, manual: true, langkah: 6, jmlKelompok: 9 }
+    xig: { kode: 'xig', nama: 'XI-G Soshum', daftar: DAFTAR_G, durasi: 300, manual: true, langkah: 6, jmlKelompok: 9 },
+    xig2: { kode: 'xig2', nama: 'XI-G Soshum · Pertemuan 2', daftar: DAFTAR_G, durasi: 0, manual: true, langkah: 0, jmlKelompok: 9, sidang: true }
   };
   let AKTIF = 'xif';
   const cfg = (k) => KELAS_CFG[k || AKTIF] || KELAS_CFG.xif;
@@ -205,6 +206,8 @@ const DAFTAR_G = ['ALEFIA RIMASENA','ALYA JAZILAH','ANDI MUHAMMAD IHDA AKMA AKHT
     ];
   }
 
-  const api = { tugasFungsi, KELAS_CFG, cfg, setKelas, durasi, kelasAktif: () => AKTIF, tantanganAcak, KELAS, SET, NAMA_FAM, DISKUSI, PROMPT, diskusiSiswa, hitungPoin, bagianPasangan, TANTANGAN, SITUASI, PENGECOH, cocokSiswa, tiketSiswa, DAFTAR, DUMMY, PIN_GURU, nama, judulKata, DURASI, JUMLAH_SOAL, KELOMPOK, MAKS_ANGGOTA, soalSiswa, nilai, buatKode, bacaKode, bentukKelompok, tambahKelompok, ALFA };
+  const JENIS = ['poli', 'eksp', 'log', 'trig', 'rasional', 'akar', 'mutlak', 'tangga', 'sepotong'];
+  const seedSoal = (g) => 4100 + g * 131, seedContoh = (g) => 900 + g * 17;
+  const api = { JENIS, seedSoal, seedContoh, tugasFungsi, KELAS_CFG, cfg, setKelas, durasi, kelasAktif: () => AKTIF, tantanganAcak, KELAS, SET, NAMA_FAM, DISKUSI, PROMPT, diskusiSiswa, hitungPoin, bagianPasangan, TANTANGAN, SITUASI, PENGECOH, cocokSiswa, tiketSiswa, DAFTAR, DUMMY, PIN_GURU, nama, judulKata, DURASI, JUMLAH_SOAL, KELOMPOK, MAKS_ANGGOTA, soalSiswa, nilai, buatKode, bacaKode, bentukKelompok, tambahKelompok, ALFA };
   if (typeof module !== 'undefined' && module.exports) module.exports = api; else root.BS = api;
 })(typeof window !== 'undefined' ? window : globalThis);
