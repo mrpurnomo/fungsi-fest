@@ -28,6 +28,7 @@
     atas.append(el('span', { kelas: 'chip ' + (net === 'online' ? 'ok' : (net === 'cek' ? 'abu' : 'warn')), html: ik(net === 'online' ? 'wifi' : 'putus', 'kecil') + (net === 'online' ? 'Terhubung ke guru' : (net === 'cek' ? 'Memeriksa…' : 'Mode mandiri')), title: net === 'offline' ? 'Tidak terhubung ke guru. Hasil diserahkan lewat kode.' : '' }));
   }
   async function segarkan() {
+    if (B.cfg(kelas).sidang && window.SidangSegarkan) return window.SidangSegarkan();
     const v = await UI.dialog({ judul: 'Segarkan', ikon: ik('ulang', 'besar'), isi: '<div class="tengah"><p style="font-size:1.15rem">Pilih <b>Periksa ulang</b> bila ada yang belum muncul (misalnya langkah yang sudah dibuka guru).</p><p class="muted">Pilih <b>Muat ulang aplikasi</b> bila layar macet. Progresmu tetap tersimpan di tablet ini.</p></div>', tombol: [{ t: 'Batal', nilai: null, kelas: 'sekunder' }, { t: 'Periksa ulang', nilai: 'cek', kelas: 'sekunder', ikon: 'ulang' }, { t: 'Muat ulang aplikasi', nilai: 'muat', ikon: 'ulang' }], tutupLuar: true });
     if (v === 'muat') { location.reload(); return; }
     if (v === 'cek') { await cekJaringan(); if (net === 'online' && idx !== null) mulaiPing(); if (P && (P.tahap === 'lanjut' || P.tahap === 'kelompok')) lanjutDari(); else UI.toast(net === 'online' ? 'Terhubung ke guru' : 'Belum tersambung ke guru', net === 'online' ? 'centang' : 'awas'); }

@@ -206,8 +206,42 @@ const DAFTAR_G = ['ALEFIA RIMASENA','ALYA JAZILAH','ANDI MUHAMMAD IHDA AKMA AKHT
     ];
   }
 
+  /* ---- soal sidang: soal 1 hitungan, soal 2 dari grafik ke fungsi (angka berbeda dari contoh di slide) ---- */
+  const FN_G = { poli: (p, x) => p.a * x * x + p.c, eksp: (p, x) => p.a * Math.pow(p.b, x), log: (p, x) => Math.log(x) / Math.log(p.b), trig: (p, x) => p.A * Math.sin(p.B * x * Math.PI / 180), rasional: (p, x) => p.k / x, akar: (p, x) => p.a * Math.sqrt(x), mutlak: (p, x) => p.a * Math.abs(x - p.h), tangga: (p, x) => p.s * Math.ceil(x), sepotong: (p, x) => (x < p.c ? p.m1 * x + p.k1 : p.m2 * x + p.k2) };
+  const SG = {
+    poli: [{ a: 3, c: -2, t: [[0, -2], [1, 1]], x0: 3, xr: [-3, 3], yr: [-4, 12] }, { a: -1, c: 9, t: [[0, 9], [2, 5]], x0: 3, xr: [-4, 4], yr: [-8, 10] }],
+    eksp: [{ a: 5, b: 2, t: [[0, 5], [1, 10]], x0: 3, xr: [-2, 3], yr: [0, 45] }, { a: 2, b: 4, t: [[0, 2], [1, 8]], x0: 2, xr: [-2, 3], yr: [0, 40] }],
+    log: [{ b: 2, t: [[4, 2], [8, 3]], x0: 32, xr: [0, 10], yr: [-3, 4] }, { b: 3, t: [[3, 1], [27, 3]], x0: 9, xr: [0, 30], yr: [-3, 4] }],
+    trig: [{ A: 4, B: 1, t: [[90, 4], [270, -4]], x0: 450, xr: [0, 360], yr: [-5, 5] }, { A: 2, B: 3, t: [[30, 2], [90, -2]], x0: 150, xr: [0, 360], yr: [-3, 3] }],
+    rasional: [{ k: 12, t: [[3, 4], [4, 3]], x0: 6, xr: [-12, 12], yr: [-12, 12] }, { k: -6, t: [[2, -3], [3, -2]], x0: 6, xr: [-8, 8], yr: [-8, 8] }],
+    akar: [{ a: 4, t: [[1, 4], [4, 8]], x0: 9, xr: [-1, 10], yr: [-1, 14] }, { a: 5, t: [[1, 5], [4, 10]], x0: 16, xr: [-1, 17], yr: [-1, 22] }],
+    mutlak: [{ a: 3, h: 2, t: [[2, 0], [3, 3]], x0: -1, xr: [-3, 6], yr: [-1, 12] }, { a: 2, h: -2, t: [[-2, 0], [-1, 2]], x0: 1, xr: [-6, 4], yr: [-1, 8] }],
+    tangga: [{ s: 4, t: [[0.5, 4], [1.5, 8]], x0: 3.2, xr: [0, 4], yr: [0, 18] }, { s: 5, t: [[0.5, 5], [1.5, 10]], x0: 2.7, xr: [0, 4], yr: [0, 22] }],
+    sepotong: [{ c: 2, m1: 2, k1: 0, m2: 3, k2: -2, t: [[1, 2], [3, 7], [4, 10]], x0: 5, xr: [0, 6], yr: [-1, 18] }, { c: 3, m1: 1, k1: 1, m2: 2, k2: -2, t: [[1, 2], [2, 3], [4, 6], [5, 8]], x0: 6, xr: [0, 7], yr: [0, 12] }]
+  };
+  const sg = (x) => String(x).replace('-', '−'), tk = (q) => '(' + sg(q[0]) + ', ' + sg(q[1]) + ')', lin2 = (m, k) => sg(m) + 'x' + (k === 0 ? '' : (k < 0 ? ' − ' : ' + ') + Math.abs(k));
+  const JEL_G = {
+    poli: (p, k, x0) => 'Titik ' + tk(p.t[0]) + ' memberi c = ' + sg(p.c) + '. Titik ' + tk(p.t[1]) + ': ' + sg(p.t[1][1]) + ' = a · ' + p.t[1][0] + '² + (' + sg(p.c) + ') → a = ' + sg(p.a) + '. Jadi f(x) = ' + sg(p.a) + 'x² ' + (p.c < 0 ? '− ' : '+ ') + Math.abs(p.c) + '. Maka f(' + x0 + ') = ' + sg(p.a) + ' · ' + (x0 * x0) + ' ' + (p.c < 0 ? '− ' : '+ ') + Math.abs(p.c) + ' = ' + sg(k) + '.',
+    eksp: (p, k, x0) => 'Titik ' + tk(p.t[0]) + ' memberi a = ' + p.a + '. Titik ' + tk(p.t[1]) + ': ' + p.t[1][1] + ' = ' + p.a + ' · b → b = ' + p.b + '. Jadi f(x) = ' + p.a + ' · ' + p.b + 'ˣ. Maka f(' + x0 + ') = ' + p.a + ' · ' + p.b + '^' + x0 + ' = ' + k + '.',
+    log: (p, k, x0) => 'Titik ' + tk(p.t[0]) + ': ᵇlog ' + p.t[0][0] + ' = ' + p.t[0][1] + ' → b^' + p.t[0][1] + ' = ' + p.t[0][0] + ' → b = ' + p.b + '. Jadi f(x) = ' + p.b + 'log x. Maka f(' + x0 + ') = ' + p.b + 'log ' + x0 + ' = ' + k + '.',
+    trig: (p, k, x0) => 'Puncak di ' + tk(p.t[0]) + ' → A = ' + p.A + '. Puncak pertama di x = 90 ÷ B = ' + p.t[0][0] + ' → B = ' + p.B + '. Jadi f(x) = ' + p.A + ' sin(' + p.B + 'x). Maka f(' + x0 + ') = ' + p.A + ' sin(' + (p.B * x0) + '°) = ' + p.A + ' sin 90° = ' + k + '.',
+    rasional: (p, k, x0) => 'Titik ' + tk(p.t[0]) + ': x · y = ' + sg(p.t[0][0] * p.t[0][1]) + ' → k = ' + sg(p.k) + '. Titik ' + tk(p.t[1]) + ' memberi hasil kali yang sama. Jadi f(x) = ' + sg(p.k) + ' ÷ x. Maka f(' + x0 + ') = ' + sg(p.k) + ' ÷ ' + x0 + ' = ' + sg(k) + '.',
+    akar: (p, k, x0) => 'Titik ' + tk(p.t[1]) + ': ' + p.t[1][1] + ' = a · √' + p.t[1][0] + ' = 2a → a = ' + p.a + '. Titik ' + tk(p.t[0]) + ' cocok. Jadi f(x) = ' + p.a + '√x. Maka f(' + x0 + ') = ' + p.a + ' · √' + x0 + ' = ' + p.a + ' · ' + Math.sqrt(x0) + ' = ' + k + '.',
+    mutlak: (p, k, x0) => 'Puncak V di ' + tk(p.t[0]) + ' → h = ' + sg(p.h) + '. Titik ' + tk(p.t[1]) + ': ' + sg(p.t[1][1]) + ' = a · |' + sg(p.t[1][0]) + ' − (' + sg(p.h) + ')| → a = ' + p.a + '. Jadi f(x) = ' + p.a + '|x − (' + sg(p.h) + ')|. Maka f(' + x0 + ') = ' + p.a + ' · |' + x0 + ' − (' + sg(p.h) + ')| = ' + k + '.',
+    tangga: (p, k, x0) => 'Untuk 0 < x ≤ 1, nilai y = ' + p.s + ', jadi s = ' + p.s + '. Titik ' + tk(p.t[1]) + ' cocok (2 anak tangga). Jadi f(x) = ' + p.s + ' × pembulatan ke atas x. Maka f(' + x0 + '): pembulatan ke atas ' + String(x0).replace('.', ',') + ' adalah ' + Math.ceil(x0) + ', sehingga ' + p.s + ' × ' + Math.ceil(x0) + ' = ' + k + '.',
+    sepotong: (p, k, x0) => 'Potongan 1 (x < ' + p.c + '): y = ' + lin2(p.m1, p.k1) + '. Potongan 2 (x ≥ ' + p.c + '): melalui ' + tk(p.t[p.t.length - 2]) + ' dan ' + tk(p.t[p.t.length - 1]) + ', kemiringan ' + p.m2 + ', y = ' + lin2(p.m2, p.k2) + '. Karena ' + x0 + ' ≥ ' + p.c + ', pakai potongan 2: f(' + x0 + ') = ' + p.m2 + ' · ' + x0 + (p.k2 < 0 ? ' − ' : ' + ') + Math.abs(p.k2) + ' = ' + k + '.'
+  };
+  function soalGrafik(fam, seed) {
+    const L = SG[fam], i = Math.abs(seed | 0) % L.length, p = L[i], kunci = Math.round(FN_G[fam](p, p.x0) * 1000) / 1000;
+    return { fam, idx: i, kunci, tanya: 'Perhatikan grafik di atas. Tentukan nilai <i>f</i>(' + String(p.x0).replace('.', ',') + ').', jelas: JEL_G[fam](p, kunci, p.x0), grafik: { fam, idx: i, p } };
+  }
+  function soalPres(g, no) {
+    const f = api_JENIS()[g]; if (no === 2) { const q = soalGrafik(f, seedSoal(g)); return Object.assign({ no: 2 }, q); }
+    const q = tantanganAcak(f, seedSoal(g) + 1234); return { no: 1, tanya: q.tanya, kunci: q.kunci, jelas: q.jelas, grafik: null };
+  }
+  const api_JENIS = () => ['poli', 'eksp', 'log', 'trig', 'rasional', 'akar', 'mutlak', 'tangga', 'sepotong'];
   const JENIS = ['poli', 'eksp', 'log', 'trig', 'rasional', 'akar', 'mutlak', 'tangga', 'sepotong'];
   const seedSoal = (g) => 4100 + g * 131, seedContoh = (g) => 900 + g * 17;
-  const api = { JENIS, seedSoal, seedContoh, tugasFungsi, KELAS_CFG, cfg, setKelas, durasi, kelasAktif: () => AKTIF, tantanganAcak, KELAS, SET, NAMA_FAM, DISKUSI, PROMPT, diskusiSiswa, hitungPoin, bagianPasangan, TANTANGAN, SITUASI, PENGECOH, cocokSiswa, tiketSiswa, DAFTAR, DUMMY, PIN_GURU, nama, judulKata, DURASI, JUMLAH_SOAL, KELOMPOK, MAKS_ANGGOTA, soalSiswa, nilai, buatKode, bacaKode, bentukKelompok, tambahKelompok, ALFA };
+  const api = { soalPres, soalGrafik, FN_G, SG, JENIS, seedSoal, seedContoh, tugasFungsi, KELAS_CFG, cfg, setKelas, durasi, kelasAktif: () => AKTIF, tantanganAcak, KELAS, SET, NAMA_FAM, DISKUSI, PROMPT, diskusiSiswa, hitungPoin, bagianPasangan, TANTANGAN, SITUASI, PENGECOH, cocokSiswa, tiketSiswa, DAFTAR, DUMMY, PIN_GURU, nama, judulKata, DURASI, JUMLAH_SOAL, KELOMPOK, MAKS_ANGGOTA, soalSiswa, nilai, buatKode, bacaKode, bentukKelompok, tambahKelompok, ALFA };
   if (typeof module !== 'undefined' && module.exports) module.exports = api; else root.BS = api;
 })(typeof window !== 'undefined' ? window : globalThis);

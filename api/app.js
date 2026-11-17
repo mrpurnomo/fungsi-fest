@@ -5,7 +5,7 @@ const B = require('./_lib/bersama.js');
 const { AsyncLocalStorage } = require('node:async_hooks');
 const als = new AsyncLocalStorage();
 const KELAS_OK = ['xif', 'xig', 'xig2'];
-const keys = (kl) => ({ S: 'gf:' + kl + ':siswa', KEL: 'gf:' + kl + ':kelompok', G: 'gf:' + kl + ':gerbang', L: 'gf:' + kl + ':langkah', A: 'gf:' + kl + ':arsip', KB: 'gf:' + kl + ':kelasbuka', P: 'gf:' + kl + ':pameran', SD: 'gf:' + kl + ':sidang', SL: 'gf:' + kl + ':sdslide', SV: 'gf:' + kl + ':sdsuara', JW: 'gf:' + kl + ':sdjawab', TG: 'gf:' + kl + ':sdtanggapan', NG: 'gf:' + kl + ':sdnilai', PR: 'gf:' + kl + ':sdperan', CR: 'gf:' + kl + ':sdcoret' });
+const keys = (kl) => ({ S: 'gf:' + kl + ':siswa', KEL: 'gf:' + kl + ':kelompok', G: 'gf:' + kl + ':gerbang', L: 'gf:' + kl + ':langkah', A: 'gf:' + kl + ':arsip', KB: 'gf:' + kl + ':kelasbuka', P: 'gf:' + kl + ':pameran', SD: 'gf:' + kl + ':sidang', SL: 'gf:' + kl + ':sdslide', SV: 'gf:' + kl + ':sdsuara', JW: 'gf:' + kl + ':sdjawab', TG: 'gf:' + kl + ':sdtanggapan', NG: 'gf:' + kl + ':sdnilai', PR: 'gf:' + kl + ':sdperan', CR: 'gf:' + kl + ':sdcoret', CN: 'gf:' + kl + ':sdcn' });
 const ctx = () => als.getStore() || { kl: 'xif', K: keys('xif') };
 const nm = (i) => B.nama(i, ctx().kl), CFG = () => B.cfg(ctx().kl), NLANGKAH = () => CFG().langkah;
 
@@ -41,21 +41,58 @@ const sudahMasuk = (kel, idx) => { for (let g = 0; g < kel.length; g++) if (kel[
 const tampilKel = (kel) => kel.map((g) => g.map((s) => ({ idx: s.idx, nama: nm(s.idx) })));
 
 /* ---------------- Sidang presentasi (kelas xig2) ---------------- */
-const FASE_SD = ['siap', 'presentasi', 'tanya', 'soal', 'hasil', 'tanggapan', 'selesai'];
+const FASE_SD = ['siap', 'presentasi', 'tanya', 'soal', 'tanggapan', 'hasil', 'selesai'];
 const hmap = (a) => { const o = {}; for (let i = 0; i < (a || []).length; i += 2) { try { o[a[i]] = JSON.parse(a[i + 1]); } catch (e) { /* abaikan */ } } return o; };
-const sdBaru = () => ({ giliran: null, fase: 'siap', mulaiFase: 0, durasi: { presentasi: 180, tanya: 120, soal: 90, tanggapan: 120 }, tambah: 0, jedaAt: null, selesai: [], soalSelesai: [], kecuali: [], anggota: [], peran: {}, berikut: null, hasilSoal: null });
+/* jadwal: 13.15-15.15 WITA, mulai tampil 13.25, sembilan kelompok => sekitar 12 menit per kelompok */
+const DURASI0 = { presentasi: 270, tanya: 120, soal: 90, soal2: 90, tanggapan: 75 };
+const sdBaru = () => ({ giliran: null, fase: 'siap', mulaiFase: 0, durasi: Object.assign({}, DURASI0), tambah: 0, jedaAt: null, selesai: [], soalSelesai: [], kecuali: [], anggota: [], peran: {}, berikut: null, buka: false, soalNo: 1, sub: 'jawab', hasil: {}, hasilBintang: null });
 async function bacaSD() {
-  const m = await redis('MGET', ctx().K.SD, ctx().K.SL); let s = sdBaru(); try { if (m[0]) s = Object.assign(s, JSON.parse(m[0])); } catch (e) { /* abaikan */ }
+  const m = await redis('MGET', ctx().K.SD, ctx().K.SL); let s = sdBaru(); try { if (m[0]) { const x = JSON.parse(m[0]); s = Object.assign(s, x); s.durasi = Object.assign({}, DURASI0, x.durasi || {}); } } catch (e) { /* abaikan */ }
   let l = {}; try { if (m[1]) l = JSON.parse(m[1]); } catch (e) { /* abaikan */ }
   const sama = l && l.g === s.giliran; s.slide = sama ? (l.slide | 0) : 0; s.pembicara = sama && Number.isInteger(l.pembicara) ? l.pembicara : null; return s;
 }
 async function tulisSD(s) { const x = Object.assign({}, s); delete x.slide; delete x.pembicara; await redis('SET', ctx().K.SD, JSON.stringify(x)); }
-const soalSD = (g) => B.tantanganAcak(B.JENIS[g], B.seedSoal(g));
+const soalSD = (g, no) => B.soalPres(g, no === 2 ? 2 : 1);
 const rata = (a) => (a.length ? a.reduce((x, y) => x + y, 0) / a.length : null);
-async function hitungHasilSoal(g) {
-  const jw = hmap(await redis('HGETALL', ctx().K.JW)), q = soalSD(g), ks = Object.keys(jw).filter((k) => k.startsWith('g:' + g + ':')), benar = ks.filter((k) => jw[k].benar).length;
-  return { kunci: q.kunci, jelas: q.jelas, n: ks.length, benar, persen: ks.length ? Math.round(benar / ks.length * 100) : 0 };
+const durasiNow = (s) => (s.fase === 'soal' ? (s.sub === 'jawab' ? (s.soalNo === 2 ? s.durasi.soal2 : s.durasi.soal) : 0) : (s.durasi[s.fase] || 0));
+const waktuHabis = (s) => { if (s.jedaAt) return false; const d = durasiNow(s); return !!d && Date.now() - s.mulaiFase >= (d + (s.tambah || 0)) * 1000; };
+const jmlPenonton = (s) => CFG().daftar.length - s.anggota.length;
+/* hasil per soal: jumlah, benar, sebaran jawaban */
+async function hitungHasil(g, no) {
+  const jw = hmap(await redis('HGETALL', ctx().K.JW)), q = soalSD(g, no), pre = 'g:' + g + ':' + no + ':', ks = Object.keys(jw).filter((k) => k.startsWith(pre)), benar = ks.filter((k) => jw[k].benar).length, cnt = {};
+  ks.forEach((k) => { cnt[jw[k].j] = (cnt[jw[k].j] || 0) + 1; });
+  const sebaran = Object.keys(cnt).map((j) => ({ j: Number(j), n: cnt[j], benar: Number(j) === q.kunci })).sort((a, b) => b.n - a.n).slice(0, 5);
+  return { no, kunci: q.kunci, n: ks.length, benar, persen: ks.length ? Math.round(benar / ks.length * 100) : 0, sebaran };
 }
+async function hitungBintang(g) {
+  const sv = hmap(await redis('HGETALL', ctx().K.SV)), ks = Object.keys(sv).filter((k) => k.startsWith('g:' + g + ':') && sv[k].k), dist = [0, 0, 0, 0, 0], pem = {};
+  ks.forEach((k) => { dist[sv[k].k - 1]++; Object.keys(sv[k].p || {}).forEach((a) => { (pem[a] = pem[a] || []).push(sv[k].p[a]); }); });
+  const o = {}; Object.keys(pem).forEach((a) => { o[a] = { n: pem[a].length, rata: rata(pem[a]) }; });
+  return { n: ks.length, rata: rata(ks.map((k) => sv[k].k)), dist, pembicara: o };
+}
+async function kunciSekarang(s) { s.hasil = s.hasil || {}; s.hasil[s.soalNo] = await hitungHasil(s.giliran, s.soalNo); s.sub = 'kunci'; if (!s.soalSelesai.includes(s.giliran)) s.soalSelesai.push(s.giliran); }
+const gantiFase = (s, f) => { s.fase = f; s.mulaiFase = Date.now(); s.tambah = 0; s.jedaAt = null; };
+/* peralihan yang digerakkan penyaji (atau guru) */
+async function terapkanAksi(s, a, guru) {
+  const g = s.giliran; if (g == null) return 'tidak-ada-giliran';
+  if (a === 'tanya') { if (!guru && s.fase !== 'presentasi') return 'urutan'; gantiFase(s, 'tanya'); return null; }
+  if (a === 'soal') { if (!guru && !['presentasi', 'tanya'].includes(s.fase)) return 'urutan'; gantiFase(s, 'soal'); s.soalNo = 1; s.sub = 'jawab'; s.hasil = {}; return null; }
+  if (a === 'kunci') { if (s.fase !== 'soal' || s.sub !== 'jawab') return 'urutan'; await kunciSekarang(s); return null; }
+  if (a === 'lanjut') { if (s.fase !== 'soal' || s.sub !== 'kunci') return 'urutan'; if (s.soalNo === 1) { s.soalNo = 2; s.sub = 'jawab'; s.mulaiFase = Date.now(); s.tambah = 0; s.jedaAt = null; } else s.sub = 'stat'; return null; }
+  if (a === 'nilai') { if (!guru && !(s.fase === 'soal' && s.sub === 'stat')) return 'urutan'; gantiFase(s, 'tanggapan'); return null; }
+  if (a === 'hasil') { if (!guru) return 'urutan'; s.hasilBintang = await hitungBintang(g); gantiFase(s, 'hasil'); return null; }
+  if (a === 'selesai') { if (!guru && s.fase !== 'hasil') return 'urutan'; if (!s.hasilBintang) s.hasilBintang = await hitungBintang(g); gantiFase(s, 'selesai'); if (!s.selesai.includes(g)) s.selesai.push(g); return null; }
+  return 'aksi';
+}
+/* peralihan otomatis: waktu habis atau semua penonton sudah menjawab / menilai */
+async function autoMaju(s, cn) {
+  if (s.giliran == null) return false; const g = s.giliran, total = jmlPenonton(s);
+  if (s.fase === 'soal' && s.sub === 'jawab') { const n = Number((cn && cn[s.soalNo === 2 ? 1 : 0]) || 0); if (waktuHabis(s) || (total > 0 && n >= total)) { await kunciSekarang(s); return true; } }
+  if (s.fase === 'tanggapan') { const n = Number((cn && cn[2]) || 0); if (waktuHabis(s) || (total > 0 && n >= total)) { s.hasilBintang = await hitungBintang(g); gantiFase(s, 'hasil'); return true; } }
+  return false;
+}
+const cnBaca = async (g) => { const r = await redis('HMGET', ctx().K.CN, 'j:' + g + ':1', 'j:' + g + ':2', 'v:' + g, 't:' + g); return (r || []).map((x) => Number(x) || 0); };
+const grafikDari = (q) => (q.grafik ? { fam: q.grafik.fam, idx: q.grafik.idx, p: q.grafik.p } : null);
 const semuaPeran = (m) => { const o = {}; Object.keys(m).forEach((k) => { const p = k.split(':'); if (p[0] === 'r') (o[p[1]] = o[p[1]] || {})[m[k]] = +p[2]; }); return o; };
 async function peranG(g) { const m = hmap(await redis('HGETALL', ctx().K.PR)), o = {}; Object.keys(m).forEach((k) => { const p = k.split(':'); if (p[0] === 'r' && +p[1] === g) o[m[k]] = +p[2]; }); return o; }
 /* klaim peran atomik (HSETNX): satu peran hanya untuk satu anggota walau dua murid menekan bersamaan */
@@ -66,53 +103,70 @@ async function simpanPeran(g, idx, p, bebas) {
   const hasil = await peranG(g); const s2 = await bacaSD(); if (s2.giliran === g) { s2.peran = hasil; await tulisSD(s2); } return hasil;
 }
 async function sdSiswaOk(b) { const idx = bersihIdx(b.idx); if (idx === null || idx === B.DUMMY || !b.token) return null; const d = await ambilSiswa(idx); return d && d.token === b.token ? idx : null; }
+const kelompokDari = (kl, idx) => { let g = -1; (kl ? kl.kel : []).forEach((x, gi) => { if (x.some((m) => m.idx === idx)) g = gi; }); return g; };
 async function sdAksiSiswa(b, kirim) {
   const K = ctx().K;
   if (b.a === 'sd-status') {
-    const s = await bacaSD(), idx = bersihIdx(b.idx), saya = idx !== null && s.anggota.includes(idx), tampilHasil = ['hasil', 'tanggapan', 'selesai'].includes(s.fase);
-    const out = { ok: true, sekarang: Date.now(), fase: s.fase, giliran: s.giliran, jenis: s.giliran != null ? B.JENIS[s.giliran] : null, slide: s.slide, pembicara: s.pembicara, mulaiFase: s.mulaiFase, durasi: s.durasi, tambah: s.tambah || 0, jedaAt: s.jedaAt || null, peran: s.peran || {}, anggota: s.anggota.map((i) => ({ idx: i, nama: nm(i) })), berikut: s.berikut, selesai: s.selesai, sayaPenyaji: saya, hasilSoal: tampilHasil ? s.hasilSoal : null };
-    if (s.giliran != null && ['soal', 'hasil', 'tanggapan', 'selesai'].includes(s.fase)) out.soal = { tanya: soalSD(s.giliran).tanya };
-    if (idx !== null && b.token && !saya && s.giliran != null && ['soal', 'hasil', 'tanggapan'].includes(s.fase)) {
-      const [d, jw, sv] = await Promise.all([ambilSiswa(idx), redis('HGET', K.JW, 'g:' + s.giliran + ':' + idx), redis('HGET', K.SV, 'g:' + s.giliran + ':' + idx)]);
-      if (d && d.token === b.token) { try { if (jw) { const j = JSON.parse(jw); out.jawabanSaya = { j: j.j, benar: tampilHasil ? j.benar : undefined }; } if (sv) out.suaraSaya = JSON.parse(sv); } catch (e) { /* abaikan */ } }
+    const s = await bacaSD(), idx = bersihIdx(b.idx), saya = idx !== null && s.anggota.includes(idx); let cn = [0, 0, 0, 0];
+    if (s.giliran != null && ['soal', 'tanggapan', 'hasil', 'selesai'].includes(s.fase)) { cn = await cnBaca(s.giliran); if (await autoMaju(s, cn)) await tulisSD(s); }
+    const g = s.giliran, f = s.fase, no = s.soalNo, tampilHasil = f === 'soal' ? s.sub !== 'jawab' : ['tanggapan', 'hasil', 'selesai'].includes(f);
+    const out = { ok: true, sekarang: Date.now(), fase: f, giliran: g, jenis: g != null ? B.JENIS[g] : null, slide: s.slide, pembicara: s.pembicara, mulaiFase: s.mulaiFase, durasi: s.durasi, tambah: s.tambah || 0, jedaAt: s.jedaAt || null, peran: s.peran || {}, anggota: s.anggota.map((i) => ({ idx: i, nama: nm(i) })), berikut: s.berikut, selesai: s.selesai, buka: !!s.buka, sayaPenyaji: saya, soalNo: no, sub: s.sub, total: g != null ? jmlPenonton(s) : 0, jawabN: cn[no === 2 ? 1 : 0], suaraN: cn[2], tepuk: cn[3] };
+    if (g != null && f === 'soal') { const q = soalSD(g, no); out.soal = { no, tanya: q.tanya, grafik: grafikDari(q) }; }
+    if (g != null && ['soal', 'tanggapan', 'hasil', 'selesai'].includes(f)) out.hasil = s.hasil || {};
+    if (g != null && saya && ['hasil', 'selesai'].includes(f)) out.hasilBintang = s.hasilBintang;
+    if (idx !== null && b.token && !saya && g != null && ['soal', 'tanggapan'].includes(f)) {
+      const [d, jw, sv] = await Promise.all([ambilSiswa(idx), redis('HMGET', K.JW, 'g:' + g + ':1:' + idx, 'g:' + g + ':2:' + idx), redis('HGET', K.SV, 'g:' + g + ':' + idx)]);
+      if (d && d.token === b.token) { try { const js = {}; (jw || []).forEach((x, i) => { if (x) { const o = JSON.parse(x), no2 = i + 1, h = (s.hasil || {})[no2]; js[no2] = { j: o.j, benar: h ? o.benar : undefined }; } }); out.jawabSaya = js; if (sv) out.suaraSaya = JSON.parse(sv); } catch (e) { /* abaikan */ } }
     }
     return kirim(200, out);
   }
-  if (b.a === 'sd-info') { const kl = await ambilKel(), idx = bersihIdx(b.idx); let sayaG = -1; (kl ? kl.kel : []).forEach((g, gi) => { if (g.some((m) => m.idx === idx)) sayaG = gi; }); const pr = semuaPeran(hmap(await redis('HGETALL', ctx().K.PR))); return kirim(200, { ok: true, kelompok: kl ? tampilKel(kl.kel) : [], jenis: B.JENIS, sayaKelompok: sayaG, peran: pr }); }
+  if (b.a === 'sd-info') { const kl = await ambilKel(), idx = bersihIdx(b.idx), sayaG = kelompokDari(kl, idx), pr = semuaPeran(hmap(await redis('HGETALL', ctx().K.PR))); return kirim(200, { ok: true, kelompok: kl ? tampilKel(kl.kel) : [], jenis: B.JENIS, sayaKelompok: sayaG, peran: pr }); }
   const idx = await sdSiswaOk(b); if (idx === null) return kirim(403, { error: 'tidak-dikenali' });
   const s = await bacaSD(), saya = s.anggota.includes(idx);
   if (b.a === 'sd-rapor') {
-    const kl = await ambilKel(); let g = -1; (kl ? kl.kel : []).forEach((x, gi) => { if (x.some((m) => m.idx === idx)) g = gi; }); if (g < 0) return kirim(409, { error: 'tanpa-kelompok' });
-    const [sv, jw, tg] = await Promise.all([redis('HGETALL', K.SV), redis('HGETALL', K.JW), redis('HGETALL', K.TG)]), SVm = hmap(sv), JWm = hmap(jw), TGm = hmap(tg), ks = Object.keys(SVm).filter((k) => k.startsWith('g:' + g + ':')), js = Object.keys(JWm).filter((k) => k.startsWith('g:' + g + ':')), tk = Object.keys(TGm).filter((k) => k.startsWith('g:' + g + ':'));
-    return kirim(200, { ok: true, g, jenis: B.JENIS[g], suara: { n: ks.filter((k) => SVm[k].k).length, rata: rata(ks.map((k) => SVm[k].k).filter((x) => x)) }, pembicara: kl.kel[g].map((m) => { const v = ks.map((k) => SVm[k].p && SVm[k].p[m.idx]).filter((x) => x != null); return { nama: nm(m.idx), n: v.length, rata: rata(v) }; }), jawab: { n: js.length, benar: js.filter((k) => JWm[k].benar).length }, tanggapan: { total: tk.length, tanya: tk.filter((k) => TGm[k].jenis === 'tanya').length, saran: tk.filter((k) => TGm[k].jenis === 'saran').length, apresiasi: tk.filter((k) => TGm[k].jenis === 'apresiasi').length } });
+    const kl = await ambilKel(), g = kelompokDari(kl, idx); if (g < 0) return kirim(409, { error: 'tanpa-kelompok' });
+    const rk = await sdRekap(), kg = rk.kelompok[g], ang = kl.kel[g].map((m) => m.idx), ind = rk.individu.filter((x) => ang.includes(x.idx)).map((x) => ({ nama: x.nama, penyampaian: x.penyampaian }));
+    const [sv, tg, ng, cn] = await Promise.all([redis('HGETALL', K.SV), redis('HGETALL', K.TG), redis('HGETALL', K.NG), cnBaca(g)]), SVm = hmap(sv), TGm = hmap(tg), NGm = hmap(ng), ks = Object.keys(SVm).filter((k) => k.startsWith('g:' + g + ':') && SVm[k].k), tk = Object.keys(TGm).filter((k) => k.startsWith('g:' + g + ':')), dist = [0, 0, 0, 0, 0]; ks.forEach((k) => { dist[SVm[k].k - 1]++; });
+    const jw = hmap(await redis('HGETALL', K.JW)), soal = [1, 2].map((no) => { const pre = 'g:' + g + ':' + no + ':', kk = Object.keys(jw).filter((k) => k.startsWith(pre)), bn = kk.filter((k) => jw[k].benar).length; return { no, n: kk.length, benar: bn, persen: kk.length ? Math.round(bn / kk.length * 100) : null }; });
+    const ngg = NGm['g:' + g] || null;
+    return kirim(200, { ok: true, g, jenis: B.JENIS[g], anggota: kl.kel[g].map((m) => nm(m.idx)), nilai: { guru: kg.guru, bintang: kg.bintang, mengajar: kg.mengajar, kontribusi: kg.kontribusi }, suara: { n: ks.length, rata: rata(ks.map((k) => SVm[k].k)), dist }, pembicara: kl.kel[g].map((m) => { const v = ks.map((k) => SVm[k].p && SVm[k].p[m.idx]).filter((x) => x != null); return { nama: nm(m.idx), n: v.length, rata: rata(v), nilaiAkhir: (ind.find((y) => y.nama === nm(m.idx)) || {}).penyampaian }; }), soal, rubrik: ngg, tanggapan: { total: tk.length, tanya: tk.filter((k) => TGm[k].jenis === 'tanya').length, saran: tk.filter((k) => TGm[k].jenis === 'saran').length, apresiasi: tk.filter((k) => TGm[k].jenis === 'apresiasi').length }, tepuk: cn[3], selesai: s.selesai.includes(g) });
   }
   if (b.a === 'sd-coret') {
-    if (!saya || s.giliran == null) return kirim(403, { error: 'bukan-penyaji' }); const sl = Number(b.slide); if (!Number.isInteger(sl) || sl < 0 || sl > 20 || !Array.isArray(b.strokes)) return kirim(400, { error: 'coret' });
+    if (!saya || s.giliran == null) return kirim(403, { error: 'bukan-penyaji' }); const sl = Number(b.slide); if (!Number.isInteger(sl) || sl < 0 || sl > 30 || !Array.isArray(b.strokes)) return kirim(400, { error: 'coret' });
     const str = JSON.stringify({ g: s.giliran, slide: sl, strokes: b.strokes.slice(0, 200), t: Date.now() }); if (str.length > 120000) return kirim(413, { error: 'terlalu-besar' }); await redis('SET', K.CR, str); return kirim(200, { ok: true });
   }
   if (b.a === 'sd-peran') {
-    const kl = await ambilKel(); let g = -1; (kl ? kl.kel : []).forEach((x, gi) => { if (x.some((m) => m.idx === idx)) g = gi; }); if (g < 0) return kirim(409, { error: 'tanpa-kelompok' });
+    const kl = await ambilKel(), g = kelompokDari(kl, idx); if (g < 0) return kirim(409, { error: 'tanpa-kelompok' }); if (s.selesai.includes(g)) return kirim(409, { error: 'sudah-selesai' });
     const p = Number(b.peran); if (![0, 1, 2, 3].includes(p)) return kirim(400, { error: 'peran' }); const cur = await simpanPeran(g, idx, p, false); if (!cur) return kirim(409, { error: 'peran-diambil' }); return kirim(200, { ok: true, g, peran: cur });
   }
   if (b.a === 'sd-mulai') {
-    const kl = await ambilKel(); let g = -1; (kl ? kl.kel : []).forEach((x, gi) => { if (x.some((m) => m.idx === idx)) g = gi; }); if (g < 0) return kirim(409, { error: 'tanpa-kelompok' });
+    const kl = await ambilKel(), g = kelompokDari(kl, idx); if (g < 0) return kirim(409, { error: 'tanpa-kelompok' });
+    if (!s.buka) return kirim(409, { error: 'belum-dibuka' }); if (s.selesai.includes(g)) return kirim(409, { error: 'sudah-selesai' });
     const prG = await peranG(g); if (!prG[idx]) return kirim(409, { error: 'peran-belum' });
     if (s.giliran !== null && s.giliran !== g && !['siap', 'selesai'].includes(s.fase)) return kirim(409, { error: 'kelompok-lain-tampil' });
-    if (s.giliran !== g) { s.giliran = g; s.anggota = kl.kel[g].map((x) => x.idx); s.hasilSoal = null; } s.peran = prG; if (s.berikut === g) s.berikut = null;
-    if (s.fase === 'siap' || s.giliran !== g || s.fase === 'selesai') { s.fase = 'presentasi'; s.mulaiFase = Date.now(); s.tambah = 0; s.jedaAt = null; s.selesai = s.selesai.filter((x) => x !== g); }
+    if (s.giliran !== g) { s.giliran = g; s.anggota = kl.kel[g].map((x) => x.idx); s.hasil = {}; s.hasilBintang = null; s.soalNo = 1; s.sub = 'jawab'; } s.peran = prG; if (s.berikut === g) s.berikut = null;
+    if (s.fase === 'siap' || s.giliran !== g || s.fase === 'selesai') { gantiFase(s, 'presentasi'); s.hasil = {}; s.hasilBintang = null; s.soalNo = 1; s.sub = 'jawab'; }
     await tulisSD(s); return kirim(200, { ok: true, giliran: g });
   }
-  if (b.a === 'sd-slide') { if (!saya || s.giliran == null) return kirim(403, { error: 'bukan-penyaji' }); const n = Number(b.slide); if (!Number.isInteger(n) || n < 0 || n > 20) return kirim(400, { error: 'slide' }); const pm = Number(b.pembicara), pem = b.pembicara != null && s.anggota.includes(pm) ? pm : s.pembicara; await redis('SET', K.SL, JSON.stringify({ g: s.giliran, slide: n, pembicara: pem, t: Date.now() })); return kirim(200, { ok: true }); }
+  if (b.a === 'sd-aksi') {
+    if (!saya || s.giliran == null) return kirim(403, { error: 'bukan-penyaji' }); if (!['tanya', 'soal', 'kunci', 'lanjut', 'nilai', 'selesai'].includes(b.aksi)) return kirim(400, { error: 'aksi' });
+    const e = await terapkanAksi(s, b.aksi, false); if (e) return kirim(409, { error: e }); await tulisSD(s); return kirim(200, { ok: true, fase: s.fase, soalNo: s.soalNo, sub: s.sub });
+  }
+  if (b.a === 'sd-slide') { if (!saya || s.giliran == null) return kirim(403, { error: 'bukan-penyaji' }); const n = Number(b.slide); if (!Number.isInteger(n) || n < 0 || n > 30) return kirim(400, { error: 'slide' }); const pm = Number(b.pembicara), pem = b.pembicara != null && s.anggota.includes(pm) ? pm : s.pembicara; await redis('SET', K.SL, JSON.stringify({ g: s.giliran, slide: n, pembicara: pem, t: Date.now() })); return kirim(200, { ok: true }); }
   if (b.a === 'sd-pembicara') { if (!saya || s.giliran == null) return kirim(403, { error: 'bukan-penyaji' }); const p = Number(b.pembicara); if (!s.anggota.includes(p)) return kirim(400, { error: 'pembicara' }); await redis('SET', K.SL, JSON.stringify({ g: s.giliran, slide: s.slide, pembicara: p, t: Date.now() })); return kirim(200, { ok: true }); }
   if (b.a === 'sd-suara') {
-    if (saya || s.giliran == null || !['soal', 'hasil', 'tanggapan'].includes(s.fase)) return kirim(409, { error: 'di-luar-fase' });
-    const key = 'g:' + s.giliran + ':' + idx, v = (x) => (Number.isInteger(x) && x >= 1 && x <= 5 ? x : null); let cur = { k: null, p: {} }; try { const o = await redis('HGET', K.SV, key); if (o) cur = JSON.parse(o); } catch (e) { /* abaikan */ }
+    if (saya || s.giliran == null || s.fase !== 'tanggapan' || !s.buka) return kirim(409, { error: 'di-luar-fase' });
+    const key = 'g:' + s.giliran + ':' + idx, v = (x) => (Number.isInteger(x) && x >= 1 && x <= 5 ? x : null); let cur = { k: null, p: {} }, ada = false; try { const o = await redis('HGET', K.SV, key); if (o) { cur = JSON.parse(o); ada = true; } } catch (e) { /* abaikan */ }
     if (v(b.k)) cur.k = b.k; if (v(b.p) && s.anggota.includes(Number(b.pembicara))) { cur.p = cur.p || {}; cur.p[Number(b.pembicara)] = b.p; }
-    await redis('HSET', K.SV, key, JSON.stringify(cur)); return kirim(200, { ok: true, suaraSaya: cur });
+    if (b.pm && typeof b.pm === 'object') Object.keys(b.pm).forEach((a) => { if (s.anggota.includes(Number(a)) && v(b.pm[a])) { cur.p = cur.p || {}; cur.p[Number(a)] = b.pm[a]; } });
+    await redis('HSET', K.SV, key, JSON.stringify(cur)); if (!ada) await redis('HINCRBY', K.CN, 'v:' + s.giliran, 1); return kirim(200, { ok: true, suaraSaya: cur });
   }
   if (b.a === 'sd-jawab') {
-    if (saya || s.giliran == null || s.fase !== 'soal') return kirim(409, { error: 'di-luar-fase' }); const j = Number(b.j); if (!Number.isInteger(j) || Math.abs(j) > 1e9) return kirim(400, { error: 'jawaban' });
-    await redis('HSET', K.JW, 'g:' + s.giliran + ':' + idx, JSON.stringify({ j, benar: j === soalSD(s.giliran).kunci, t: Date.now() })); return kirim(200, { ok: true });
+    if (saya || s.giliran == null || s.fase !== 'soal' || s.sub !== 'jawab' || !s.buka) return kirim(409, { error: 'di-luar-fase' }); const j = Number(b.j); if (!Number.isInteger(j) || Math.abs(j) > 1e9) return kirim(400, { error: 'jawaban' });
+    const fld = 'g:' + s.giliran + ':' + s.soalNo + ':' + idx, ada = await redis('HGET', K.JW, fld); await redis('HSET', K.JW, fld, JSON.stringify({ j, benar: j === soalSD(s.giliran, s.soalNo).kunci, t: Date.now() })); if (ada == null) await redis('HINCRBY', K.CN, 'j:' + s.giliran + ':' + s.soalNo, 1); return kirim(200, { ok: true, no: s.soalNo });
+  }
+  if (b.a === 'sd-tepuk') {
+    if (saya || s.giliran == null || !['hasil', 'selesai'].includes(s.fase)) return kirim(409, { error: 'di-luar-fase' }); const n = Math.max(1, Math.min(8, Number(b.n) || 1)); await redis('HINCRBY', K.CN, 't:' + s.giliran, n); return kirim(200, { ok: true });
   }
   return kirim(400, { error: 'Aksi tidak dikenal' });
 }
@@ -132,8 +186,8 @@ async function sdRekap() {
     const hadir = !!sis['s' + i]; let g = -1; for (let x = 0; x < kelA.length; x++) if (kelA[x].some((m) => m.idx === i)) g = x;
     const pv = []; Object.keys(SVm).forEach((k) => { const o = SVm[k] && SVm[k].p; if (o && o[i] != null) pv.push(o[i]); });
     const gi = g >= 0 && NGm['i:' + g + ':' + i] != null ? NGm['i:' + g + ':' + i] * 25 : null, pe = [pv.length ? rata(pv) / 5 * 100 : null, gi].filter((x) => x != null), el = g >= 0 ? eligible(g) : sd.soalSelesai;
-    const bnr = el.filter((h) => JWm['g:' + h + ':' + i] && JWm['g:' + h + ':' + i].benar).length, tp = Object.keys(TGm).filter((k) => TGm[k].oleh === i).length;
-    individu.push({ idx: i, nama: nm(i), kelompok: g + 1, hadir, penyampaian: hadir && pe.length ? rata(pe) : null, jawaban: hadir && el.length ? bnr / el.length * 100 : null, partisipasi: hadir && aktif.size ? Math.min(1, tp / 2) * 100 : null, nSoal: el.length });
+    let bnr = 0; el.forEach((h) => [1, 2].forEach((no) => { const o = JWm['g:' + h + ':' + no + ':' + i]; if (o && o.benar) bnr++; })); const tp = Object.keys(TGm).filter((k) => TGm[k].oleh === i).length, tot = el.length * 2;
+    individu.push({ idx: i, nama: nm(i), kelompok: g + 1, hadir, penyampaian: hadir && pe.length ? rata(pe) : null, jawaban: hadir && tot ? bnr / tot * 100 : null, partisipasi: hadir && aktif.size ? Math.min(1, tp / 2) * 100 : null, nSoal: tot });
   });
   return { kelompok, individu, tanggapan: log, selesai: sd.selesai };
 }
@@ -141,11 +195,12 @@ async function sdAksiGuru(b, kirim) {
   const K = ctx().K;
   if (b.a === 'g-sd-status') {
     const [s, sv, jw, tg, ng, kl, kb, pr] = await Promise.all([bacaSD(), redis('HGETALL', K.SV), redis('HGETALL', K.JW), redis('HGETALL', K.TG), redis('HGETALL', K.NG), ambilKel(), redis('GET', K.KB), redis('HGETALL', K.PR)]), g = s.giliran;
+    let cn = [0, 0, 0, 0]; if (g != null && ['soal', 'tanggapan', 'hasil', 'selesai'].includes(s.fase)) { cn = await cnBaca(g); if (await autoMaju(s, cn)) await tulisSD(s); }
     const SVm = hmap(sv), JWm = hmap(jw), TGm = hmap(tg), NGm = hmap(ng), PRm = semuaPeran(hmap(pr));
-    const out = { ok: true, sekarang: Date.now(), sd: Object.assign({}, s, { anggota: s.anggota.map((i) => ({ idx: i, nama: nm(i) })), jenis: g != null ? B.JENIS[g] : null }), penonton: CFG().daftar.length - s.anggota.length, kelompok: kl ? tampilKel(kl.kel) : [], kelasBuka: kb === '1', peran: PRm };
+    const out = { ok: true, sekarang: Date.now(), sd: Object.assign({}, s, { anggota: s.anggota.map((i) => ({ idx: i, nama: nm(i) })), jenis: g != null ? B.JENIS[g] : null }), penonton: CFG().daftar.length - s.anggota.length, kelompok: kl ? tampilKel(kl.kel) : [], kelasBuka: kb === '1', peran: PRm, cn: { j1: cn[0], j2: cn[1], v: cn[2], t: cn[3] } };
     out.ringkas = []; for (let h = 0; h < CFG().jmlKelompok; h++) { const ks = Object.keys(SVm).filter((k) => k.startsWith('g:' + h + ':')), js = Object.keys(JWm).filter((k) => k.startsWith('g:' + h + ':')), tk = Object.keys(TGm).filter((k) => k.startsWith('g:' + h + ':')), ngg = NGm['g:' + h], gk = ngg ? rata(['isi', 'kedalaman', 'kejelasan', 'kompak'].map((c) => ngg[c]).filter((x) => Number.isFinite(x))) : null; out.ringkas.push({ g: h, suaraN: ks.filter((k) => SVm[k].k).length, suaraRata: rata(ks.map((k) => SVm[k].k).filter((x) => x)), jawabN: js.length, benar: js.filter((k) => JWm[k].benar).length, tgN: tk.length, guru: gk == null ? null : gk * 25 }); }
     if (g != null) {
-      const ks = Object.keys(SVm).filter((k) => k.startsWith('g:' + g + ':')), js = Object.keys(JWm).filter((k) => k.startsWith('g:' + g + ':'));
+      const ks = Object.keys(SVm).filter((k) => k.startsWith('g:' + g + ':')), js = Object.keys(JWm).filter((k) => k.startsWith('g:' + g + ':' + s.soalNo + ':'));
       const rp = {}; s.anggota.forEach((a) => { const v = ks.map((k) => SVm[k].p && SVm[k].p[a]).filter((x) => x != null); rp[a] = { n: v.length, rata: rata(v) }; });
       out.suara = { n: ks.filter((k) => SVm[k].k).length, rata: rata(ks.map((k) => SVm[k].k).filter((x) => x)), pembicara: rp }; out.jawab = { n: js.length, benar: js.filter((k) => JWm[k].benar).length };
       out.tanggapan = {}; Object.keys(TGm).filter((k) => k.startsWith('g:' + g + ':')).forEach((k) => { out.tanggapan[k.split(':')[2]] = TGm[k]; }); out.nilai = NGm['g:' + g] || null; out.nilaiI = {}; s.anggota.forEach((a) => { if (NGm['i:' + g + ':' + a] != null) out.nilaiI[a] = NGm['i:' + g + ':' + a]; });
@@ -154,17 +209,17 @@ async function sdAksiGuru(b, kirim) {
   }
   if (b.a === 'g-sd-set') {
     const s = await bacaSD(), nowT = Date.now(), gOk = (v) => Number.isInteger(v) && v >= 0 && v < CFG().jmlKelompok;
-    if (b.durasi && typeof b.durasi === 'object') ['presentasi', 'tanya', 'soal', 'tanggapan'].forEach((k) => { const n = Number(b.durasi[k]); if (Number.isFinite(n) && n >= 10 && n <= 1800) s.durasi[k] = Math.round(n); });
+    if (b.durasi && typeof b.durasi === 'object') ['presentasi', 'tanya', 'soal', 'soal2', 'tanggapan'].forEach((k) => { const n = Number(b.durasi[k]); if (Number.isFinite(n) && n >= 10 && n <= 1800) s.durasi[k] = Math.round(n); });
+    if (typeof b.buka === 'boolean') s.buka = b.buka;
     if (b.berikut !== undefined) s.berikut = gOk(b.berikut) ? b.berikut : null;
-    if (gOk(b.giliran) && b.giliran !== s.giliran) { const kl = await ambilKel(); s.giliran = b.giliran; s.anggota = ((kl && kl.kel[b.giliran]) || []).map((x) => x.idx); s.hasilSoal = null; s.fase = 'siap'; s.mulaiFase = nowT; s.tambah = 0; s.jedaAt = null; s.peran = await peranG(b.giliran); if (s.berikut === b.giliran) s.berikut = null; }
-    if (b.nonaktif === true) { s.giliran = null; s.fase = 'siap'; s.anggota = []; s.peran = {}; s.hasilSoal = null; s.mulaiFase = nowT; s.tambah = 0; s.jedaAt = null; }
+    if (gOk(b.giliran) && b.giliran !== s.giliran) { const kl = await ambilKel(); s.giliran = b.giliran; s.anggota = ((kl && kl.kel[b.giliran]) || []).map((x) => x.idx); s.hasil = {}; s.hasilBintang = null; s.soalNo = 1; s.sub = 'jawab'; s.fase = 'siap'; s.mulaiFase = nowT; s.tambah = 0; s.jedaAt = null; s.peran = await peranG(b.giliran); if (s.berikut === b.giliran) s.berikut = null; }
+    if (b.nonaktif === true) { s.giliran = null; s.fase = 'siap'; s.anggota = []; s.peran = {}; s.hasil = {}; s.hasilBintang = null; s.mulaiFase = nowT; s.tambah = 0; s.jedaAt = null; }
     if (b.stop === true && s.giliran != null) { s.fase = 'siap'; s.mulaiFase = nowT; s.tambah = 0; s.jedaAt = null; }
     if (gOk(b.kecualiToggle)) { s.kecuali = s.kecuali.includes(b.kecualiToggle) ? s.kecuali.filter((x) => x !== b.kecualiToggle) : s.kecuali.concat([b.kecualiToggle]); }
     if (b.kecualiSemua === false) s.kecuali = [];
+    if (b.aksi && s.giliran != null) { const e = await terapkanAksi(s, b.aksi, true); if (e) return kirim(409, { error: e }); }
     if (b.fase && FASE_SD.includes(b.fase) && s.giliran != null) {
-      s.fase = b.fase; s.mulaiFase = nowT; s.tambah = 0; s.jedaAt = null;
-      if (b.fase === 'hasil') { s.hasilSoal = await hitungHasilSoal(s.giliran); if (!s.soalSelesai.includes(s.giliran)) s.soalSelesai.push(s.giliran); }
-      if (b.fase === 'selesai' && !s.selesai.includes(s.giliran)) s.selesai.push(s.giliran);
+      if (b.fase === 'soal') await terapkanAksi(s, 'soal', true); else if (b.fase === 'hasil') await terapkanAksi(s, 'hasil', true); else if (b.fase === 'selesai') await terapkanAksi(s, 'selesai', true); else { gantiFase(s, b.fase); if (b.fase === 'siap') { s.hasil = {}; s.soalNo = 1; s.sub = 'jawab'; } }
     }
     if (b.jeda === true && !s.jedaAt) s.jedaAt = nowT; if (b.jeda === false && s.jedaAt) { s.mulaiFase += nowT - s.jedaAt; s.jedaAt = null; }
     if (Number.isFinite(b.tambahDetik) && Math.abs(b.tambahDetik) <= 600) s.tambah = Math.max(-600, Math.min(1800, (s.tambah || 0) + Math.round(b.tambahDetik)));
@@ -172,7 +227,7 @@ async function sdAksiGuru(b, kirim) {
     if (gOk(b.hapusSelesaiG)) s.selesai = s.selesai.filter((q) => q !== b.hapusSelesaiG);
     if (b.hapusSelesai === true && gOk(b.giliran)) s.selesai = s.selesai.filter((x) => x !== b.giliran);
     await tulisSD(s);
-    if (Number.isInteger(b.slide) || Number.isInteger(b.pembicara)) { await redis('SET', K.SL, JSON.stringify({ g: s.giliran, slide: Number.isInteger(b.slide) ? Math.max(0, Math.min(20, b.slide)) : s.slide, pembicara: Number.isInteger(b.pembicara) ? b.pembicara : s.pembicara, t: nowT })); }
+    if (Number.isInteger(b.slide) || Number.isInteger(b.pembicara)) { await redis('SET', K.SL, JSON.stringify({ g: s.giliran, slide: Number.isInteger(b.slide) ? Math.max(0, Math.min(30, b.slide)) : s.slide, pembicara: Number.isInteger(b.pembicara) ? b.pembicara : s.pembicara, t: nowT })); }
     return kirim(200, { ok: true });
   }
   if (b.a === 'g-sd-tanggapan') {
@@ -200,9 +255,10 @@ async function sdAksiGuru(b, kirim) {
   if (b.a === 'g-sd-reset-kelompok') {
     const g = Number(b.giliran); if (!Number.isInteger(g) || g < 0 || g >= CFG().jmlKelompok) return kirim(400, { error: 'tidak-valid' });
     for (const H of [K.SV, K.JW, K.TG, K.NG]) { const m = hmap(await redis('HGETALL', H)); for (const k of Object.keys(m)) { const p = k.split(':'); if ((p[0] === 'g' && +p[1] === g) || (p[0] === 'i' && +p[1] === g)) await redis('HDEL', H, k); } }
-    const s = await bacaSD(); s.selesai = s.selesai.filter((x) => x !== g); s.soalSelesai = s.soalSelesai.filter((x) => x !== g); if (s.giliran === g) { s.giliran = null; s.fase = 'siap'; s.anggota = []; s.peran = {}; s.hasilSoal = null; s.mulaiFase = Date.now(); s.tambah = 0; s.jedaAt = null; } if (s.berikut === g) s.berikut = null; await tulisSD(s); await redis('DEL', K.SL); return kirim(200, { ok: true });
+    for (const f of ['j:' + g + ':1', 'j:' + g + ':2', 'v:' + g, 't:' + g]) await redis('HDEL', K.CN, f);
+    const s = await bacaSD(); s.selesai = s.selesai.filter((x) => x !== g); s.soalSelesai = s.soalSelesai.filter((x) => x !== g); if (s.giliran === g) { s.giliran = null; s.fase = 'siap'; s.anggota = []; s.peran = {}; s.hasil = {}; s.hasilBintang = null; s.mulaiFase = Date.now(); s.tambah = 0; s.jedaAt = null; } if (s.berikut === g) s.berikut = null; await tulisSD(s); await redis('DEL', K.SL); return kirim(200, { ok: true });
   }
-  if (b.a === 'g-sd-reset') { await redis('DEL', K.SD, K.SL, K.SV, K.JW, K.TG, K.NG, K.PR, K.CR); return kirim(200, { ok: true }); }
+  if (b.a === 'g-sd-reset') { await redis('DEL', K.SD, K.SL, K.SV, K.JW, K.TG, K.NG, K.PR, K.CR, K.CN); return kirim(200, { ok: true }); }
   return kirim(400, { error: 'Aksi tidak dikenal' });
 }
 
