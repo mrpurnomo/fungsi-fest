@@ -543,6 +543,11 @@ sub { font-size: .68em; line-height: 0; vertical-align: baseline; position: rela
 .roda-sisi { display: flex; flex-direction: column; gap: .8rem; } .roda-hasil { min-height: 6.5rem; display: flex; align-items: center; justify-content: center; text-align: center; border-radius: 1.2rem; background: var(--awan); padding: .6rem; }
 .roda-menang { display: flex; flex-direction: column; align-items: center; line-height: 1.15; } .roda-menang small { color: var(--tinta-3); font-weight: 700; } .roda-menang b { font-family: var(--tampil); font-size: 2.6rem; color: var(--td); } .roda-menang span { font-weight: 700; color: var(--tinta-2); }
 @media (max-width: 1100px) { .sdg { grid-template-columns: minmax(14rem, 16rem) minmax(0, 1fr) minmax(13.5rem, 15rem); gap: .6rem; } .roda-wrap { grid-template-columns: 1fr; } .sd-dash { grid-template-columns: 1fr; } }
+
+/* catatan cetak */
+.sd-cetak { display: none; }
+@media print { body.mencetak > *:not(.sd-cetak) { display: none !important; } body.mencetak { background: #fff !important; overflow: visible !important; height: auto !important; } .sd-cetak { display: block !important; position: static; padding: 0; font-size: 12pt; } .sd-cetak h1 { font-size: 22pt; margin: 0 0 .2rem; } .sd-cetak .sd-slide { height: auto; min-height: 0; box-shadow: none; margin: 0 0 .8rem; break-inside: avoid; border-width: 1.5px; padding: .5rem .9rem; } .sd-cetak .sd-s-isi { overflow: visible; font-size: 12pt; gap: .4rem; } .sd-cetak .sd-s-kep h2 { font-size: 15pt; } .sd-cetak .sd-s-isi.judul h1 { font-size: 24pt; } .sd-cetak .sd-grafik { height: 7cm; flex: none; } .sd-cetak .sd-rumus { font-size: 18pt; } .sd-cetak .sd-s-kaki { display: none; } .sd-cet-soal { break-inside: avoid; margin-top: .6rem; } .sd-cet-isi { margin: .6rem 0; color: #888; } .sd-ubin .ubin { width: 3rem; height: 3rem; } @page { size: A4; margin: 12mm; } }
+.sd-rapor { display: flex; flex-direction: column; gap: .4rem; }
 </style>
 </head>
 <body>
@@ -1844,6 +1849,20 @@ const DAFTAR_G = ['ALEFIA RIMASENA','ALYA JAZILAH','ANDI MUHAMMAD IHDA AKMA AKHT
     return root0;
   }
 
+  /* ---------------------------------------------------------------- catatan per jenis (cetak / simpan PDF) */
+  function catatan(g) {
+    const f = JENIS[g], q = B.tantanganAcak(f, B.seedSoal(g)), d = GF.K[f], host = el('div', { kelas: 'sd-cetak fx-' + f }); host.append(el('h1', null, 'Catatan: Fungsi ' + NAMA[f]), el('p', { kelas: 'muted' }, 'Kelompok ' + (g + 1) + ' · XI-G Soshum · Matematika Tingkat Lanjut · SMA YPVDP Bontang'));
+    for (let n = 0; n < NS; n++) host.append(slide(g, n, null));
+    host.append(el('section', { kelas: 'sd-cet-soal' }, el('h2', null, 'Soal presentasi dan pembahasan'), el('div', { html: q.tanya }), el('p', null, el('b', null, 'Jawaban: '), String(q.kunci).replace('-', '−')), el('p', null, q.jelas)), el('section', { kelas: 'sd-cet-soal' }, el('h2', null, 'Ringkasan'), el('ul', null, d.ciri.map((x) => el('li', null, x))), el('p', { html: '<b>Bentuk umum:</b> ' + d.umum }), el('h2', null, 'Umpan balik untukku'), el('div', { kelas: 'sd-cet-isi' }, '__________________________________________'), el('div', { kelas: 'sd-cet-isi' }, '__________________________________________')));
+    document.body.append(host); document.body.classList.add('mencetak'); const bersih = () => { host.remove(); document.body.classList.remove('mencetak'); window.removeEventListener('afterprint', bersih); }; window.addEventListener('afterprint', bersih); setTimeout(() => window.print(), 250); setTimeout(() => { if (host.isConnected) bersih(); }, 120000);
+  }
+  /* rapor kelompok penyaji */
+  async function rapor(A) {
+    const r = await A('sd-rapor'); if (!r.ok) { UI.toast('Rapor belum tersedia', 'awas'); return; } const f = (v) => (v == null ? '–' : v.toFixed(1).replace('.', ',')), isi = el('div', { kelas: 'sd-rapor fx-' + r.jenis });
+    isi.append(el('div', { kelas: 'sdg-hitung' }, [['Bintang kelompok', '★ ' + f(r.suara.rata), r.suara.n + ' penilai'], ['Penonton benar', r.jawab.n ? Math.round(r.jawab.benar / r.jawab.n * 100) + '%' : '–', r.jawab.benar + ' dari ' + r.jawab.n], ['Tanggapan', String(r.tanggapan.total), r.tanggapan.tanya + ' tanya · ' + r.tanggapan.saran + ' saran · ' + r.tanggapan.apresiasi + ' apresiasi']].map(([t, v, s]) => el('div', { kelas: 'kartu sdg-h' }, el('div', { kelas: 'eyebrow', gaya: 'margin:0' }, t), el('b', null, v), el('span', { kelas: 'muted' }, s)))), el('div', { kelas: 'eyebrow', gaya: 'margin-top:.8rem' }, 'Bintang pembicara'), el('div', { kelas: 'baris', gaya: 'gap:.5rem;flex-wrap:wrap' }, r.pembicara.map((p) => el('span', { kelas: 'chip', gaya: 'font-size:1rem' }, depan(p.nama) + ' ★ ' + f(p.rata) + (p.n ? ' (' + p.n + ')' : '')))), el('p', { kelas: 'muted kecil' }, 'Penilaian teman bersifat anonim. Nilai akhir diumumkan guru.'));
+    UI.dialog({ lebar: true, judul: 'Rapor presentasi · Kelompok ' + (r.g + 1), ikon: ik('bintang', 'besar'), isi, tombol: [{ t: 'Tutup', nilai: true, kelas: 'sekunder' }, { t: 'Unduh catatan', nilai: false, ikon: 'kirim' }], tutupLuar: true }).then((v) => { if (v === false) catatan(r.g); });
+  }
+
   /* ---------------------------------------------------------------- waktu fase (dengan jeda dan tambah/kurang waktu) */
   const durFase = (S) => (S && S.durasi && S.durasi[S.fase] ? Math.max(0, S.durasi[S.fase] + (S.tambah || 0)) : 0);
   const sisaFase = (S, off) => { if (!S || !['presentasi', 'soal', 'tanggapan'].includes(S.fase)) return null; const ref = S.jedaAt || (Date.now() + off); return durFase(S) - (ref - S.mulaiFase) / 1000; };
@@ -1884,13 +1903,13 @@ const DAFTAR_G = ['ALEFIA RIMASENA','ALYA JAZILAH','ANDI MUHAMMAD IHDA AKMA AKHT
         const f = JENIS[g], sudah = (S.selesai || []).includes(g) && S.giliran !== g;
         const teks = mine ? 'Kelompokmu sedang tampil sekarang.' : lain ? 'Kelompok ' + (S.giliran + 1) + ' sedang tampil. Tunggu giliranmu.' : sudah ? 'Presentasi kelompokmu sudah selesai. Kerja bagus!' : S.berikut === g ? 'Giliran kelompokmu selanjutnya! Siapkan diri.' : 'Saat gurumu memanggil kelompokmu, tekan tombol di bawah.';
         const btn = el('button', { kelas: 'btn besar' + (mine || S.berikut === g ? ' sorot denyut' : ''), type: 'button', disabled: lain, html: ik('main') + (mine ? 'Buka layar presentasi' : sudah ? 'Tampil lagi' : 'Mulai presentasi'), onclick: async () => { if (mine) return setView('penyaji'); btn.disabled = true; const r = await A('sd-mulai'); if (r.ok) { await ambil(); setView('penyaji'); } else { btn.disabled = false; UI.toast(r.error === 'kelompok-lain-tampil' ? 'Kelompok lain sedang tampil' : 'Gagal memulai. Coba lagi.', 'awas'); } } });
-        kiri.append(el('div', { kelas: 'sd-hero fx-' + f }, el('div', { kelas: 'sd-hero-a' }, el('span', { html: UI.ubin(f) }), el('div', null, el('div', { kelas: 'eyebrow' }, 'Kelompokmu'), el('h2', null, 'Kelompok ' + (g + 1) + ' · ' + NAMA[f]))), el('div', { kelas: 'sd-anggota' }, nmKel(g).map((a) => el('span', { kelas: 'sd-ang' + (a.idx === idx ? ' aku' : '') }, depan(a.nama) + (a.idx === idx ? ' (kamu)' : '')))), el('p', { kelas: 'sd-hero-p' }, teks), btn));
+        kiri.append(el('div', { kelas: 'sd-hero fx-' + f }, el('div', { kelas: 'sd-hero-a' }, el('span', { html: UI.ubin(f) }), el('div', null, el('div', { kelas: 'eyebrow' }, 'Kelompokmu'), el('h2', null, 'Kelompok ' + (g + 1) + ' · ' + NAMA[f]))), el('div', { kelas: 'sd-anggota' }, nmKel(g).map((a) => el('span', { kelas: 'sd-ang' + (a.idx === idx ? ' aku' : '') }, depan(a.nama) + (a.idx === idx ? ' (kamu)' : '')))), el('p', { kelas: 'sd-hero-p' }, teks), el('div', { kelas: 'baris', gaya: 'gap:.6rem;flex-wrap:wrap' }, btn, sudah || (S.selesai || []).includes(g) ? el('button', { kelas: 'btn sekunder', type: 'button', html: ik('bintang') + 'Lihat rapor', onclick: () => rapor(A) }) : null)));
       }
       if (live() && !mine) { const f = JENIS[S.giliran]; kiri.append(el('div', { kelas: 'sd-live fx-' + f }, el('span', { kelas: 'chip ok' }, 'Sedang berlangsung'), el('h3', null, 'Kelompok ' + (S.giliran + 1) + ' · ' + NAMA[f]), el('div', { kelas: 'muted' }, FASE_NAMA[S.fase]), el('button', { kelas: 'btn besar hijau', type: 'button', html: ik('bintang') + 'Lihat presentasi & beri penilaian', onclick: () => setView('penonton') }))); }
       else if (!mine) kiri.append(el('div', { kelas: 'sd-live kosong' }, el('h3', null, S.berikut != null ? 'Giliran selanjutnya: Kelompok ' + (S.berikut + 1) : 'Belum ada presentasi berlangsung'), el('div', { kelas: 'muted' }, 'Halaman ini berganti sendiri saat guru memulai.')));
       kanan.append(el('div', { kelas: 'eyebrow' }, 'Kelompok lain'));
       const daftar = el('div', { kelas: 'sd-daftar-kel' }); kanan.append(daftar);
-      for (let i = 0; i < 9; i++) { if (i === g) continue; const st = statusKel(i), f = JENIS[i], nm = nmKel(i).map((a) => depan(a.nama)).join(', '); daftar.append(el('div', { kelas: 'sd-kel fx-' + f + ' ' + st }, el('span', { html: UI.ubin(f) }), el('div', { gaya: 'flex:1;min-width:0' }, el('b', null, 'Kelompok ' + (i + 1) + ' · ' + NAMA[f]), el('div', { kelas: 'muted kecil sd-nm' }, nm || '–')), st === 'tampil' && !mine ? el('button', { kelas: 'btn kecil hijau', type: 'button', onclick: () => setView('penonton') }, 'Lihat') : el('span', { kelas: 'chip ' + (st === 'selesai' ? 'ok' : st === 'tampil' || st === 'bersiap' ? 'sorot' : 'abu') }, st === 'selesai' ? 'Selesai' : st === 'tampil' ? 'Tampil' : st === 'bersiap' ? 'Bersiap' : 'Belum'))); }
+      for (let i = 0; i < 9; i++) { if (i === g) continue; const st = statusKel(i), f = JENIS[i], nm = nmKel(i).map((a) => depan(a.nama)).join(', '); daftar.append(el('div', { kelas: 'sd-kel fx-' + f + ' ' + st }, el('span', { html: UI.ubin(f) }), el('div', { gaya: 'flex:1;min-width:0' }, el('b', null, 'Kelompok ' + (i + 1) + ' · ' + NAMA[f]), el('div', { kelas: 'muted kecil sd-nm' }, nm || '–')), st === 'tampil' && !mine ? el('button', { kelas: 'btn kecil hijau', type: 'button', onclick: () => setView('penonton') }, 'Lihat') : st === 'selesai' ? el('button', { kelas: 'btn kecil sekunder', type: 'button', html: ik('kirim', 'kecil') + 'Catatan', onclick: () => catatan(i) }) : el('span', { kelas: 'chip ' + (st === 'selesai' ? 'ok' : st === 'tampil' || st === 'bersiap' ? 'sorot' : 'abu') }, st === 'selesai' ? 'Selesai' : st === 'tampil' ? 'Tampil' : st === 'bersiap' ? 'Bersiap' : 'Belum'))); }
     }
     /* ---- penyaji ---- */
     function curSlide() { return lokal && S && lokal.g === S.giliran && Date.now() - lokal.t < 3500 ? lokal.slide : (S ? S.slide : 0); }
@@ -1925,7 +1944,7 @@ const DAFTAR_G = ['ALEFIA RIMASENA','ALYA JAZILAH','ANDI MUHAMMAD IHDA AKMA AKHT
       if (['hasil', 'tanggapan', 'selesai'].includes(S.fase)) {
         if (S.hasilSoal && S.fase !== 'selesai') { const jw = S.jawabanSaya; isi.append(el('div', { kelas: 'umpan ' + (jw && jw.benar ? 'ok' : ''), html: '<span><b>Jawaban benar: ' + String(S.hasilSoal.kunci).replace('-', '−') + '</b> · ' + S.hasilSoal.persen + '% penonton benar. ' + (jw ? (jw.benar ? 'Jawabanmu benar.' : 'Jawabanmu: ' + String(jw.j).replace('-', '−') + '.') : 'Kamu belum menjawab.') + '</span>' }), el('div', { kelas: 'sd-jelas kecil' }, S.hasilSoal.jelas)); }
         if (S.fase === 'hasil' || S.fase === 'tanggapan') { const sv = S.suaraSaya || {}, p = sv.p || {}; isi.append(el('div', { kelas: 'eyebrow' }, 'Beri bintang · anonim'), bintang('Bintang untuk kelompok', sv.k || 0, (i) => kirimSuara({ k: i })), el('div', { kelas: 'sd-bgrid' }, S.anggota.map((a) => bintang('Pembicara: ' + depan(a.nama), p[a.idx] || 0, (i) => kirimSuara({ p: i, pembicara: a.idx }), S.pembicara === a.idx))), el('div', { kelas: 'muted kecil' }, 'Bintangmu tidak diketahui siapa pun. Boleh diubah selama waktu masih jalan.')); }
-        if (S.fase === 'selesai') isi.append(el('div', { kelas: 'sd-besar' }, el('h3', null, 'Presentasi selesai'), el('p', null, 'Terima kasih sudah menyimak dan menilai!'), el('button', { kelas: 'btn besar', type: 'button', onclick: () => setView('dash') }, 'Kembali ke dasbor')));
+        if (S.fase === 'selesai') isi.append(el('div', { kelas: 'sd-besar' }, el('h3', null, 'Presentasi selesai'), el('p', null, 'Terima kasih sudah menyimak dan menilai!'), el('div', { kelas: 'baris', gaya: 'gap:.6rem;flex-wrap:wrap;justify-content:center' }, el('button', { kelas: 'btn besar hijau', type: 'button', html: ik('kirim') + 'Unduh catatan ' + NAMA[f], onclick: () => catatan(S.giliran) }), el('button', { kelas: 'btn besar sekunder', type: 'button', onclick: () => setView('dash') }, 'Kembali ke dasbor'))));
       }
     }
     function tick() { const t = document.getElementById('sd-timer'); if (!t || !S) return; const s = sisaFase(S, off); if (s == null) { t.textContent = ''; return; } t.textContent = wkt(s, S); t.className = 'sd-timer' + (s <= 10 && !S.jedaAt ? ' merah' : '') + (S.jedaAt ? ' jeda' : ''); }
@@ -2080,7 +2099,7 @@ const DAFTAR_G = ['ALEFIA RIMASENA','ALYA JAZILAH','ANDI MUHAMMAD IHDA AKMA AKHT
     return { buat };
   })();
 
-  root.Sidang = { murid, guru, slide };
+  root.Sidang = { murid, guru, slide, catatan };
 })(window);
 
 ;

@@ -72,6 +72,11 @@ async function sdAksiSiswa(b, kirim) {
   if (b.a === 'sd-info') { const kl = await ambilKel(), idx = bersihIdx(b.idx); let sayaG = -1; (kl ? kl.kel : []).forEach((g, gi) => { if (g.some((m) => m.idx === idx)) sayaG = gi; }); return kirim(200, { ok: true, kelompok: kl ? tampilKel(kl.kel) : [], jenis: B.JENIS, sayaKelompok: sayaG }); }
   const idx = await sdSiswaOk(b); if (idx === null) return kirim(403, { error: 'tidak-dikenali' });
   const s = await bacaSD(), saya = s.anggota.includes(idx);
+  if (b.a === 'sd-rapor') {
+    const kl = await ambilKel(); let g = -1; (kl ? kl.kel : []).forEach((x, gi) => { if (x.some((m) => m.idx === idx)) g = gi; }); if (g < 0) return kirim(409, { error: 'tanpa-kelompok' });
+    const [sv, jw, tg] = await Promise.all([redis('HGETALL', K.SV), redis('HGETALL', K.JW), redis('HGETALL', K.TG)]), SVm = hmap(sv), JWm = hmap(jw), TGm = hmap(tg), ks = Object.keys(SVm).filter((k) => k.startsWith('g:' + g + ':')), js = Object.keys(JWm).filter((k) => k.startsWith('g:' + g + ':')), tk = Object.keys(TGm).filter((k) => k.startsWith('g:' + g + ':'));
+    return kirim(200, { ok: true, g, jenis: B.JENIS[g], suara: { n: ks.filter((k) => SVm[k].k).length, rata: rata(ks.map((k) => SVm[k].k).filter((x) => x)) }, pembicara: kl.kel[g].map((m) => { const v = ks.map((k) => SVm[k].p && SVm[k].p[m.idx]).filter((x) => x != null); return { nama: nm(m.idx), n: v.length, rata: rata(v) }; }), jawab: { n: js.length, benar: js.filter((k) => JWm[k].benar).length }, tanggapan: { total: tk.length, tanya: tk.filter((k) => TGm[k].jenis === 'tanya').length, saran: tk.filter((k) => TGm[k].jenis === 'saran').length, apresiasi: tk.filter((k) => TGm[k].jenis === 'apresiasi').length } });
+  }
   if (b.a === 'sd-mulai') {
     const kl = await ambilKel(); let g = -1; (kl ? kl.kel : []).forEach((x, gi) => { if (x.some((m) => m.idx === idx)) g = gi; }); if (g < 0) return kirim(409, { error: 'tanpa-kelompok' });
     if (s.giliran !== null && s.giliran !== g && !['siap', 'selesai'].includes(s.fase)) return kirim(409, { error: 'kelompok-lain-tampil' });

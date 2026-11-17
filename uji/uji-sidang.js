@@ -70,6 +70,8 @@ const G = (a, o) => api(Object.assign({ a, pin: B.PIN_GURU, kelas: 'xig2' }, o))
   await G('g-sd-set', { fase: 'selesai' }); r = await S('sd-mulai', 9); ok(r.ok && r.giliran === 3, 'murid mengaktifkan kelompoknya setelah giliran selesai');
   r = await S('sd-status', 9); ok(r.giliran === 3 && r.fase === 'presentasi' && r.sayaPenyaji === true, 'status: kelompok murid aktif sebagai penyaji');
   r = await S('sd-mulai', 9); ok(r.ok, 'mulai berulang tidak merusak (idempoten)'); r = await S('sd-mulai', 12); ok(r._s === 409, 'kelompok lain ditolak saat presentasi berjalan');
+  r = await S('sd-rapor', 1); ok(r.ok && r.g === 0 && r.jenis === 'poli' && r.suara.n === 3 && Math.abs(r.suara.rata - 4) < 1e-9 && r.jawab.n === 3 && r.jawab.benar === 2 && r.tanggapan.total === 2 && r.tanggapan.tanya === 1 && r.pembicara.length === 3 && JSON.stringify(r).indexOf('idx') < 0, 'rapor penyaji: bintang, benar, tanggapan, tanpa identitas pemilih');
+  r = await api({ a: 'sd-rapor', kelas: 'xig2', idx: 1, token: 'salah' }); ok(r._s === 403, 'rapor butuh token');
   await G('g-sd-reset'); r = await G('g-sd-status'); ok(r.sd.giliran === null && r.sd.selesai.length === 0, 'atur ulang sidang');
   await G('g-reset-semua'); await api({ a: 'g-reset-semua', pin: B.PIN_GURU, kelas: 'xig' });
 })();
